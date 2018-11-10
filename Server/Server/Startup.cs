@@ -26,8 +26,12 @@ namespace Server
                 app.UseDeveloperExceptionPage();
             }
 
+            // to redirect HTTP requests to HTTPS
+            app.UseHttpsRedirection();
             //создается единственный в приложении маршрут, который позволит сопоставлять запросы с контроллерами и их методами.
             app.UseMvc();
+            
+           // app.UseMvcWithDefaultRoute(); // TO REPLACE app.UseMvc(routes => { routes.MapRoute("default", "{controller=Home}/{action=Index}{id?}"); });
         }
     }
 }
