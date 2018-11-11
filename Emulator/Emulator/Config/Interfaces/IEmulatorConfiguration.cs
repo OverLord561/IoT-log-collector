@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Emulator.Config.Interfaces
 {
-    public interface IConfiguration
+    public interface IEmulatorConfiguration
     {
         ServerSettings GetServerSettings();
     }

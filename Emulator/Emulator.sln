@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.27421.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Emulator", "Emulator\Emulator.csproj", "{20235C65-E79E-451E-9ECB-AC64BA36932E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppSettingsConfigurationPlugin", "AppSettingsConfigurationPlugin\AppSettingsConfigurationPlugin.csproj", "{B14A4966-7E56-4AD0-9D06-69CD8CBE81B1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MicrosoftConfigurationPlugin", "AppSettingsConfigurationPlugin\MicrosoftConfigurationPlugin.csproj", "{B14A4966-7E56-4AD0-9D06-69CD8CBE81B1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

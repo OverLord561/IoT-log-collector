@@ -17,8 +17,8 @@ namespace Emulator
             container = new Container();
 
             //container.RegisterSingleton<TestClass>();
-            container.RegisterSingleton<IConfiguration, Configuration>(); //container.Register<IConfiguration, Configuration>(Lifestyle.Singleton);
-            container.RegisterSingleton<IHttpClient, HttpClient>();
+            container.RegisterSingleton<IEmulatorConfiguration, EmulatorConfiguration>(); //container.Register<IConfiguration, Configuration>(Lifestyle.Singleton);
+            container.RegisterSingleton<IHttpClient, RestSharpHttpClient>();
 
             container.Verify(); // iterates registered service to check if something is not correct, will throw an exception before any                         execution of the progam
         }

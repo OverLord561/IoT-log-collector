@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace Emulator.Services
 {
-    public class HttpClient : IHttpClient
+    public class RestSharpHttpClient : IHttpClient
     {
-        private readonly IConfiguration _configuration;
+        private readonly IEmulatorConfiguration _configuration;
         private readonly string _baseUrl;
 
-        public HttpClient(IConfiguration configuration)
+        public RestSharpHttpClient(IEmulatorConfiguration configuration)
         {
             _configuration = configuration;
             _baseUrl = _configuration.GetServerSettings().BaseUrl;

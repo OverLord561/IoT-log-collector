@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Server.Models;
 
 namespace Server.Controllers
@@ -13,6 +14,13 @@ namespace Server.Controllers
     [ApiController]
     public class TestApiController : ControllerBase
     {
+        private readonly IConfiguration _configuration;
+        public TestApiController(IConfiguration configuration) {
+            _configuration = configuration;
+
+            var test = _configuration.GetValue<string>("test");
+        }
+
         [HttpGet]
         public ActionResult<string> Get()
         {
