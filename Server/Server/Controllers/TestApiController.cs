@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Server.Models;
+using Server.Repositories.Interfaces;
 
 namespace Server.Controllers
 {
@@ -15,10 +16,12 @@ namespace Server.Controllers
     public class TestApiController : ControllerBase
     {
         private readonly IConfiguration _configuration;
-        public TestApiController(IConfiguration configuration) {
-            _configuration = configuration;
+        private readonly IFirstRepository _firstRepository;
 
-            var test = _configuration.GetValue<string>("test");
+        public TestApiController(IConfiguration configuration, IFirstRepository firstRepository)
+        {
+            _configuration = configuration;
+            _firstRepository = firstRepository;
         }
 
         [HttpGet]

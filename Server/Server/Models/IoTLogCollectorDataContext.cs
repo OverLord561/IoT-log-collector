@@ -10,7 +10,7 @@ namespace Server.Models
     {
         public IoTLogCollectorDataContext(DbContextOptions<IoTLogCollectorDataContext> options) : base(options) { }
 
-        public DbSet<First> Firsts { get; set; }
+        public DbSet<First> First { get; set; }
 
     }
 }
