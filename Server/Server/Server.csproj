@@ -21,7 +21,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AppSettingsConfigurationPlugin\MicrosoftConfigurationPlugin.csproj" />
-    <ProjectReference Include="..\MySQLDataProvider\MySQLDataProviderPlugin.csproj" />
+    <ProjectReference Include="..\DataProviderFacade\DataProviderFacade.csproj" />
     <ProjectReference Include="..\Repositories\Repository.csproj" />
   </ItemGroup>
 

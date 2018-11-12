@@ -1,4 +1,5 @@
 ﻿using AppSettingsConfigurationPlugin;
+using DataProviderFacade;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -7,7 +8,6 @@ using Microsoft.AspNetCore.Mvc.ViewComponents;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using MySQLDataProviderPlugin;
 using Server.Models;
 using Server.Repositories;
 using Server.Repositories.Interfaces;
@@ -15,27 +15,32 @@ using SimpleInjector;
 using SimpleInjector.Integration.AspNetCore.Mvc;
 using SimpleInjector.Lifestyles;
 using System;
+using System.IO;
+using System.Linq;
+using System.Reflection;
 
 namespace Server
 {
     public class Startup
     {
         public IConfiguration Configuration;
-        private readonly Action<DbContextOptionsBuilder> DbContextOptionsBuilder;
+        private Action<DbContextOptionsBuilder> DbContextOptionsBuilder;
         private Container container = new Container();
 
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, IHostingEnvironment env)
         {
             Configuration = new MicrosoftConfiguration("appsettings.json").config;
 
-            DbContextOptionsBuilder = new MySqlDataProvider(Configuration.GetConnectionString("MySQLServer")).DbContextOptionsBuilder;
+            //DbContextOptionsBuilder = new MySqlDataProvider(Configuration.GetConnectionString("MySQLServer")).DbContextOptionsBuilder;
+
+            ConfigureDbProviders(configuration, env);
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<IoTLogCollectorDataContext>(this.DbContextOptionsBuilder);
+            services.AddDbContext<IoTLogCollectorDataContext>(DbContextOptionsBuilder);
 
             services.AddMvc();
 
@@ -93,6 +98,30 @@ namespace Server
 
         #endregion
 
+        #region Plugins
+
+        void ConfigureDbProviders(IConfiguration configuration, IHostingEnvironment env)
+        {
+
+            var pluginsPath = Path.Combine(env.ContentRootPath, "Plugins");
+            foreach (var file in Directory.GetFiles(pluginsPath, "*.dll"))
+            {
+                var asm = Assembly.LoadFile(file);
+
+                foreach (var type in asm.GetTypes())
+                {
+                    if (type.GetInterfaces().Contains(typeof(IDataProvider)))
+                    {
+                        Object[] args = { Configuration.GetConnectionString("MySQLServer") };
+
+                        var dataProvider = Activator.CreateInstance(type, args) as IDataProvider;
+                        DbContextOptionsBuilder = dataProvider.DbContextOptionsBuilder;
+                    }
+                }
+            }
+        }
+
+        #endregion
 
     }
 }

@@ -1,9 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using DataProviderFacade;
+using Microsoft.EntityFrameworkCore;
 using System;
 
 namespace MySQLDataProviderPlugin
 {
-    public class MySqlDataProvider
+    public class MySqlDataProvider: IDataProvider
     {
         public readonly Action<DbContextOptionsBuilder> DbContextOptionsBuilder;
 
@@ -12,5 +13,7 @@ namespace MySQLDataProviderPlugin
             DbContextOptionsBuilder = new Action<DbContextOptionsBuilder>(options =>
                 options.UseMySql(connectionString));
         }
+
+        Action<DbContextOptionsBuilder> IDataProvider.DbContextOptionsBuilder => DbContextOptionsBuilder;
     }
 }

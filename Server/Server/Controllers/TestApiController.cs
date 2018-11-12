@@ -22,6 +22,8 @@ namespace Server.Controllers
         {
             _configuration = configuration;
             _firstRepository = firstRepository;
+
+            var test = firstRepository.All();
         }
 
         [HttpGet]
