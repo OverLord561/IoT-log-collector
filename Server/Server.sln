@@ -7,11 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Server", "Server\Server.csp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MySQLDataProviderPlugin", "MySQLDataProvider\MySQLDataProviderPlugin.csproj", "{AACBE520-7F98-447F-B7A8-38B4F7DD105F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MicrosoftConfigurationPlugin", "AppSettingsConfigurationPlugin\MicrosoftConfigurationPlugin.csproj", "{6C558581-D894-44D3-807F-36220BB66EC4}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Repository", "Repositories\Repository.csproj", "{98E1F33F-67AB-4E2A-BA78-515AB19E7408}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataProviderFacade", "DataProviderFacade\DataProviderFacade.csproj", "{B91D9FBE-E2CE-4A25-877D-DC200A401F29}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataProviderFacade", "DataProviderFacade\DataProviderFacade.csproj", "{B91D9FBE-E2CE-4A25-877D-DC200A401F29}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,10 +25,6 @@ Global
 		{AACBE520-7F98-447F-B7A8-38B4F7DD105F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AACBE520-7F98-447F-B7A8-38B4F7DD105F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AACBE520-7F98-447F-B7A8-38B4F7DD105F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6C558581-D894-44D3-807F-36220BB66EC4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6C558581-D894-44D3-807F-36220BB66EC4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6C558581-D894-44D3-807F-36220BB66EC4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6C558581-D894-44D3-807F-36220BB66EC4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{98E1F33F-67AB-4E2A-BA78-515AB19E7408}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{98E1F33F-67AB-4E2A-BA78-515AB19E7408}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{98E1F33F-67AB-4E2A-BA78-515AB19E7408}.Release|Any CPU.ActiveCfg = Release|Any CPU

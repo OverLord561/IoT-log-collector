@@ -1,19 +1,37 @@
 ﻿using DataProviderFacade;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using MySQLDataProviderPlugin.Models;
 using System;
+using System.IO;
 
 namespace MySQLDataProviderPlugin
 {
-    public class MySqlDataProvider: IDataProvider
+    public class MySqlDataProvider : IDataStoragePlugin
     {
-        public readonly Action<DbContextOptionsBuilder> DbContextOptionsBuilder;
+        private static readonly IConfiguration _config;
+        private readonly MySQLDbContext _dbContext;
 
-        public MySqlDataProvider(string connectionString)
+        static MySqlDataProvider()
         {
-            DbContextOptionsBuilder = new Action<DbContextOptionsBuilder>(options =>
-                options.UseMySql(connectionString));
+            var builder = new ConfigurationBuilder()
+               .SetBasePath(Directory.GetCurrentDirectory())
+               .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+
+            _config = builder.Build();
         }
 
-        Action<DbContextOptionsBuilder> IDataProvider.DbContextOptionsBuilder => DbContextOptionsBuilder;
+        public MySqlDataProvider()
+        {
+
+            var optionsBuilder = new DbContextOptionsBuilder<MySQLDbContext>();
+            optionsBuilder.UseMySql(_config.GetValue<string>("connectionString"));
+
+
+            _dbContext = new MySQLDbContext(optionsBuilder.Options);
+        }
+
+        public IOperations Operations => new Repository(_dbContext);
     }
 }

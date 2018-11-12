@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using DataProviderFacade;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Server.Models;
-using Server.Repositories.Interfaces;
 
 namespace Server.Controllers
 {
@@ -16,14 +16,15 @@ namespace Server.Controllers
     public class TestApiController : ControllerBase
     {
         private readonly IConfiguration _configuration;
-        private readonly IFirstRepository _firstRepository;
 
-        public TestApiController(IConfiguration configuration, IFirstRepository firstRepository)
+        private readonly IEnumerable<IDataStoragePlugin> _dataStoragePlugin;
+
+        public TestApiController(IConfiguration configuration, IEnumerable<IDataStoragePlugin> dataStoragePlugin)
         {
             _configuration = configuration;
-            _firstRepository = firstRepository;
+            _dataStoragePlugin = dataStoragePlugin;
 
-            var test = firstRepository.All();
+            var test = _dataStoragePlugin.First().Operations.All();
         }
 
         [HttpGet]

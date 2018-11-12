@@ -1,16 +1,11 @@
-﻿using AppSettingsConfigurationPlugin;
-using DataProviderFacade;
+﻿using DataProviderFacade;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.ViewComponents;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Server.Models;
-using Server.Repositories;
-using Server.Repositories.Interfaces;
 using SimpleInjector;
 using SimpleInjector.Integration.AspNetCore.Mvc;
 using SimpleInjector.Lifestyles;
@@ -24,25 +19,28 @@ namespace Server
     public class Startup
     {
         public IConfiguration Configuration;
-        private Action<DbContextOptionsBuilder> DbContextOptionsBuilder;
         private Container container = new Container();
+
 
         public Startup(IConfiguration configuration, IHostingEnvironment env)
         {
-            Configuration = new MicrosoftConfiguration("appsettings.json").config;
+            var builder = new ConfigurationBuilder()
+               .SetBasePath(Directory.GetCurrentDirectory())
+               .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
 
-            //DbContextOptionsBuilder = new MySqlDataProvider(Configuration.GetConnectionString("MySQLServer")).DbContextOptionsBuilder;
+            Configuration = builder.Build();
 
-            ConfigureDbProviders(configuration, env);
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<IoTLogCollectorDataContext>(DbContextOptionsBuilder);
+            //services.AddDbContext<IoTLogCollectorDataContext>(DbContextOptionsBuilder);
 
             services.AddMvc();
+
+            //services.Add()
 
             IntegrateSimpleInjector(services);
         }
@@ -50,7 +48,7 @@ namespace Server
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            InitializeContainer(app);
+            InitializeContainer(app, env);
 
             if (env.IsDevelopment())
             {
@@ -82,16 +80,19 @@ namespace Server
             services.UseSimpleInjectorAspNetRequestScoping(container);
         }
 
-        private void InitializeContainer(IApplicationBuilder app)
+        private void InitializeContainer(IApplicationBuilder app, IHostingEnvironment env)
         {
             // Add application presentation components:
             container.RegisterMvcControllers(app);
             container.RegisterMvcViewComponents(app);
 
             // Add application services. For instance:
-            container.Register<IFirstRepository, FirstRepository<First>>(Lifestyle.Scoped);
+            //container.Register<IFirstRepository, FirstRepository<First>>(Lifestyle.Scoped);
 
             // Allow Simple Injector to resolve services from ASP.NET Core.
+
+            ConfigureDbProviders(env);
+
             container.AutoCrossWireAspNetComponents(app);
         }
 
@@ -100,25 +101,16 @@ namespace Server
 
         #region Plugins
 
-        void ConfigureDbProviders(IConfiguration configuration, IHostingEnvironment env)
+        void ConfigureDbProviders(IHostingEnvironment env)
         {
+            string pluginDirectory = Path.Combine(env.ContentRootPath, "Plugins");
 
-            var pluginsPath = Path.Combine(env.ContentRootPath, "Plugins");
-            foreach (var file in Directory.GetFiles(pluginsPath, "*.dll"))
-            {
-                var asm = Assembly.LoadFile(file);
+            var pluginAssemblies =
+                from file in new DirectoryInfo(pluginDirectory).GetFiles()
+                where file.Extension.ToLower() == ".dll" //TODO add filter for user selected data storage
+                select Assembly.Load(AssemblyName.GetAssemblyName(file.FullName));
 
-                foreach (var type in asm.GetTypes())
-                {
-                    if (type.GetInterfaces().Contains(typeof(IDataProvider)))
-                    {
-                        Object[] args = { Configuration.GetConnectionString("MySQLServer") };
-
-                        var dataProvider = Activator.CreateInstance(type, args) as IDataProvider;
-                        DbContextOptionsBuilder = dataProvider.DbContextOptionsBuilder;
-                    }
-                }
-            }
+            container.Collection.Register<IDataStoragePlugin>(pluginAssemblies);
         }
 
         #endregion
