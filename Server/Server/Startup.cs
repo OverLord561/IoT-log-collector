@@ -9,10 +9,10 @@ using Microsoft.Extensions.DependencyInjection;
 using SimpleInjector;
 using SimpleInjector.Integration.AspNetCore.Mvc;
 using SimpleInjector.Lifestyles;
-using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
+using System.Runtime.Loader;
 
 namespace Server
 {
@@ -29,18 +29,13 @@ namespace Server
                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
 
             Configuration = builder.Build();
-
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            //services.AddDbContext<IoTLogCollectorDataContext>(DbContextOptionsBuilder);
-
             services.AddMvc();
-
-            //services.Add()
 
             IntegrateSimpleInjector(services);
         }
@@ -103,15 +98,29 @@ namespace Server
 
         void ConfigureDbProviders(IHostingEnvironment env)
         {
+            //AssemblyLoadContext.Default.Resolving += OnAssemblyResolving;
+
             string pluginDirectory = Path.Combine(env.ContentRootPath, "Plugins");
 
-            var pluginAssemblies =
-                from file in new DirectoryInfo(pluginDirectory).GetFiles()
-                where file.Extension.ToLower() == ".dll" //TODO add filter for user selected data storage
-                select Assembly.Load(AssemblyName.GetAssemblyName(file.FullName));
+            var ass = new List<Assembly>();
+            foreach (var file in new DirectoryInfo(pluginDirectory).GetFiles())
+            {
+                if (file.Extension.ToLower() == ".dll")
+                {
+                    var assm = AssemblyLoadContext.Default.LoadFromAssemblyPath(file.FullName);
+                    //var assm = Assembly.Load(AssemblyName.GetAssemblyName(file.FullName));
+                    ass.Add(assm);
+                }
+            }
+            
 
-            container.Collection.Register<IDataStoragePlugin>(pluginAssemblies);
+            container.Collection.Register<IDataStoragePlugin>(ass);
         }
+
+        //private Assembly OnAssemblyResolving(AssemblyLoadContext arg1, AssemblyName arg2)
+        //{
+        //    throw new NotImplementedException();
+        //}
 
         #endregion
 

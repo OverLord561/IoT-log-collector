@@ -1,8 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using System;
-
-namespace DataProviderFacade
+﻿namespace DataProviderFacade
 {
     public interface IDataStoragePlugin
     {
