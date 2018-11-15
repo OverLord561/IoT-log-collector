@@ -19,15 +19,19 @@ namespace MySQLDataProviderPlugin
 
             var builder = new ConfigurationBuilder()
                .SetBasePath(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location))
-               .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+               .AddJsonFile("mySqlDataProvider.json", optional: true, reloadOnChange: true);
 
             var configurator = builder.Build();
 
             var optionsBuilder = new DbContextOptionsBuilder<MySQLDbContext>();
 
-            optionsBuilder.UseMySql(configurator.GetValue<string>("connectionString"));
+            optionsBuilder.UseMySql(configurator.GetConnectionString("mySQLConnectionString"));
 
-            _dbContext = new MySQLDbContext(optionsBuilder.Options);
+            _dbContext = new MySQLDbContext(optionsBuilder.Options);            
+
+            _dbContext.Database.Migrate();
+
+
         }
 
         public IOperations Operations => new Repository(_dbContext);

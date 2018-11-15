@@ -1,7 +1,7 @@
 ﻿using DataProviderFacade;
 using Microsoft.EntityFrameworkCore;
 
-namespace MySQLDataProviderPlugin.Models
+namespace MySQLDataProviderPlugin
 {
     public class MySQLDbContext : DbContext
     {

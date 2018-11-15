@@ -24,6 +24,8 @@ namespace Server.Controllers
             _configuration = configuration;
             _dataStoragePlugin = dataStoragePlugin;
 
+            var ss = _dataStoragePlugin.FirstOrDefault();
+
             var test = _dataStoragePlugin.First().Operations.All();
         }
 
@@ -35,7 +37,7 @@ namespace Server.Controllers
 
         [HttpPost]
         [Route("test")]
-        public IActionResult Send([FromBody] RestCall model)
+        public IActionResult Send()
         {
             return Ok("hello");
         }
