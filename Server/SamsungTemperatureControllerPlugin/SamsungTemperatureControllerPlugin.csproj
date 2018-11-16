@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+	<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+	<GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+    <PostBuildEvent>copy "$(SolutionDir)SamsungTemperatureControllerPlugin\bin\Debug\netstandard2.0\" "$(SolutionDir)Server\Plugins\$(TargetFileName)"
+</PostBuildEvent>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DataProviderFacade\DataProviderFacade.csproj" />
+  </ItemGroup>
+
+</Project>

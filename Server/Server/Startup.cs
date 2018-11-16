@@ -56,8 +56,6 @@ namespace Server
             app.UseHttpsRedirection();
             //создается единственный в приложении маршрут, который позволит сопоставлять запросы с контроллерами и их методами.
             app.UseMvc();
-                                 
-
         }
 
         #region SimpleInjector
@@ -113,15 +111,9 @@ namespace Server
                     ass.Add(assm);
                 }
             }
-            
 
             container.Collection.Register<IDataStoragePlugin>(ass);
         }
-
-        //private Assembly OnAssemblyResolving(AssemblyLoadContext arg1, AssemblyName arg2)
-        //{
-        //    throw new NotImplementedException();
-        //}
 
         #endregion
 

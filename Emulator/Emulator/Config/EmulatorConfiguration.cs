@@ -1,27 +1,27 @@
-﻿using AppSettingsConfigurationPlugin;
-using Emulator.Config.Interfaces;
+﻿using Emulator.Config.Interfaces;
 using Emulator.Models;
 using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using System.IO;
 
 namespace Emulator.Config
 {
     public class EmulatorConfiguration : IEmulatorConfiguration
     {
-        private readonly MicrosoftConfiguration appSettingsConfiguration;
+        public readonly IConfiguration _config;
 
         public EmulatorConfiguration()
         {
-            appSettingsConfiguration = new MicrosoftConfiguration("appsettings.json");
-        }
+            var builder = new ConfigurationBuilder()
+               .SetBasePath(Directory.GetCurrentDirectory())
+               .AddJsonFile("emulatorAppsettings.json", optional: true, reloadOnChange: true);
 
+            _config = builder.Build();
+        }
 
         public ServerSettings GetServerSettings()
         {
             ServerSettings serverSettings = new ServerSettings();
-            appSettingsConfiguration.config.Bind("serverSettings", serverSettings);
+            _config.Bind("serverSettings", serverSettings);
 
             return serverSettings;
         }

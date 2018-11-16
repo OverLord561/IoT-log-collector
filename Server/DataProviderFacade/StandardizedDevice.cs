@@ -4,14 +4,13 @@ using System.Text;
 
 namespace DataProviderFacade
 {
-    public class GeneralDevice
+    [Serializable]
+    public class StandardizedDevice
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
 
         public DateTime DateStamp { get; set; }
 
         public byte[] Message { get; set; }
-
-        public string DeviceIdentifier { get; set; }
     }
 }

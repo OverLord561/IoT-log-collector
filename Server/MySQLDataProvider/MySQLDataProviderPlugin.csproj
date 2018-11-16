@@ -1,14 +1,13 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>netcoreapp2.0;netstandard2.0</TargetFrameworks>
-    <SignAssembly>false</SignAssembly>
-    <AssemblyOriginatorKeyFile>sign.pfx</AssemblyOriginatorKeyFile>
+    <SignAssembly>false</SignAssembly>    
 	<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 	<GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
 	<PostBuildEvent>copy "$(SolutionDir)MySQLDataProvider\bin\Debug\netstandard2.0\" "$(SolutionDir)Server\Plugins\$(TargetFileName)"
-
-copy "$(SolutionDir)MySQLDataProvider\bin\Debug\netcoreapp2.0\" "$(SolutionDir)Server\Plugins\$(TargetFileName)"</PostBuildEvent>
+copy "$(SolutionDir)MySQLDataProvider\bin\Debug\netcoreapp2.0\" "$(SolutionDir)Server\Plugins\$(TargetFileName)"
+</PostBuildEvent>
   </PropertyGroup>
  
   <ItemGroup>
@@ -32,9 +31,5 @@ copy "$(SolutionDir)MySQLDataProvider\bin\Debug\netcoreapp2.0\" "$(SolutionDir)S
       <Version>2.1.6</Version>
     </PackageReference>
   </ItemGroup>
-
-  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="Clean" />
-  </Target>
 
 </Project>

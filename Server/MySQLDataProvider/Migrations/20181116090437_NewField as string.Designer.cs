@@ -2,29 +2,35 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MySQLDataProviderPlugin;
 
 namespace MySQLDataProviderPlugin.Migrations
 {
     [DbContext(typeof(MySQLDbContext))]
-    partial class MySQLDbContextModelSnapshot : ModelSnapshot
+    [Migration("20181116090437_NewField as string")]
+    partial class NewFieldasstring
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "2.1.4-rtm-31024")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
-            modelBuilder.Entity("DataProviderFacade.StandardizedDevice", b =>
+            modelBuilder.Entity("DataProviderFacade.GeneralDevice", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
                     b.Property<DateTime>("DateStamp");
 
+                    b.Property<string>("DeviceIdentifier");
+
                     b.Property<byte[]>("Message");
+
+                    b.Property<string>("testField2");
 
                     b.HasKey("Id");
 

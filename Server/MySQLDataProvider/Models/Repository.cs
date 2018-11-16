@@ -15,25 +15,25 @@ namespace MySQLDataProviderPlugin.Models
             _context = context;
         }
 
-        public bool Add(GeneralDevice device)
+        public bool Add(StandardizedDevice device)
         {
             _context.GeneralDevices.Add(device);
 
             return _context.SaveChanges() > 0;
         }
 
-        public List<GeneralDevice> All()
+        public List<StandardizedDevice> All()
         {
             return _context.GeneralDevices.ToList();
 
         }
 
-        public List<GeneralDevice> Get(Expression<Func<GeneralDevice, bool>> predicate)
+        public List<StandardizedDevice> Get(Expression<Func<StandardizedDevice, bool>> predicate)
         {
             return _context.GeneralDevices.Where(predicate).ToList();
         }
 
-        public bool Remove(GeneralDevice device)
+        public bool Remove(StandardizedDevice device)
         {
             throw new NotImplementedException();
         }

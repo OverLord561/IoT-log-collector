@@ -1,8 +1,6 @@
 ﻿using Emulator.Config.Interfaces;
-using Emulator.Models;
 using Emulator.Services.Interfaces;
 using RestSharp;
-using System;
 using System.Threading.Tasks;
 
 namespace Emulator.Services

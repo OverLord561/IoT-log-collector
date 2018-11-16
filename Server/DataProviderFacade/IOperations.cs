@@ -7,12 +7,12 @@ namespace DataProviderFacade
 {
     public interface IOperations
     {
-        bool Add(GeneralDevice device);
+        bool Add(StandardizedDevice device);
 
-        bool Remove(GeneralDevice device);
+        bool Remove(StandardizedDevice device);
 
-        List<GeneralDevice> Get(Expression<Func<GeneralDevice, bool>> predicate);
+        List<StandardizedDevice> Get(Expression<Func<StandardizedDevice, bool>> predicate);
 
-        List<GeneralDevice> All();
+        List<StandardizedDevice> All();
     }
 }

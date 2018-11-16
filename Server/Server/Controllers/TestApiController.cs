@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using DataProviderFacade;
-using Microsoft.AspNetCore.Http;
+﻿using DataProviderFacade;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using Server.Models;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace Server.Controllers
 {
@@ -24,14 +21,28 @@ namespace Server.Controllers
             _configuration = configuration;
             _dataStoragePlugin = dataStoragePlugin;
 
-            var ss = _dataStoragePlugin.FirstOrDefault();
+            //StandardizedDevice device = new Samsung_RT38F(25).ConverterToStandard();
 
-            var test = _dataStoragePlugin.First().Operations.All();
+            //_dataStoragePlugin.First().Operations.Add(device);
         }
 
         [HttpGet]
         public ActionResult<string> Get()
         {
+            var setOfData = _dataStoragePlugin.First().Operations.All();
+
+            BinaryFormatter bf = new BinaryFormatter();
+
+            foreach (var device in setOfData) {
+                using (MemoryStream ms = new MemoryStream(device.Message))
+                {
+                    var obj = bf.Deserialize(ms) as IStandardizedDeviceOperations;
+
+                    var res = obj.PrepareDataForUI();
+
+                }
+            }
+
             return "Hello from first Api Controller";
         }
 

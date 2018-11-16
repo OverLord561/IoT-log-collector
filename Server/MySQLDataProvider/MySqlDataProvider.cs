@@ -12,9 +12,9 @@ namespace MySQLDataProviderPlugin
 {
     public class MySqlDataProvider : IDataStoragePlugin
     {
-        private readonly MySQLDbContext _dbContext;
+        private static readonly MySQLDbContext _dbContext;
 
-        public MySqlDataProvider()
+        static MySqlDataProvider()
         {
 
             var builder = new ConfigurationBuilder()
@@ -30,7 +30,6 @@ namespace MySQLDataProviderPlugin
             _dbContext = new MySQLDbContext(optionsBuilder.Options);            
 
             _dbContext.Database.Migrate();
-
 
         }
 
