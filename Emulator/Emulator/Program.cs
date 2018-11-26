@@ -1,11 +1,14 @@
-﻿using Emulator.Config;
+﻿using DataProviderFacade;
+using Emulator.Config;
 using Emulator.Config.Interfaces;
 using Emulator.Models;
 using Emulator.Services;
 using Emulator.Services.Interfaces;
 using SimpleInjector;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace Emulator
 {
@@ -28,15 +31,39 @@ namespace Emulator
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            for (var i = 0; i < 1000; i++) {
-                var res = container.GetInstance<IHttpClient>()
-                        .Get<string>("api/log-collector/")
-                        .Result;
-            }
+            //for (var i = 0; i < 1000; i++)
+            //{
+            //    var res = container.GetInstance<IHttpClient>()
+            //                .Post<StandardizedDevice, string>("api/log-collector/write-log",
+            //                new StandardizedDevice
+            //                {
+            //                    Id = Guid.NewGuid(),
+            //                    DateStamp = DateTime.Now
+            //                });
+            //}
 
+
+            var uploadTasks = new List<Task>();
+            for (var i = 0; i < 1; i++)
+            {
+
+
+                var res = container.GetInstance<IHttpClient>()
+                            .Post<StandardizedDevice, string>("api/log-collector/write-log",
+                            new StandardizedDevice
+                            {
+                                Id = Guid.NewGuid(),
+                                DateStamp = DateTime.Now
+                            });
+
+                uploadTasks.Add(res);
+            }
             stopwatch.Start();
 
-             Console.WriteLine("Time elapsed: {0}", stopwatch.Elapsed);
+            Task.WhenAll(uploadTasks).Wait();
+
+
+            Console.WriteLine("Time elapsed: {0}", stopwatch.Elapsed);
 
             //var res2 = container.GetInstance<IHttpClient>()
             //            .Post<RestCall, string>("api/log-collector/test", new RestCall { Name = 123 })

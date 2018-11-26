@@ -3,10 +3,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 
-namespace MySQLDataProviderPlugin.Models
+namespace MySQLDataProviderPlugin
 {
-    class Repository : IOperations
+    public class Repository : IOperations
     {
         private readonly MySQLDbContext _context;
 
@@ -20,6 +21,27 @@ namespace MySQLDataProviderPlugin.Models
             _context.GeneralDevices.Add(device);
 
             return _context.SaveChanges() > 0;
+        }
+
+        public async Task<bool> AddAsync(StandardizedDevice device)
+        {
+            await _context.GeneralDevices.AddAsync(device);
+
+            return await _context.SaveChangesAsync() > 0;
+        }
+
+        public bool AddRange(List<StandardizedDevice> standardizedDevices)
+        {
+            _context.GeneralDevices.AddRange(standardizedDevices);
+
+            return _context.SaveChanges() > 0;
+        }
+
+        public async Task<bool> AddRangeAsync(List<StandardizedDevice> standardizedDevices)
+        {
+            await _context.GeneralDevices.AddRangeAsync(standardizedDevices);
+
+            return await _context.SaveChangesAsync() > 0;
         }
 
         public List<StandardizedDevice> All()

@@ -33,15 +33,15 @@ namespace Server.Controllers
 
             BinaryFormatter bf = new BinaryFormatter();
 
-            foreach (var device in setOfData) {
-                using (MemoryStream ms = new MemoryStream(device.Message))
-                {
-                    var obj = bf.Deserialize(ms) as IStandardizedDeviceOperations;
+            //foreach (var device in setOfData) {
+            //    using (MemoryStream ms = new MemoryStream(device.Message))
+            //    {
+            //        var obj = bf.Deserialize(ms) as IStandardizedDeviceOperations;
 
-                    var res = obj.PrepareDataForUI();
+            //        var res = obj.PrepareDataForUI();
 
-                }
-            }
+            //    }
+            //}
 
             return "Hello from first Api Controller";
         }

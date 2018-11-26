@@ -19,7 +19,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DataProviderFacade\DataProviderFacade.csproj" />
-    <ProjectReference Include="..\Repositories\Repository.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,0 +1,5 @@
+{
+  "ConnectionStrings": {
+    "msSQLConnectionString": "Data Source=WS-LV-CP2364;Initial Catalog=iotlogcollector;MultipleActiveResultSets=True;App=EntityFramework"
+  }
+}

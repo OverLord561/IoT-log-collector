@@ -1,12 +1,8 @@
 ﻿using DataProviderFacade;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using MySQLDataProviderPlugin.Models;
-using System;
-
 using System.IO;
 using System.Reflection;
-using System.Xml.Linq;
 
 namespace MySQLDataProviderPlugin
 {
@@ -27,7 +23,7 @@ namespace MySQLDataProviderPlugin
 
             optionsBuilder.UseMySql(configurator.GetConnectionString("mySQLConnectionString"));
 
-            _dbContext = new MySQLDbContext(optionsBuilder.Options);            
+            _dbContext = new MySQLDbContext(optionsBuilder.Options);
 
             _dbContext.Database.Migrate();
 

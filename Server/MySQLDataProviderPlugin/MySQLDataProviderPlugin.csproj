@@ -5,8 +5,8 @@
     <SignAssembly>false</SignAssembly>    
 	<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 	<GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
-	<PostBuildEvent>copy "$(SolutionDir)MySQLDataProvider\bin\Debug\netstandard2.0\" "$(SolutionDir)Server\Plugins\$(TargetFileName)"
-copy "$(SolutionDir)MySQLDataProvider\bin\Debug\netcoreapp2.0\" "$(SolutionDir)Server\Plugins\$(TargetFileName)"
+	<PostBuildEvent>copy "$(SolutionDir)MySQLDataProviderPlugin\bin\Debug\netstandard2.0\" "$(SolutionDir)Server\Plugins\$(TargetFileName)"
+copy "$(SolutionDir)MySQLDataProviderPlugin\bin\Debug\netcoreapp2.0\" "$(SolutionDir)Server\Plugins\$(TargetFileName)"
 </PostBuildEvent>
   </PropertyGroup>
  
