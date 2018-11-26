@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using TemperatureController;
 
 namespace Emulator
 {
@@ -42,19 +43,12 @@ namespace Emulator
             //                });
             //}
 
-
             var uploadTasks = new List<Task>();
             for (var i = 0; i < 1; i++)
             {
-
-
                 var res = container.GetInstance<IHttpClient>()
                             .Post<StandardizedDevice, string>("api/log-collector/write-log",
-                            new StandardizedDevice
-                            {
-                                Id = Guid.NewGuid(),
-                                DateStamp = DateTime.Now
-                            });
+                            new Samsung_RT38F(1).ConverterToStandard());                           
 
                 uploadTasks.Add(res);
             }
@@ -62,13 +56,8 @@ namespace Emulator
 
             Task.WhenAll(uploadTasks).Wait();
 
-
             Console.WriteLine("Time elapsed: {0}", stopwatch.Elapsed);
-
-            //var res2 = container.GetInstance<IHttpClient>()
-            //            .Post<RestCall, string>("api/log-collector/test", new RestCall { Name = 123 })
-            //            .Result;
-
+            
             Console.ReadLine();
         }
     }

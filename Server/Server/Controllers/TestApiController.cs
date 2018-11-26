@@ -1,10 +1,9 @@
 ﻿using DataProviderFacade;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using System;
+using Server.Extensions;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 
 namespace Server.Controllers
@@ -15,39 +14,30 @@ namespace Server.Controllers
     {
         private readonly IConfiguration _configuration;
 
-        private readonly IEnumerable<IDataStoragePlugin> _dataStoragePlugin;
+        private readonly IDataStoragePlugin _dataStoragePlugin;
 
-        public TestApiController(IConfiguration configuration, IEnumerable<IDataStoragePlugin> dataStoragePlugin)
+        public TestApiController(IConfiguration configuration, IEnumerable<IDataStoragePlugin> dataStoragePluginsCollection)
         {
             _configuration = configuration;
-            _dataStoragePlugin = dataStoragePlugin;
-
-            var test = _dataStoragePlugin.ToList();
-
-            //MSSQLDataProvider mSSQLDataProvider = new MSSQLDataProvider();
-            //mSSQLDataProvider.Operations.Add(new StandardizedDevice { Id = Guid.NewGuid() });
-
-            //StandardizedDevice device = new Samsung_RT38F(25).ConverterToStandard();
-
-            //_dataStoragePlugin.First().Operations.Add(device);
+            _dataStoragePlugin = dataStoragePluginsCollection.GetDataStorageProvider();
         }
 
         [HttpGet]
         public ActionResult<string> Get()
         {
-            var setOfData = _dataStoragePlugin.First().Operations.All();
+            var setOfData = _dataStoragePlugin.Operations.All();
 
             BinaryFormatter bf = new BinaryFormatter();
 
-            //foreach (var device in setOfData) {
-            //    using (MemoryStream ms = new MemoryStream(device.Message))
-            //    {
-            //        var obj = bf.Deserialize(ms) as IStandardizedDeviceOperations;
+            foreach (var device in setOfData)
+            {
+                using (MemoryStream ms = new MemoryStream(device.Message))
+                {
+                    var obj = bf.Deserialize(ms) as IStandardizedDeviceOperations;
 
-            //        var res = obj.PrepareDataForUI();
-
-            //    }
-            //}
+                    var res = obj.PrepareDataForUI();
+                }
+            }
 
             return "Hello from first Api Controller";
         }

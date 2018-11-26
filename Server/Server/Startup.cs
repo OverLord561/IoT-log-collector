@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.ViewComponents;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Server.Models;
 using SimpleInjector;
 using SimpleInjector.Integration.AspNetCore.Mvc;
 using SimpleInjector.Lifestyles;
@@ -20,7 +21,6 @@ namespace Server
     {
         public IConfiguration Configuration;
         private Container container = new Container();
-
 
         public Startup(IConfiguration configuration, IHostingEnvironment env)
         {
@@ -97,22 +97,28 @@ namespace Server
 
         void ConfigureDbProviders(IHostingEnvironment env)
         {
-            //AssemblyLoadContext.Default.Resolving += OnAssemblyResolving;
+            var userSettings = new UserSettings();
+            Configuration.Bind("userSettings", userSettings);
 
             string pluginDirectory = Path.Combine(env.ContentRootPath, "Plugins");
 
-            var ass = new List<Assembly>();
+
+            var dataProvidersAssms = new List<Assembly>();
+
             foreach (var file in new DirectoryInfo(pluginDirectory).GetFiles())
             {
                 if (file.Extension.ToLower() == ".dll")
                 {
                     var assm = AssemblyLoadContext.Default.LoadFromAssemblyPath(file.FullName);
-                    //var assm = Assembly.Load(AssemblyName.GetAssemblyName(file.FullName));
-                    ass.Add(assm);
+
+                    if (assm.GetName().Name == userSettings.DataProviderPluginName)
+                    {
+                        dataProvidersAssms.Add(assm);
+                    }
                 }
             }
 
-            container.Collection.Register<IDataStoragePlugin>(ass);
+            container.Collection.Register<IDataStoragePlugin>(dataProvidersAssms);
         }
 
         #endregion

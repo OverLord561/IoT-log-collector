@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.Serialization.Formatters.Binary;
+using Server.Extensions;
 using System.Threading.Tasks;
 
 namespace Server.Controllers
@@ -14,39 +14,33 @@ namespace Server.Controllers
     [ApiController]
     public class DeviceController : ControllerBase
     {
-        private readonly IEnumerable<IDataStoragePlugin> _dataStoragePlugin;
+        private readonly IDataStoragePlugin _dataStoragePlugin;
 
-        public DeviceController(IConfiguration configuration, IEnumerable<IDataStoragePlugin> dataStoragePlugin)
+        public DeviceController(IConfiguration configuration, IEnumerable<IDataStoragePlugin> dataStoragePluginsCollection)
         {
-            _dataStoragePlugin = dataStoragePlugin;
+            _dataStoragePlugin = dataStoragePluginsCollection.GetDataStorageProvider();
         }
-
 
         [HttpPost]
         [Route("write-log")]
         public async Task<IActionResult> WriteLog([FromBody] StandardizedDevice standardizedDevice)
         {
+            //var list = new List<StandardizedDevice>();
 
-            //StandardizedDevice device = new Samsung_RT38F(25).ConverterToStandard();
+            //for (var i = 0; i < 10000; i++)
+            //{
+            //    list.Add(new StandardizedDevice()
+            //    {
+            //        Id = Guid.NewGuid(),
+            //        DateStamp = DateTime.Now
+            //    });
+            //}
 
-            //_dataStoragePlugin.First().Operations.Add(device);
+            //await _dataStoragePlugin.Operations.AddRangeAsync(list);
 
-            var list = new List<StandardizedDevice>();
+            _dataStoragePlugin.Operations.Add(standardizedDevice);
 
-            for (var i = 0; i < 10000; i++)
-            {
-                list.Add(new StandardizedDevice()
-                {
-                    Id = Guid.NewGuid(),
-                    DateStamp = DateTime.Now
-                });
-            }
-
-            await _dataStoragePlugin.First().Operations.AddRangeAsync(list);
-
-            //_dataStoragePlugin.First().Operations.Add(standardizedDevice);
-
-            return Ok("hello");
+            return Ok("success");
         }
     }
 }

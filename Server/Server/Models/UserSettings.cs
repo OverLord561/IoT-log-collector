@@ -2,6 +2,6 @@
 {
     public class UserSettings
     {
-        public string DataProviderPlugin { get; set; }
+        public string DataProviderPluginName { get; set; }
     }
 }

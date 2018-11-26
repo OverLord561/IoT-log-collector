@@ -1,4 +1,6 @@
-﻿using System;
+﻿using DataProviderFacade;
+using Microsoft.Extensions.Configuration;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -7,12 +9,9 @@ namespace Server.Extensions
 {
     public static class Extensions
     {
-        public static IEnumerable<T> Where<T>(this IEnumerable<T> data, Func<T, bool> predicate)
+        public static T GetDataStorageProvider<T>(this IEnumerable<T> data) where T: IDataStoragePlugin
         {
-            foreach (T value in data)
-            {
-                if (predicate(value)) yield return value;
-            }
+            return data.FirstOrDefault();
         }
     }
 }
