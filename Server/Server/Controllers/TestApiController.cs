@@ -1,6 +1,7 @@
 ﻿using DataProviderFacade;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -20,6 +21,11 @@ namespace Server.Controllers
         {
             _configuration = configuration;
             _dataStoragePlugin = dataStoragePlugin;
+
+            var test = _dataStoragePlugin.ToList();
+
+            //MSSQLDataProvider mSSQLDataProvider = new MSSQLDataProvider();
+            //mSSQLDataProvider.Operations.Add(new StandardizedDevice { Id = Guid.NewGuid() });
 
             //StandardizedDevice device = new Samsung_RT38F(25).ConverterToStandard();
 
