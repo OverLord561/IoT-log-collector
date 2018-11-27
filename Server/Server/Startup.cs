@@ -1,4 +1,4 @@
-﻿using DataProviderFacade;
+﻿using DataProviderCommon;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -10,6 +10,7 @@ using Server.Models;
 using SimpleInjector;
 using SimpleInjector.Integration.AspNetCore.Mvc;
 using SimpleInjector.Lifestyles;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -82,7 +83,7 @@ namespace Server
 
             // Add application services. For instance:
             //container.Register<IFirstRepository, FirstRepository<First>>(Lifestyle.Scoped);
-
+            container.Register<DataStoragesHelperType>();
             // Allow Simple Injector to resolve services from ASP.NET Core.
 
             ConfigureDbProviders(env);
@@ -97,11 +98,7 @@ namespace Server
 
         void ConfigureDbProviders(IHostingEnvironment env)
         {
-            var userSettings = new UserSettings();
-            Configuration.Bind("userSettings", userSettings);
-
             string pluginDirectory = Path.Combine(env.ContentRootPath, "Plugins");
-
 
             var dataProvidersAssms = new List<Assembly>();
 
@@ -111,14 +108,15 @@ namespace Server
                 {
                     var assm = AssemblyLoadContext.Default.LoadFromAssemblyPath(file.FullName);
 
-                    if (assm.GetName().Name == userSettings.DataProviderPluginName)
-                    {
-                        dataProvidersAssms.Add(assm);
-                    }
+                    dataProvidersAssms.Add(assm);
                 }
             }
 
             container.Collection.Register<IDataStoragePlugin>(dataProvidersAssms);
+
+            //var t = container.GetInstance<ITestType>(); //throw SimpleInjector.ActivationException
+            //IServiceProvider provider = container;
+            //object instance = provider.GetService(typeof(ITestType)); // return null
         }
 
         #endregion

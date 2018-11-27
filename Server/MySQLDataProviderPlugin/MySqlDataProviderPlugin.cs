@@ -1,4 +1,4 @@
-﻿using DataProviderFacade;
+﻿using DataProviderCommon;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System.IO;
@@ -6,11 +6,11 @@ using System.Reflection;
 
 namespace MySQLDataProviderPlugin
 {
-    public class MySqlDataProvider : IDataStoragePlugin
+    public class MySQLDataProviderPlugin : IDataStoragePlugin
     {
         private static readonly MySQLDbContext _dbContext;
 
-        static MySqlDataProvider()
+        static MySQLDataProviderPlugin()
         {
 
             var builder = new ConfigurationBuilder()

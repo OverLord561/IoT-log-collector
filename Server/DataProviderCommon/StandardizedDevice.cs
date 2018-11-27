@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace DataProviderFacade
+namespace DataProviderCommon
 {
     [Serializable]
     public class StandardizedDevice

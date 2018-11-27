@@ -1,4 +1,4 @@
-﻿namespace DataProviderFacade
+﻿namespace DataProviderCommon
 {
     public interface IStandardizedDeviceOperations
     {

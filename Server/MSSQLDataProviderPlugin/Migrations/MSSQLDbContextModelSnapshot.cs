@@ -19,7 +19,7 @@ namespace MSSQLDataProviderPlugin.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("DataProviderFacade.StandardizedDevice", b =>
+            modelBuilder.Entity("DataProviderCommon.StandardizedDevice", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();

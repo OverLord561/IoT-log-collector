@@ -1,4 +1,4 @@
-﻿using DataProviderFacade;
+﻿using DataProviderCommon;
 using Microsoft.EntityFrameworkCore;
 
 namespace MySQLDataProviderPlugin

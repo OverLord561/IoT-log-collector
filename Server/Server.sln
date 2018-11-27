@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MySQLDataProviderPlugin", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Repository", "Repositories\Repository.csproj", "{98E1F33F-67AB-4E2A-BA78-515AB19E7408}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataProviderFacade", "DataProviderFacade\DataProviderFacade.csproj", "{B91D9FBE-E2CE-4A25-877D-DC200A401F29}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataProviderCommon", "DataProviderCommon\DataProviderCommon.csproj", "{B91D9FBE-E2CE-4A25-877D-DC200A401F29}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SamsungTemperatureControllerPlugin", "SamsungTemperatureControllerPlugin\SamsungTemperatureControllerPlugin.csproj", "{D90A4A22-91F2-4F57-8F4C-AF64D22E0874}"
 EndProject

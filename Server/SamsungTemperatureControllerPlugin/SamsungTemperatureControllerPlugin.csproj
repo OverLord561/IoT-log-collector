@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DataProviderFacade\DataProviderFacade.csproj" />
+    <ProjectReference Include="..\DataProviderCommon\DataProviderCommon.csproj" />
   </ItemGroup>
 
 </Project>

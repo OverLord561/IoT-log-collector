@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DataProviderFacade
+namespace DataProviderCommon
 {
     public interface IOperations
     {

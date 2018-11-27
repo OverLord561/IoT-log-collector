@@ -1,4 +1,4 @@
-﻿using DataProviderFacade;
+﻿using DataProviderCommon;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using MSSQLDataProviderPlugin;
@@ -7,11 +7,11 @@ using System.Reflection;
 
 namespace MSSQlDataProviderPlugin
 {
-    public class MSSQLDataProvider : IDataStoragePlugin
+    public class MSSQLDataProviderPlugin : IDataStoragePlugin
     {
         private static readonly MSSQLDbContext _dbContext;
 
-        static MSSQLDataProvider()
+        static MSSQLDataProviderPlugin()
         {
 
             var builder = new ConfigurationBuilder()

@@ -1,11 +1,7 @@
-﻿using DataProviderFacade;
+﻿using DataProviderCommon;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using Server.Extensions;
 using System.Threading.Tasks;
 
 namespace Server.Controllers
@@ -16,9 +12,9 @@ namespace Server.Controllers
     {
         private readonly IDataStoragePlugin _dataStoragePlugin;
 
-        public DeviceController(IConfiguration configuration, IEnumerable<IDataStoragePlugin> dataStoragePluginsCollection)
+        public DeviceController(IConfiguration configuration, DataStoragesHelperType dataStorages, DataStoragesHelperType testType)
         {
-            _dataStoragePlugin = dataStoragePluginsCollection.GetDataStorageProvider();
+            _dataStoragePlugin = dataStorages.GetDataStoragePlugin() ?? throw new ArgumentNullException(nameof(dataStorages));
         }
 
         [HttpPost]

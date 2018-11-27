@@ -9,7 +9,7 @@
     ".NETStandard,Version=v2.0/": {
       "SamsungTemperatureControllerPlugin/1.0.0": {
         "dependencies": {
-          "DataProviderFacade": "1.0.0",
+          "DataProviderCommon": "1.0.0",
           "NETStandard.Library": "2.0.3"
         },
         "runtime": {
@@ -22,9 +22,9 @@
           "Microsoft.NETCore.Platforms": "1.1.0"
         }
       },
-      "DataProviderFacade/1.0.0": {
+      "DataProviderCommon/1.0.0": {
         "runtime": {
-          "DataProviderFacade.dll": {}
+          "DataProviderCommon.dll": {}
         }
       }
     }
@@ -49,7 +49,7 @@
       "path": "netstandard.library/2.0.3",
       "hashPath": "netstandard.library.2.0.3.nupkg.sha512"
     },
-    "DataProviderFacade/1.0.0": {
+    "DataProviderCommon/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

@@ -8,7 +8,7 @@
     ".NETCoreApp,Version=v2.0": {
       "MySQLDataProviderPlugin/1.0.0": {
         "dependencies": {
-          "DataProviderFacade": "1.0.0",
+          "DataProviderCommon": "1.0.0",
           "Microsoft.EntityFrameworkCore": "2.1.4",
           "Microsoft.EntityFrameworkCore.Tools": "2.1.4",
           "Microsoft.Extensions.Configuration": "2.1.1",
@@ -541,9 +541,9 @@
           "System.Threading.Tasks": "4.3.0"
         }
       },
-      "DataProviderFacade/1.0.0": {
+      "DataProviderCommon/1.0.0": {
         "runtime": {
-          "DataProviderFacade.dll": {}
+          "DataProviderCommon.dll": {}
         }
       }
     }
@@ -960,7 +960,7 @@
       "path": "system.threading.tasks.extensions/4.3.0",
       "hashPath": "system.threading.tasks.extensions.4.3.0.nupkg.sha512"
     },
-    "DataProviderFacade/1.0.0": {
+    "DataProviderCommon/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
