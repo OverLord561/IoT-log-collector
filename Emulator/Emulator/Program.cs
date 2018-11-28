@@ -9,7 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using TemperatureController;
+
 
 namespace Emulator
 {
@@ -47,8 +47,8 @@ namespace Emulator
             for (var i = 0; i < 1; i++)
             {
                 var res = container.GetInstance<IHttpClient>()
-                            .Post<StandardizedDevice, string>("api/log-collector/write-log",
-                            new Samsung_RT38F(1).ConverterToStandard());                           
+                            .Post<string, string>("api/log-collector/write-log",
+                            "{\"PluginType\":\"SamsungTemperatureControllerPlugin\",\"deviceCharacteristics\":{\"Temperature\":10.0,\"Humidity\":10.0}}");
 
                 uploadTasks.Add(res);
             }
@@ -57,7 +57,7 @@ namespace Emulator
             Task.WhenAll(uploadTasks).Wait();
 
             Console.WriteLine("Time elapsed: {0}", stopwatch.Elapsed);
-            
+
             Console.ReadLine();
         }
     }

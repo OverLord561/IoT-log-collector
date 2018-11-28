@@ -37,6 +37,7 @@ namespace Server
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             IntegrateSimpleInjector(services);
         }
@@ -84,6 +85,8 @@ namespace Server
             // Add application services. For instance:
             //container.Register<IFirstRepository, FirstRepository<First>>(Lifestyle.Scoped);
             container.Register<DataStoragesHelperType>();
+            container.Register<DeviceHelperType>();
+
             // Allow Simple Injector to resolve services from ASP.NET Core.
 
             ConfigureDbProviders(env);
@@ -100,7 +103,7 @@ namespace Server
         {
             string pluginDirectory = Path.Combine(env.ContentRootPath, "Plugins");
 
-            var dataProvidersAssms = new List<Assembly>();
+            var assemblies = new List<Assembly>();
 
             foreach (var file in new DirectoryInfo(pluginDirectory).GetFiles())
             {
@@ -108,11 +111,13 @@ namespace Server
                 {
                     var assm = AssemblyLoadContext.Default.LoadFromAssemblyPath(file.FullName);
 
-                    dataProvidersAssms.Add(assm);
+                    assemblies.Add(assm);
                 }
             }
 
-            container.Collection.Register<IDataStoragePlugin>(dataProvidersAssms);
+            container.Collection.Register<IDataStoragePlugin>(assemblies);
+            container.Collection.Register<IDevicePlugin>(assemblies);
+
 
             //var t = container.GetInstance<ITestType>(); //throw SimpleInjector.ActivationException
             //IServiceProvider provider = container;

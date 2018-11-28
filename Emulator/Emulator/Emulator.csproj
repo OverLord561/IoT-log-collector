@@ -18,9 +18,6 @@
     <Reference Include="DataProviderFacade">
       <HintPath>..\..\Server\Server\Plugins\DataProviderFacade.dll</HintPath>
     </Reference>
-    <Reference Include="SamsungTemperatureControllerPlugin">
-      <HintPath>..\..\Server\Server\Plugins\SamsungTemperatureControllerPlugin.dll</HintPath>
-    </Reference>
   </ItemGroup>
 
   <ItemGroup>

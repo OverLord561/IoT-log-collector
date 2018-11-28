@@ -1,48 +1,40 @@
 ﻿using DataProviderCommon;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 
-namespace TemperatureController
+namespace SamsungTemperatureControllerPlugin
 {
     [Serializable]
-    public class Samsung_RT38F : IStandardizedDeviceOperations
+    public class SamsungTemperatureControllerPlugin : IDevicePlugin
     {
-        static BinaryFormatter bf;
-        private StandardizedDevice standardizedDevice;
-
         private const string GuidId = "CE9A8BDB-1E95-4517-B97C-754262401CB3";
         private const string Name = "Samsung_RT38F";
-        private decimal CelciusTemperature { get; set; }
-
-        static Samsung_RT38F()
-        {
-            bf = new BinaryFormatter();
-        }
-
-        public Samsung_RT38F(decimal celciusTemperature)
-        {
-            this.CelciusTemperature = celciusTemperature;
-
-            standardizedDevice = ConverterToStandard();
-        }
+        private DeviceCharacteristics DeviceCharacteristics;
 
         // Interface methods
-        public StandardizedDevice ConverterToStandard()
+        public StandardizedDevice ConverterToStandard(string message)
         {
+            JObject characteristicPart = JObject.Parse(message);
+            DeviceCharacteristics = characteristicPart["DeviceCharacteristics"].ToObject<DeviceCharacteristics>();
+
             return new StandardizedDevice
             {
                 Id = Guid.NewGuid(),
                 DateStamp = DateTime.Now,
-                Message = ObjectToByteArray()
+                Message = CharacteristicToByteArray()
             };
         }
 
-        public byte[] ObjectToByteArray()
+        public byte[] CharacteristicToByteArray()
         {
             using (MemoryStream ms = new MemoryStream())
             {
-                bf.Serialize(ms, this);
+                BinaryFormatter bf = new BinaryFormatter();
+
+                bf.Serialize(ms, DeviceCharacteristics);
                 return ms.ToArray();
             }
         }
@@ -51,6 +43,6 @@ namespace TemperatureController
         {
             // TODO do all stuff to prepare data for ui
             return true;
-        }        
+        }
     }
 }
