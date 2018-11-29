@@ -4,7 +4,7 @@ using System;
 namespace SamsungTemperatureControllerPlugin
 {
     [Serializable]
-    public class DeviceCharacteristics
+    public class DeviceData
     {
         public double Temperature { get; set; }
 

@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 
 namespace DataProviderCommon
 {
-    [Serializable]
-    public class StandardizedDevice
+    public class DeviceLogs
     {
-        public Guid Id { get; set; }
+        [Required]
+        public int Id { get; set; }
+
+        public string DeviceGuid { get; set; }
 
         public DateTime DateStamp { get; set; }
 

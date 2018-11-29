@@ -2,7 +2,9 @@
 {
     public interface IDevicePlugin
     {
-        StandardizedDevice ConverterToStandard(string message);
+        string PluginName { get; }
+
+        DeviceLogs ConverterToStandard(string message);
 
         bool PrepareDataForUI();
     }

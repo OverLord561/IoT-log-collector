@@ -10,6 +10,6 @@ namespace MSSQlDataProviderPlugin
     {
         public MSSQLDbContext(DbContextOptions<MSSQLDbContext> options) : base(options) { }
 
-        public DbSet<StandardizedDevice> GeneralDevices { get; set; }
+        public DbSet<DeviceLogs> DeviceLogs { get; set; }
     }
 }

@@ -11,16 +11,15 @@ namespace Server
         private readonly IConfiguration _configuration;
         private readonly IEnumerable<IDevicePlugin> _devicePluginsCollection;
 
-
         public DeviceHelperType(IConfiguration configuration, IEnumerable<IDevicePlugin> devicePluginsCollection)
         {
             _configuration = configuration;
             _devicePluginsCollection = devicePluginsCollection;
         }
 
-        public IDevicePlugin GetDevicePlugin()
+        public IDevicePlugin GetDevicePlugin(string pluginName)
         {
-            return _devicePluginsCollection.FirstOrDefault();
+            return _devicePluginsCollection.FirstOrDefault(x => x.PluginName == pluginName);
         }
     }
 }

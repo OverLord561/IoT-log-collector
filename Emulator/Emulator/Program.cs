@@ -48,7 +48,7 @@ namespace Emulator
             {
                 var res = container.GetInstance<IHttpClient>()
                             .Post<string, string>("api/log-collector/write-log",
-                            "{\"PluginType\":\"SamsungTemperatureControllerPlugin\",\"deviceCharacteristics\":{\"Temperature\":10.0,\"Humidity\":10.0}}");
+                            "{\"PluginName\":\"SamsungDPlugin\",\"DeviceData\":{\"Temperature\":10.0,\"Humidity\":10.0}}");
 
                 uploadTasks.Add(res);
             }

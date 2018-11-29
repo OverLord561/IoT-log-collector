@@ -11,30 +11,30 @@ namespace SamsungTemperatureControllerPlugin
     public class SamsungTemperatureControllerPlugin : IDevicePlugin
     {
         private const string GuidId = "CE9A8BDB-1E95-4517-B97C-754262401CB3";
-        private const string Name = "Samsung_RT38F";
-        private DeviceCharacteristics DeviceCharacteristics;
+
+        public string PluginName => "SamsungDPlugin";
 
         // Interface methods
-        public StandardizedDevice ConverterToStandard(string message)
+        public DeviceLogs ConverterToStandard(string message)
         {
             JObject characteristicPart = JObject.Parse(message);
-            DeviceCharacteristics = characteristicPart["DeviceCharacteristics"].ToObject<DeviceCharacteristics>();
+            var deviceData = characteristicPart["DeviceData"].ToObject<DeviceData>();
 
-            return new StandardizedDevice
+            return new DeviceLogs
             {
-                Id = Guid.NewGuid(),
+                DeviceGuid = GuidId,
                 DateStamp = DateTime.Now,
-                Message = CharacteristicToByteArray()
+                Message = CharacteristicToByteArray(deviceData)
             };
         }
 
-        public byte[] CharacteristicToByteArray()
+        public byte[] CharacteristicToByteArray(DeviceData deviceData)
         {
             using (MemoryStream ms = new MemoryStream())
             {
                 BinaryFormatter bf = new BinaryFormatter();
 
-                bf.Serialize(ms, DeviceCharacteristics);
+                bf.Serialize(ms, deviceData);
                 return ms.ToArray();
             }
         }

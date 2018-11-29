@@ -11,6 +11,9 @@ namespace MSSQlDataProviderPlugin
     {
         private static readonly MSSQLDbContext _dbContext;
 
+        public string PluginName => "MSSQLDSPlugin";
+
+
         static MSSQLDataProviderPlugin()
         {
 
@@ -30,6 +33,7 @@ namespace MSSQlDataProviderPlugin
 
         }
 
-        public IOperations Operations => new Repository(_dbContext);
+        public IDataStorageOperationsOperations Operations => new Repository(_dbContext);
+
     }
 }

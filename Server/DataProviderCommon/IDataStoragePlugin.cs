@@ -2,6 +2,8 @@
 {
     public interface IDataStoragePlugin
     {
-        IOperations Operations { get; }
+        string PluginName { get;}
+
+        IDataStorageOperationsOperations Operations { get; }
     }
 }

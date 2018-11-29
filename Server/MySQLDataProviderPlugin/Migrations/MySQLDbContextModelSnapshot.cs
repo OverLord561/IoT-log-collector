@@ -17,18 +17,20 @@ namespace MySQLDataProviderPlugin.Migrations
                 .HasAnnotation("ProductVersion", "2.1.4-rtm-31024")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
-            modelBuilder.Entity("DataProviderCommon.StandardizedDevice", b =>
+            modelBuilder.Entity("DataProviderCommon.DeviceLogs", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
                     b.Property<DateTime>("DateStamp");
+
+                    b.Property<string>("DeviceGuid");
 
                     b.Property<byte[]>("Message");
 
                     b.HasKey("Id");
 
-                    b.ToTable("GeneralDevices");
+                    b.ToTable("DeviceLogs");
                 });
 #pragma warning restore 612, 618
         }

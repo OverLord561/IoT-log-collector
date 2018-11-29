@@ -9,6 +9,8 @@ namespace MySQLDataProviderPlugin
     public class MySQLDataProviderPlugin : IDataStoragePlugin
     {
         private static readonly MySQLDbContext _dbContext;
+        public string PluginName => "MySQLDSPlugin";
+
 
         static MySQLDataProviderPlugin()
         {
@@ -29,6 +31,6 @@ namespace MySQLDataProviderPlugin
 
         }
 
-        public IOperations Operations => new Repository(_dbContext);
+        public IDataStorageOperationsOperations Operations => new Repository(_dbContext);
     }
 }

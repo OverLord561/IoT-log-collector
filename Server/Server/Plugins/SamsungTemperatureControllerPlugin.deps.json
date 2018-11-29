@@ -32,8 +32,19 @@
         }
       },
       "DataProviderCommon/1.0.0": {
+        "dependencies": {
+          "System.ComponentModel.Annotations": "4.2.0.0"
+        },
         "runtime": {
           "DataProviderCommon.dll": {}
+        }
+      },
+      "System.ComponentModel.Annotations.Reference/4.2.0.0": {
+        "runtime": {
+          "System.ComponentModel.Annotations.dll": {
+            "assemblyVersion": "4.2.0.0",
+            "fileVersion": "4.6.26515.6"
+          }
         }
       }
     }
@@ -67,6 +78,11 @@
     },
     "DataProviderCommon/1.0.0": {
       "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "System.ComponentModel.Annotations.Reference/4.2.0.0": {
+      "type": "reference",
       "serviceable": false,
       "sha512": ""
     }

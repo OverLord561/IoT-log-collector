@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace MySQLDataProviderPlugin
 {
-    public class Repository : IOperations
+    public class Repository : IDataStorageOperationsOperations
     {
         private readonly MySQLDbContext _context;
 
@@ -16,46 +16,46 @@ namespace MySQLDataProviderPlugin
             _context = context;
         }
 
-        public bool Add(StandardizedDevice device)
+        public bool Add(DeviceLogs device)
         {
-            _context.GeneralDevices.Add(device);
+            _context.DeviceLogs.Add(device);
 
             return _context.SaveChanges() > 0;
         }
 
-        public async Task<bool> AddAsync(StandardizedDevice device)
+        public async Task<bool> AddAsync(DeviceLogs device)
         {
-            await _context.GeneralDevices.AddAsync(device);
+            await _context.DeviceLogs.AddAsync(device);
 
             return await _context.SaveChangesAsync() > 0;
         }
 
-        public bool AddRange(List<StandardizedDevice> standardizedDevices)
+        public bool AddRange(List<DeviceLogs> standardizedDevices)
         {
-            _context.GeneralDevices.AddRange(standardizedDevices);
+            _context.DeviceLogs.AddRange(standardizedDevices);
 
             return _context.SaveChanges() > 0;
         }
 
-        public async Task<bool> AddRangeAsync(List<StandardizedDevice> standardizedDevices)
+        public async Task<bool> AddRangeAsync(List<DeviceLogs> standardizedDevices)
         {
-            await _context.GeneralDevices.AddRangeAsync(standardizedDevices);
+            await _context.DeviceLogs.AddRangeAsync(standardizedDevices);
 
             return await _context.SaveChangesAsync() > 0;
         }
 
-        public List<StandardizedDevice> All()
+        public List<DeviceLogs> All()
         {
-            return _context.GeneralDevices.ToList();
+            return _context.DeviceLogs.ToList();
 
         }
 
-        public List<StandardizedDevice> Get(Expression<Func<StandardizedDevice, bool>> predicate)
+        public List<DeviceLogs> Get(Expression<Func<DeviceLogs, bool>> predicate)
         {
-            return _context.GeneralDevices.Where(predicate).ToList();
+            return _context.DeviceLogs.Where(predicate).ToList();
         }
 
-        public bool Remove(StandardizedDevice device)
+        public bool Remove(DeviceLogs device)
         {
             throw new NotImplementedException();
         }

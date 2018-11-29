@@ -24,7 +24,7 @@ namespace Server
             var userSettings = new UserSettings();
             _configuration.Bind("userSettings", userSettings);
 
-            return _dataStoragePlugins.FirstOrDefault(x => x.GetType().Name == userSettings.DataProviderPluginName);
+            return _dataStoragePlugins.FirstOrDefault(x => x.PluginName == userSettings.DataProviderPluginName);
         }
     }
 }
