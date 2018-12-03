@@ -25,6 +25,12 @@ export const signInReducer = (state = initialState, action) => {
                 isFetching: action.isFetching,
             };
         }
+        case types.LOGIN: {
+            return {
+                ...state,
+                authorized: action.authorized,
+            };
+        }
         default: { return state; }
     }
 };

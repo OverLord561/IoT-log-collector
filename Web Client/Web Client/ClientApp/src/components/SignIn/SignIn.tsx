@@ -10,7 +10,6 @@ import { IApplicationState } from '../../store/index';
 interface IStateProps {
     loginModel: ILoginModel;
     authorized: boolean;
-    userName: string;
     errors: string[];
     isFetching: boolean;
 }
@@ -103,7 +102,6 @@ function mapStateToProps(state: IApplicationState): IStateProps {
     return {
         loginModel: state.signIn.loginModel,
         authorized: state.signIn.authorized,
-        userName: state.signIn.userName,
         errors: state.signIn.errors,
         isFetching: state.signIn.isFetching,
     };

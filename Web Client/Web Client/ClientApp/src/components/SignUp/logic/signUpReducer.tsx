@@ -25,6 +25,12 @@ export const signUpReducer = (state = initialState, action) => {
                 isFetching: action.isFetching,
             };
         }
+        case types.REGISTER: {
+            return {
+                ...state,
+                errors: action.errors,
+            };
+        }
         default: { return state; }
     }
 };

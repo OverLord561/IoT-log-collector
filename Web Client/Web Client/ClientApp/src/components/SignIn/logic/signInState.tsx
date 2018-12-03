@@ -3,7 +3,6 @@ import { IModel } from '../../../common/Identity';
 export interface IState extends IModel {
   loginModel: ILoginModel;
   authorized: boolean;
-  userName: string;
 }
 
 export interface ILoginModel {
@@ -22,7 +21,6 @@ export function getInitialState(): IState {
       rememberMe: false,
     },
     authorized: false,
-    userName: "",
     errors: [],
     isFetching: false,
   };

@@ -24,7 +24,7 @@ export const Register = (goToPrevPage: any) => (dispatch: any, getStore: any) =>
           isFetching: false,
         });
         dispatch({
-            type: globalConstants.ADD_VALIDATION_ERROR,
+            type: types.REGISTER,
             errors: []
           });
 
@@ -34,7 +34,7 @@ export const Register = (goToPrevPage: any) => (dispatch: any, getStore: any) =>
           type: globalConstants.IS_FETCHING,
           isFetching: false,
         });
-        console.log(error);
+
         if (error.response.data.statusCode === 409) {
           dispatch({
             type: globalConstants.ADD_VALIDATION_ERROR,

@@ -5,7 +5,6 @@ export interface IState extends IModel {
 }
 
 export interface IRegisterModel {
-    email: string;
     password: string;
     passwordConfirm: string;
     [key: string]: string;

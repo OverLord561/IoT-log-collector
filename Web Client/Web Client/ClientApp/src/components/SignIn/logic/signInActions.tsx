@@ -17,7 +17,11 @@ export const Authorize = (goToPrevPage: any) => (dispatch: any, getStore: any) =
         type: globalConstants.IS_FETCHING,
         isFetching: false,
       });
-      //data.authorized = true;
+
+      dispatch({
+        type: types.LOGIN,
+        authorized: true,
+      });
       //data.userName = data.email;
 
       goToPrevPage();
