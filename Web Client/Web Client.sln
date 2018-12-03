@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27421.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Web Client", "Web Client\Web Client.csproj", "{E41C9F32-9897-4B5D-AB51-BE66001EAD8D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IoTWebClient", "Web Client\IoTWebClient.csproj", "{E41C9F32-9897-4B5D-AB51-BE66001EAD8D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

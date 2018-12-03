@@ -8,7 +8,7 @@ export default props => (
   <Navbar inverse fixedTop fluid collapseOnSelect>
     <Navbar.Header>
       <Navbar.Brand>
-        <Link to={'/'}>Web_Client</Link>
+        <Link to={'/'}>IoT Web Client</Link>
       </Navbar.Brand>
       <Navbar.Toggle />
     </Navbar.Header>
@@ -19,14 +19,14 @@ export default props => (
             <Glyphicon glyph='home' /> Home
           </NavItem>
         </LinkContainer>
-        <LinkContainer to={'/counter'}>
+        <LinkContainer to={'/sign-up'}>
           <NavItem>
-            <Glyphicon glyph='education' /> Counter
+            <Glyphicon glyph='registration-mark' /> Sign Up
           </NavItem>
         </LinkContainer>
-        <LinkContainer to={'/fetchdata'}>
+        <LinkContainer to={'/sign-in'}>
           <NavItem>
-            <Glyphicon glyph='th-list' /> Fetch data
+            <Glyphicon glyph='log-in' /> Sign In
           </NavItem>
         </LinkContainer>
       </Nav>
