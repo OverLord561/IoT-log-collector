@@ -3,4 +3,13 @@
     body {
         padding-top: 50px;
     }
+
+    .sign-up {
+        padding: 50px 0 0 0;
+    }
+}
+
+
+.sign-up {
+    padding: 150px 250px 0 150px;
 }

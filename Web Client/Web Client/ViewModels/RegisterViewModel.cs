@@ -10,15 +10,15 @@ namespace IoTWebClient.ViewModels
     {
         [Required]
         [Display(Name = "Email")]
-        public string Email { get; set; }     
+        public string Email { get; set; }
 
         [Required]
-        [DataType(DataType.Password)]        
+        [DataType(DataType.Password)]
         public string Password { get; set; }
 
         [Required]
         [Compare("Password", ErrorMessage = "Passwords does not match")]
-        [DataType(DataType.Password)]       
+        [DataType(DataType.Password)]
         public string PasswordConfirm { get; set; }
     }
 }

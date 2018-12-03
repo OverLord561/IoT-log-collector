@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using IoTWebClient.Models;
+﻿using IoTWebClient.Models;
 using IoTWebClient.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace IoTWebClient.Controllers
 {
@@ -22,7 +20,7 @@ namespace IoTWebClient.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Register(RegisterViewModel model)
+        public async Task<IActionResult> Register([FromBody]RegisterViewModel model)
         {
             if (ModelState.IsValid)
             {
@@ -44,13 +42,14 @@ namespace IoTWebClient.Controllers
                     }
                 }
             }
-            return new JsonResult(new
-            {
-                StatusCode = StatusCodes.Status409Conflict,
-                erros = ModelState.Values.SelectMany(x => x.Errors)
+            return BadRequest(
+                new
+                {
+                    StatusCode = StatusCodes.Status409Conflict,
+                    errors = ModelState.Values.SelectMany(x => x.Errors)
                                             .Select(e => e.ErrorMessage)
                                                 .ToList()
-            });
+                });
         }
     }
 }

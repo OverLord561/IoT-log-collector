@@ -3,16 +3,13 @@ import { RouteComponentProps } from 'react-router-dom';
 import { connect } from 'react-redux';
 import autobind from 'autobind-decorator';
 
-import { IValidationError } from '../../common/Identity';
-
 import { IRegisterModel } from './logic/signUpState';
 import * as actions from './logic/signUpActions';
 import { IApplicationState } from '../../store/index';
+import { IModel } from '../../common/Identity';
 
-interface IStateToProps {
+interface IStateToProps extends IModel {
     registerModel: IRegisterModel;
-    errors: IValidationError[];
-    isFetching: boolean;
 }
 
 const dispatchProps = {
@@ -69,7 +66,7 @@ class SignUp extends React.Component<IProps, any> {
                     <div className="col-sm-10">
                         <input
                             data-prop="confirmPassword"
-                            value={this.props.registerModel.confirmPassword} type="password" className="form-control" id="conf" placeholder="Confirm password" onChange={this.setRegisterData} />
+                            value={this.props.registerModel.passwordConfirm} type="password" className="form-control" id="conf" placeholder="Confirm password" onChange={this.setRegisterData} />
                     </div>
                 </div>
 
@@ -84,7 +81,7 @@ class SignUp extends React.Component<IProps, any> {
                     </div>
                     <div className="col-sm-10">
                         {this.props.errors.map((error, index) => {
-                            return <span key={index} className="help-block">{error.errorMessage}</span>;
+                            return <span key={index} className="help-block">{error}</span>;
                         })}
                     </div>
 

@@ -7,7 +7,7 @@ export interface IState extends IModel {
 export interface IRegisterModel {
     email: string;
     password: string;
-    confirmPassword: string;
+    passwordConfirm: string;
     [key: string]: string;
 }
 
@@ -15,8 +15,8 @@ export const getInitialState = (): IState => {
     return {
       registerModel: {
         email: "yurapuk452@gmail.com",
-        password: "123Qaz-",
-        confirmPassword: "123Qaz-",
+        password: "",
+        passwordConfirm: "123Qaz-",
       },
       errors: [],
       isFetching: false
