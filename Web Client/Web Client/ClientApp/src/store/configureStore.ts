@@ -3,11 +3,13 @@ import thunk from 'redux-thunk';
 import { routerReducer, routerMiddleware } from 'react-router-redux';
 import * as SignUpReducer from '../components/SignUp/logic/signUpReducer';
 import * as SignInReducer from '../components/SignIn/logic/signInReducer';
+import * as HomeReducer from '../components/Home/logic/homeReducer';
 
 export default function configureStore(history, initialState) {
   const reducers = {
     signUp: SignUpReducer.signUpReducer,
-    signIn: SignInReducer.signInReducer
+    signIn: SignInReducer.signInReducer,
+    home: HomeReducer.homeReducer
   };
 
   const middleware = [

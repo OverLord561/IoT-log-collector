@@ -1,4 +1,5 @@
 using IoTWebClient.Models;
+using IoTWebClient.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -30,6 +31,8 @@ namespace Web_Client
                 .AddEntityFrameworkStores<ApplicationContext>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
+            services.AddSingleton<AuthMessageSender>();
 
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration =>

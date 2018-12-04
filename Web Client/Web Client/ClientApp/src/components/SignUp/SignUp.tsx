@@ -10,6 +10,7 @@ import { IModel } from '../../common/Identity';
 
 interface IStateToProps extends IModel {
     registerModel: IRegisterModel;
+    authorized: boolean;
 }
 
 const dispatchProps = {
@@ -97,6 +98,7 @@ const mapStateToProps = (state: IApplicationState): IStateToProps => {
         registerModel: state.signUp.registerModel,
         errors: state.signUp.errors,
         isFetching: state.signUp.isFetching,
+        authorized: state.signIn.authorized
     };
 };
 

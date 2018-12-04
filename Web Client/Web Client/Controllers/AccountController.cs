@@ -1,4 +1,5 @@
 ﻿using IoTWebClient.Models;
+using IoTWebClient.Services;
 using IoTWebClient.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -12,11 +13,14 @@ namespace IoTWebClient.Controllers
     {
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signInManager;
+        private readonly AuthMessageSender _authMessageSender;
 
-        public AccountController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager)
+
+        public AccountController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, AuthMessageSender authMessageSender)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _authMessageSender = authMessageSender;
         }
 
         [HttpPost]
@@ -86,13 +90,20 @@ namespace IoTWebClient.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> LogOff()
+        public async Task<IActionResult> LogOut()
         {
             // удаляем аутентификационные куки
             await _signInManager.SignOutAsync();
 
             return new JsonResult(new { StatusCode = StatusCodes.Status200OK });
 
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> SendSms()
+        {
+            await _authMessageSender.SendSmsAsync("+380953393612", "hello word");
+            return Ok("sent");
         }
     }
 }

@@ -1,21 +1,37 @@
 ﻿import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, RouteComponentProps } from 'react-router-dom';
 import { Glyphicon, Nav, Navbar, NavItem } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
-import './NavMenu.css';
-import { IApplicationState } from '../store/index';
+import '../NavMenu.css';
+import { IApplicationState } from '../../store/index';
 import { connect } from 'react-redux';
+import * as actions from './logic/navMenuActions';
+import autobind from 'autobind-decorator';
 
 interface IStateToProps {
   authorized: boolean;
 }
 
-type IProps = IStateToProps;
+const dispatchProps = {
+  logOut: actions.LogOut,
+
+};
+
+type IProps = IStateToProps & RouteComponentProps<{}> & typeof dispatchProps;
 
 export class NavMenu extends React.Component<IProps, any> {
   constructor(props: IProps) {
     super(props);
   }
+
+  @autobind
+  logOut(event: any) {
+    event.preventDefault();
+
+    this.props.logOut(() => {
+       // window.location.href = '/';
+    });
+}
 
   public render() {
     return <Navbar inverse fixedTop fluid collapseOnSelect>
@@ -46,7 +62,7 @@ export class NavMenu extends React.Component<IProps, any> {
           }
 
           {this.props.authorized &&
-            <LinkContainer to={'/log-out'}>
+            <LinkContainer to={'/log-out'} onClick={this.logOut}>
               <NavItem>
                 <Glyphicon glyph='log-out' /> Log Out
               </NavItem>
@@ -67,5 +83,5 @@ const mapStateToProps = (state: IApplicationState): IStateToProps => {
 
 export default connect(
   mapStateToProps, // Selects which state properties are merged into the component's props
-  {} // Selects which action creators are merged into the component's props
+  dispatchProps // Selects which action creators are merged into the component's props
 )(NavMenu);
