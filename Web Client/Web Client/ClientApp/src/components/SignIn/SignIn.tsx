@@ -17,6 +17,7 @@ interface IStateProps {
 const dispatchProps = {
     authorize: actions.Authorize,
     setFormData: actions.SetFormData,
+    authorizeByCookie: actions.AuthorizeByCookie
 };
 
 type IProps = IState & IStateProps & RouteComponentProps<{}> & typeof dispatchProps;
@@ -25,6 +26,10 @@ class SignIn extends React.Component<IProps, any> {
 
     constructor(props: IProps) {
         super(props);
+    }
+
+    componentDidUpdate() {
+        this.props.authorizeByCookie();
     }
 
     @autobind
@@ -44,7 +49,7 @@ class SignIn extends React.Component<IProps, any> {
     logIn(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
         this.props.authorize(() => {
-            this.props.history.goBack();
+            this.props.history.push('/');
         });
     }
 

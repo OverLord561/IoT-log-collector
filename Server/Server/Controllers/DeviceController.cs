@@ -79,6 +79,8 @@ namespace Server.Controllers
                 var dataForUI = group.Select(log => log).ToList();
 
                 devicesLogs.Add(plugin.PrepareDataForUI(dataForUI));
+                devicesLogs.Add(plugin.PrepareDataForUI(dataForUI));
+
             }
 
             return new JsonResult(new { StatusCode = StatusCodes.Status200OK, Logs = devicesLogs });

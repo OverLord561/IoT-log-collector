@@ -29,9 +29,9 @@ export class NavMenu extends React.Component<IProps, any> {
     event.preventDefault();
 
     this.props.logOut(() => {
-       // window.location.href = '/';
+      // window.location.href = '/';
     });
-}
+  }
 
   public render() {
     return <Navbar inverse fixedTop fluid collapseOnSelect>
@@ -48,11 +48,13 @@ export class NavMenu extends React.Component<IProps, any> {
               <Glyphicon glyph='home' /> Home
           </NavItem>
           </LinkContainer>
-          <LinkContainer to={'/sign-up'}>
-            <NavItem>
-              <Glyphicon glyph='registration-mark' /> Sign Up
+          {!this.props.authorized &&
+            <LinkContainer to={'/sign-up'}>
+              <NavItem>
+                <Glyphicon glyph='registration-mark' /> Sign Up
             </NavItem>
-          </LinkContainer>
+            </LinkContainer>
+          }
           {!this.props.authorized &&
             <LinkContainer to={'/sign-in'}>
               <NavItem>

@@ -9,6 +9,8 @@ import {
   LineChart, Line, CartesianGrid,
   XAxis, YAxis, Tooltip, Legend
 } from 'recharts';
+import autobind from 'autobind-decorator';
+import { GenerateRandomHex } from '../../features/commonFeature';
 
 interface IStateToProps {
   authorized: boolean;
@@ -31,31 +33,60 @@ class Home extends React.Component<IProps, any> {
     this.props.loadLogData(1544006919);
   }
 
-  public render() {
-    const samsungLogs: IDeviceLogsUIFormat = this.props.devicesLogs[0];
-    let data: ILog[] = [];
-    let title: string = '';
+  @autobind
+  renderLines(log: ILog) {
+    const lines: Line[] = [];
 
-    if (samsungLogs) {
-      title = samsungLogs.deviceName;
+    Object.keys(log).forEach((element, iterator) => {
+      if (iterator > 0) {
+        const color: string = GenerateRandomHex();
+        lines.push(
+          <Line key={iterator} type="monotone" dataKey={element} stroke={color} activeDot={{ r: 8 }} />
+        );
+      }
+    });
 
-      data = samsungLogs.logs.map(log => {
-        return log;
-      });
+    return lines;
+  }
+
+  @autobind
+  renderCharts() {
+
+    return this.props.devicesLogs.map((deviceLogs, index) => {
+      return this.renderChart(deviceLogs, index);
+    });
+  }
+
+  @autobind
+  renderChart(deviceLogs: IDeviceLogsUIFormat, index?: number) {
+    let XAxisName: string = '';
+    const logs: ILog[] = deviceLogs.logs;
+    let lines: Line[] = [];
+
+    if (logs.length) {
+      const firstLog = logs[0];
+      XAxisName = Object.keys(firstLog)[0];
+
+      lines = this.renderLines(logs[0]);
     }
 
-    return <div className="home">
-      <h1>{title}</h1>
-      <LineChart width={600} height={300} data={data}
-            margin={{top: 5, right: 30, left: 20, bottom: 5}}>
-       <XAxis dataKey="hour"/>
-       <YAxis/>
-       <CartesianGrid strokeDasharray="3 3"/>
-       <Tooltip/>
-       <Legend />
-       <Line type="monotone" dataKey="temperature" stroke="#8884d8" activeDot={{r: 8}}/>
-       <Line type="monotone" dataKey="humidity" stroke="#82ca9d" />
+    return <div key={index}>
+      <h1>{deviceLogs.deviceName}</h1>
+      <LineChart width={600} height={300} data={logs}
+        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+        <XAxis dataKey={XAxisName} />
+        <YAxis />
+        <CartesianGrid strokeDasharray="3 3" />
+        <Tooltip />
+        <Legend />
+        {lines}
       </LineChart>
+    </div>;
+  }
+
+  public render() {
+    return <div className="home">
+      {this.renderCharts()}
     </div>;
   }
 }

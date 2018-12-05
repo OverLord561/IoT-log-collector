@@ -2,6 +2,7 @@ import * as types from './signInConstants';
 import { ILoginModel } from './signInState';
 import axios from 'axios';
 import * as globalConstants from '../../../constants/constants';
+import { IsAuthorized } from '../../../features/commonFeature';
 
 export const Authorize = (goToPrevPage: any) => (dispatch: any, getStore: any) => {
   const URL = globalConstants.BASE_URL.concat(types.LOGIN_URL);
@@ -16,11 +17,6 @@ export const Authorize = (goToPrevPage: any) => (dispatch: any, getStore: any) =
       dispatch({
         type: globalConstants.IS_FETCHING,
         isFetching: false,
-      });
-
-      dispatch({
-        type: types.LOGIN,
-        authorized: true,
       });
       //data.userName = data.email;
 
@@ -38,6 +34,16 @@ export const Authorize = (goToPrevPage: any) => (dispatch: any, getStore: any) =
         });
       }
     });
+};
+
+export const AuthorizeByCookie = () => (dispatch: any, getStore: any) => {
+
+  if (IsAuthorized()) {
+    dispatch({
+      type: types.LOGIN,
+      authorized: true,
+    });
+  }
 };
 
 export const LogOut = () => {

@@ -2,6 +2,8 @@ import axios from 'axios';
 
 import * as globalTypes from '../../../constants/constants';
 import * as types from './navMenuConstants';
+import * as signInTypes from '../../SignIn/logic/signInConstants';
+
 import * as globalConstants from '../../../constants/constants';
 
 export const LogOut = (goToPrevPage: any) => (dispatch: any, getStore: any) => {
@@ -21,7 +23,7 @@ export const LogOut = (goToPrevPage: any) => (dispatch: any, getStore: any) => {
             });
 
             dispatch({
-                type: 'LOGIN',
+                type: signInTypes.LOGIN,
                 authorized: false,
               });
 

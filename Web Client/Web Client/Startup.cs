@@ -24,8 +24,6 @@ namespace Web_Client
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddCors();
-
             services.AddDbContext<ApplicationContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
@@ -33,6 +31,9 @@ namespace Web_Client
                 .AddEntityFrameworkStores<ApplicationContext>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
+            services.AddDistributedMemoryCache();
+            services.AddSession();
 
             services.AddSingleton<AuthMessageSender>();
 
@@ -59,8 +60,8 @@ namespace Web_Client
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
-            app.UseCors();
             app.UseAuthentication();
+            app.UseSession();
 
             app.UseMvc(routes =>
             {

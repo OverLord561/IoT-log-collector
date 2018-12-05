@@ -65,6 +65,8 @@ namespace IoTWebClient.Controllers
                     await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false);
                 if (result.Succeeded)
                 {
+                    HttpContext.Session.SetString("isAuthorized", "true");
+
                     return new JsonResult(
                         new
                         {
@@ -94,6 +96,7 @@ namespace IoTWebClient.Controllers
         {
             // удаляем аутентификационные куки
             await _signInManager.SignOutAsync();
+            HttpContext.Session.SetString("isAuthorized", "false");
 
             return new JsonResult(new { StatusCode = StatusCodes.Status200OK });
 
@@ -102,7 +105,7 @@ namespace IoTWebClient.Controllers
         [HttpGet]
         public async Task<IActionResult> SendSms()
         {
-            await _authMessageSender.SendSmsAsync("+380953393612", "hello word");
+            await _authMessageSender.SendSmsAsync("+380663028887", "hello word");
             return Ok("sent");
         }
     }
