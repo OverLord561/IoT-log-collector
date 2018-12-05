@@ -36,7 +36,11 @@ namespace Server
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddCors();
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowSpecificOrigin",
+                    builder => builder.WithOrigins("http://localhost:60365"));
+            });
             services.AddMvc();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
@@ -54,6 +58,8 @@ namespace Server
             }
 
             container.Verify();
+            app.UseCors("AllowSpecificOrigin");
+
 
             // to redirect HTTP requests to HTTPS
             app.UseHttpsRedirection();

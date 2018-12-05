@@ -1,4 +1,5 @@
 ﻿using DataProviderCommon;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -53,6 +54,7 @@ namespace Server.Controllers
 
         [HttpGet]
         [Route("get-logs")]
+        [EnableCors("AllowSpecificOrigin")]
         public IActionResult GetLogs(int? utcDate)
         {
             var logs = new List<DeviceLog>();

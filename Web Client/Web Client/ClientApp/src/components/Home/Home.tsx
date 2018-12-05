@@ -34,8 +34,10 @@ class Home extends React.Component<IProps, any> {
   public render() {
     const samsungLogs: IDeviceLogsUIFormat = this.props.devicesLogs[0];
     let data: ILog[] = [];
+    let title: string = '';
 
     if (samsungLogs) {
+      title = samsungLogs.deviceName;
 
       data = samsungLogs.logs.map(log => {
         return log;
@@ -43,7 +45,7 @@ class Home extends React.Component<IProps, any> {
     }
 
     return <div className="home">
-      <h1>Hello, IoT log collector!!</h1>
+      <h1>{title}</h1>
       <LineChart width={600} height={300} data={data}
             margin={{top: 5, right: 30, left: 20, bottom: 5}}>
        <XAxis dataKey="hour"/>

@@ -20,6 +20,12 @@ namespace SamsungTemperatureControllerPlugin
             JObject characteristicPart = JObject.Parse(message);
             var deviceData = characteristicPart["DeviceData"].ToObject<DeviceData>();
 
+            Random rendom = new Random();
+
+
+            deviceData.Humidity = deviceData.Humidity * rendom.Next(1,10);
+            deviceData.Temperature = deviceData.Temperature * rendom.Next(1, 10);
+
             return new DeviceLog
             {
                 PluginName = PluginName,
