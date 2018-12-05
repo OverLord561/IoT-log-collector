@@ -5,12 +5,12 @@ using System.Text;
 
 namespace DataProviderCommon
 {
-    public class DeviceLogs
+    public class DeviceLog
     {
         [Required]
         public int Id { get; set; }
 
-        public string DeviceGuid { get; set; }
+        public string PluginName { get; set; }
 
         public DateTime DateStamp { get; set; }
 

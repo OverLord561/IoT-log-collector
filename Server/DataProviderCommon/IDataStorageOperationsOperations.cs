@@ -8,19 +8,19 @@ namespace DataProviderCommon
 {
     public interface IDataStorageOperationsOperations
     {
-        bool Add(DeviceLogs device);
+        bool Add(DeviceLog device);
 
-        Task<bool> AddAsync(DeviceLogs device);
+        Task<bool> AddAsync(DeviceLog device);
 
-        Task<bool> AddRangeAsync(List<DeviceLogs> standardizedDevices);
+        Task<bool> AddRangeAsync(List<DeviceLog> standardizedDevices);
         
-        bool AddRange(List<DeviceLogs> standardizedDevices);
+        bool AddRange(List<DeviceLog> standardizedDevices);
 
 
-        bool Remove(DeviceLogs device);
+        bool Remove(DeviceLog device);
 
-        List<DeviceLogs> Get(Expression<Func<DeviceLogs, bool>> predicate);
+        List<DeviceLog> Get(Expression<Func<DeviceLog, bool>> predicate);
 
-        List<DeviceLogs> All();
+        List<DeviceLog> All();
     }
 }

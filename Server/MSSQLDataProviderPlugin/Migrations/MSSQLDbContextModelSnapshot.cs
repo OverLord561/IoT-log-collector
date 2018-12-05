@@ -19,7 +19,7 @@ namespace MSSQLDataProviderPlugin.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("DataProviderCommon.DeviceLogs", b =>
+            modelBuilder.Entity("DataProviderCommon.DeviceLog", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -27,9 +27,9 @@ namespace MSSQLDataProviderPlugin.Migrations
 
                     b.Property<DateTime>("DateStamp");
 
-                    b.Property<string>("DeviceGuid");
-
                     b.Property<byte[]>("Message");
+
+                    b.Property<string>("PluginName");
 
                     b.HasKey("Id");
 

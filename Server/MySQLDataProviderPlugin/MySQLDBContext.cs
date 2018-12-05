@@ -7,7 +7,7 @@ namespace MySQLDataProviderPlugin
     {
         public MySQLDbContext(DbContextOptions<MySQLDbContext> options) : base(options) { }
 
-        public DbSet<DeviceLogs> DeviceLogs { get; set; }
+        public DbSet<DeviceLog> DeviceLogs { get; set; }
     }
 
 }

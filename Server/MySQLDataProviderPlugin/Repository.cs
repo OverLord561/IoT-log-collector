@@ -16,46 +16,46 @@ namespace MySQLDataProviderPlugin
             _context = context;
         }
 
-        public bool Add(DeviceLogs device)
+        public bool Add(DeviceLog device)
         {
             _context.DeviceLogs.Add(device);
 
             return _context.SaveChanges() > 0;
         }
 
-        public async Task<bool> AddAsync(DeviceLogs device)
+        public async Task<bool> AddAsync(DeviceLog device)
         {
             await _context.DeviceLogs.AddAsync(device);
 
             return await _context.SaveChangesAsync() > 0;
         }
 
-        public bool AddRange(List<DeviceLogs> standardizedDevices)
+        public bool AddRange(List<DeviceLog> standardizedDevices)
         {
             _context.DeviceLogs.AddRange(standardizedDevices);
 
             return _context.SaveChanges() > 0;
         }
 
-        public async Task<bool> AddRangeAsync(List<DeviceLogs> standardizedDevices)
+        public async Task<bool> AddRangeAsync(List<DeviceLog> standardizedDevices)
         {
             await _context.DeviceLogs.AddRangeAsync(standardizedDevices);
 
             return await _context.SaveChangesAsync() > 0;
         }
 
-        public List<DeviceLogs> All()
+        public List<DeviceLog> All()
         {
             return _context.DeviceLogs.ToList();
 
         }
 
-        public List<DeviceLogs> Get(Expression<Func<DeviceLogs, bool>> predicate)
+        public List<DeviceLog> Get(Expression<Func<DeviceLog, bool>> predicate)
         {
             return _context.DeviceLogs.Where(predicate).ToList();
         }
 
-        public bool Remove(DeviceLogs device)
+        public bool Remove(DeviceLog device)
         {
             throw new NotImplementedException();
         }

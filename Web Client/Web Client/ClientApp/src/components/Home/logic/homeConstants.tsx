@@ -1,2 +1,4 @@
 export const LOAD_DEVICE_LOGS = 'LOAD_DEVICE_LOGS';
-export const LOG_DATA_URL = 'server-endpoint';
+export const LOAD_LOGS_BY_DATE = (date: number) => {
+    return `get-logs?utcDate=${date}`;
+};

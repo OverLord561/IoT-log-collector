@@ -1,20 +1,23 @@
 import { IModel } from '../../../common/Identity';
 
 export interface IState extends IModel {
-    deviceLogs: IDeviceLogs;
+    devicesLogs: IDeviceLogsUIFormat[];
 }
 
-export interface IDeviceLogs {
-    deviceName: string;
-    logs: string[];
+export interface IDeviceLogsUIFormat {
+    deviceName: string,
+    logs: ILog[]
+}
+
+export interface ILog {
+    hour: string,
+    temperature: number,
+    humidity: number,
 }
 
 export const getInitialState = (): IState => {
     return {
-        deviceLogs: {
-            deviceName: '',
-            logs: []
-        },
+        devicesLogs: [],
         errors: [],
         isFetching: false
     };

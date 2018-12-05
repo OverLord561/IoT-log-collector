@@ -1,11 +1,13 @@
-﻿namespace DataProviderCommon
+﻿using System.Collections.Generic;
+
+namespace DataProviderCommon
 {
     public interface IDevicePlugin
     {
         string PluginName { get; }
 
-        DeviceLogs ConverterToStandard(string message);
+        DeviceLog ConverterToStandard(string message);
 
-        bool PrepareDataForUI();
+        IDeviceLogsUIFormat PrepareDataForUI(List<DeviceLog> deviceLogs);
     }
 }
