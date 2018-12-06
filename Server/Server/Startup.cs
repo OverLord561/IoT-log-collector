@@ -39,7 +39,7 @@ namespace Server
             services.AddCors(options =>
             {
                 options.AddPolicy("AllowSpecificOrigin",
-                    builder => builder.WithOrigins("http://localhost:60365"));
+                    builder => builder.WithOrigins("http://localhost:60365", "https://localhost:44344"));
             });
             services.AddMvc();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
