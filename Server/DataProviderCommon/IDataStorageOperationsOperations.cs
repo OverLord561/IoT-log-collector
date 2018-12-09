@@ -22,5 +22,7 @@ namespace DataProviderCommon
         List<DeviceLog> Get(Expression<Func<DeviceLog, bool>> predicate);
 
         List<DeviceLog> All();
+
+        Task<List<DeviceLog>> AllAsync();
     }
 }

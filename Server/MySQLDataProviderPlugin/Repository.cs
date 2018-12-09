@@ -1,4 +1,5 @@
 ﻿using DataProviderCommon;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -50,6 +51,11 @@ namespace MySQLDataProviderPlugin
 
         }
 
+        public async Task<List<DeviceLog>> AllAsync()
+        {
+            return await _context.DeviceLogs.ToListAsync();
+        }
+
         public List<DeviceLog> Get(Expression<Func<DeviceLog, bool>> predicate)
         {
             return _context.DeviceLogs.Where(predicate).ToList();
@@ -57,7 +63,9 @@ namespace MySQLDataProviderPlugin
 
         public bool Remove(DeviceLog device)
         {
-            throw new NotImplementedException();
+            _context.DeviceLogs.Remove(device);
+
+            return _context.SaveChanges() > 0;
         }
     }
 }

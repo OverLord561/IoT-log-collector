@@ -22,7 +22,7 @@ namespace Server.Repository
 
             if (utcDate == null)
             {
-                res = _dataStoragePlugin.Operations.All();
+                res = _dataStoragePlugin.Operations.AllAsync().Result;
             }
             else
             {

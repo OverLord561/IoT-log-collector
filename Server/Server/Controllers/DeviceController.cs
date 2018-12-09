@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Server.Controllers
 {
@@ -43,7 +44,7 @@ namespace Server.Controllers
 
         [HttpPost]
         [Route("write-log")]
-        public IActionResult WriteLog([FromBody] string smthFromDevice)
+        public async Task<IActionResult> WriteLog([FromBody] string smthFromDevice)
         {
             for (var i = 0; i < 10; i++)
             {
@@ -59,7 +60,8 @@ namespace Server.Controllers
                 var standardizedDevice = plugin.ConverterToStandard(smthFromDevice);
 
                 standardizedDevice.DateStamp = standardizedDevice.DateStamp.AddHours(i);
-                _dataStoragePlugin.Operations.Add(standardizedDevice);
+
+                await _dataStoragePlugin.Operations.AddAsync(standardizedDevice);
 
                 _synchronyHelper.UpdateCounter();
 
