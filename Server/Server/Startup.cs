@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Mvc.ViewComponents;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Server.Models;
+using Server.Repository;
+using Server.Services;
+using Server.SynchronyHelpers;
 using SimpleInjector;
 using SimpleInjector.Integration.AspNetCore.Mvc;
 using SimpleInjector.Lifestyles;
@@ -93,6 +96,9 @@ namespace Server
             //container.Register<IFirstRepository, FirstRepository<First>>(Lifestyle.Scoped);
             container.Register<DataStoragesHelperType>();
             container.Register<DeviceHelperType>();
+            container.RegisterSingleton<SynchronyHelper>();
+            container.Register<IDevicesLogsRepository, DevicesLogsRepository>();
+            container.Register<IDevicesLogsService, DevicesLogsService>();
 
             // Allow Simple Injector to resolve services from ASP.NET Core.
 

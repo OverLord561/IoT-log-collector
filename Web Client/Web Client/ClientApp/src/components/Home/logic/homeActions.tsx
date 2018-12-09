@@ -4,7 +4,7 @@ import * as globalTypes from '../../../constants/constants';
 import { IDeviceLogsUIFormat } from './homeState';
 
 const samsungLogs: IDeviceLogsUIFormat = {
-    deviceName: 'Samsung',
+    deviceName: 'Samsung. Back end error',
     logs: [
         {
             hour: 'Page A',
@@ -30,8 +30,13 @@ export const LoadLogData = (date: number) => (dispatch: any, getStore: any) => {
         isFetching: true,
     });
 
+    console.time("Call back end");
+
     axios.get(URL)
         .then(response => {
+
+            console.time("Call succeesfully back end ended");
+
             dispatch({
                 type: globalTypes.IS_FETCHING,
                 isFetching: false,
@@ -42,6 +47,8 @@ export const LoadLogData = (date: number) => (dispatch: any, getStore: any) => {
             });
 
         }).catch(error => {
+            console.time("Call back end ended with erorr");
+
             console.log(error);
             dispatch({
                 type: types.LOAD_DEVICE_LOGS,

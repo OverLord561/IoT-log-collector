@@ -5,9 +5,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Server.Extensions;
+using Server.Repository;
+using Server.Services;
+using Server.SynchronyHelpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace Server.Controllers
 {
@@ -17,14 +21,24 @@ namespace Server.Controllers
     {
         private readonly IDataStoragePlugin _dataStoragePlugin;
         private readonly DeviceHelperType _devicePluginsHelper;
+        private readonly SynchronyHelper _synchronyHelper;
+        private readonly IDevicesLogsRepository _deviceLogsRepository;
+        private readonly IDevicesLogsService _devicesLogsService;
+
 
         public DeviceController(IConfiguration configuration,
             DataStoragesHelperType dataStoragesHelper,
-            DeviceHelperType devicePluginsHelper
+            DeviceHelperType devicePluginsHelper,
+            SynchronyHelper synchronyHelper,
+            IDevicesLogsRepository deviceLogsRepository,
+            IDevicesLogsService devicesLogsService
             )
         {
             _dataStoragePlugin = dataStoragesHelper.GetDataStoragePlugin() ?? throw new ArgumentNullException(nameof(dataStoragesHelper));
             _devicePluginsHelper = devicePluginsHelper;
+            _synchronyHelper = synchronyHelper;
+            _deviceLogsRepository = deviceLogsRepository;
+            _devicesLogsService = devicesLogsService;
         }
 
         [HttpPost]
@@ -47,6 +61,8 @@ namespace Server.Controllers
                 standardizedDevice.DateStamp = standardizedDevice.DateStamp.AddHours(i);
                 _dataStoragePlugin.Operations.Add(standardizedDevice);
 
+                _synchronyHelper.UpdateCounter();
+
             }
 
             return Ok("success");
@@ -57,34 +73,14 @@ namespace Server.Controllers
         [EnableCors("AllowSpecificOrigin")]
         public IActionResult GetLogs(int? utcDate)
         {
-            var logs = new List<DeviceLog>();
+            _synchronyHelper.EventSlim.Wait();
 
-            if (utcDate == null)
-            {
-                logs = _dataStoragePlugin.Operations.All();
-            }
-            else
-            {
-                DateTime _date = utcDate.Value.FromUtcToLocalTime();
-                logs = _dataStoragePlugin.Operations.Get(d => d.DateStamp.Day == _date.Day);
-            }
+            var logs = _deviceLogsRepository.GetDeviceLogs(utcDate);
+            var logsForUI = _devicesLogsService.PrepareLogsForUI(logs);           
 
-            var groups = logs.GroupBy(l => l.PluginName);
+            _synchronyHelper.EventSlim.Reset();
 
-            List<IDeviceLogsUIFormat> devicesLogs = new List<IDeviceLogsUIFormat>();
-
-            foreach (var group in groups)
-            {
-                IDevicePlugin plugin = _devicePluginsHelper.GetDevicePlugin(group.Key);
-                var dataForUI = group.Select(log => log).ToList();
-
-                devicesLogs.Add(plugin.PrepareDataForUI(dataForUI));
-                devicesLogs.Add(plugin.PrepareDataForUI(dataForUI));
-
-            }
-
-            return new JsonResult(new { StatusCode = StatusCodes.Status200OK, Logs = devicesLogs });
-
+            return new JsonResult(new { StatusCode = StatusCodes.Status200OK, Logs = logsForUI });
         }
 
     }
