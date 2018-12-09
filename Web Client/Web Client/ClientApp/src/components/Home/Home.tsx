@@ -1,16 +1,22 @@
-import React from 'react';
-import { connect } from 'react-redux';
-import { IApplicationState } from '../../store/index';
-import { RouteComponentProps } from 'react-router-dom';
-import * as actions from './logic/homeActions';
-import { IDeviceLogsUIFormat, ILog } from './logic/homeState';
+import React from "react";
+import { connect } from "react-redux";
+import { IApplicationState } from "../../store/index";
+import { RouteComponentProps } from "react-router-dom";
+import * as actions from "./logic/homeActions";
+import { IDeviceLogsUIFormat, ILog } from "./logic/homeState";
+import * as moment from "moment";
 
 import {
-  LineChart, Line, CartesianGrid,
-  XAxis, YAxis, Tooltip, Legend
-} from 'recharts';
-import autobind from 'autobind-decorator';
-import { GenerateRandomHex } from '../../features/commonFeature';
+  LineChart,
+  Line,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Legend
+} from "recharts";
+import autobind from "autobind-decorator";
+import { GenerateRandomHex } from "../../features/commonFeature";
 
 interface IStateToProps {
   authorized: boolean;
@@ -19,7 +25,7 @@ interface IStateToProps {
 }
 
 const dispatchProps = {
-  loadLogData: actions.LoadLogData,
+  loadLogData: actions.LoadLogData
 };
 
 type IProps = IStateToProps & RouteComponentProps<{}> & typeof dispatchProps;
@@ -30,7 +36,8 @@ class Home extends React.Component<IProps, any> {
   }
 
   componentDidMount() {
-    this.props.loadLogData(1544006919);
+    const Utc = moment().format("X");
+    this.props.loadLogData(Utc);
   }
 
   @autobind
@@ -41,7 +48,13 @@ class Home extends React.Component<IProps, any> {
       if (iterator > 0) {
         const color: string = GenerateRandomHex();
         lines.push(
-          <Line key={iterator} type="monotone" dataKey={element} stroke={color} activeDot={{ r: 8 }} />
+          <Line
+            key={iterator}
+            type="monotone"
+            dataKey={element}
+            stroke={color}
+            activeDot={{ r: 8 }}
+          />
         );
       }
     });
@@ -51,7 +64,6 @@ class Home extends React.Component<IProps, any> {
 
   @autobind
   renderCharts() {
-
     return this.props.devicesLogs.map((deviceLogs, index) => {
       return this.renderChart(deviceLogs, index);
     });
@@ -59,7 +71,7 @@ class Home extends React.Component<IProps, any> {
 
   @autobind
   renderChart(deviceLogs: IDeviceLogsUIFormat, index?: number) {
-    let XAxisName: string = '';
+    let XAxisName: string = "";
     const logs: ILog[] = deviceLogs.logs;
     let lines: Line[] = [];
 
@@ -70,24 +82,28 @@ class Home extends React.Component<IProps, any> {
       lines = this.renderLines(logs[0]);
     }
 
-    return <div key={index}>
-      <h1>{deviceLogs.deviceName}</h1>
-      <LineChart width={600} height={300} data={logs}
-        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-        <XAxis dataKey={XAxisName} />
-        <YAxis />
-        <CartesianGrid strokeDasharray="3 3" />
-        <Tooltip />
-        <Legend />
-        {lines}
-      </LineChart>
-    </div>;
+    return (
+      <div key={index}>
+        <h1>{deviceLogs.deviceName}</h1>
+        <LineChart
+          width={600}
+          height={300}
+          data={logs}
+          margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+        >
+          <XAxis dataKey={XAxisName} />
+          <YAxis />
+          <CartesianGrid strokeDasharray="3 3" />
+          <Tooltip />
+          <Legend />
+          {lines}
+        </LineChart>
+      </div>
+    );
   }
 
   public render() {
-    return <div className="home">
-      {this.renderCharts()}
-    </div>;
+    return <div className="home">{this.renderCharts()}</div>;
   }
 }
 
