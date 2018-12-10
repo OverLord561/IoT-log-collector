@@ -8,11 +8,10 @@ namespace MySQLDataProviderPlugin
 {
     public class MySQLDataProviderPlugin : IDataStoragePlugin
     {
-        private static readonly MySQLDbContext _dbContext;
+        private readonly MySQLDbContext _dbContext;
         public string PluginName => "MySQLDSPlugin";
 
-
-        static MySQLDataProviderPlugin()
+        public MySQLDataProviderPlugin()
         {
 
             var builder = new ConfigurationBuilder()

@@ -16,13 +16,13 @@ namespace Server.Repository
             _dataStoragePlugin = dataStoragesHelper.GetDataStoragePlugin() ?? throw new ArgumentNullException(nameof(dataStoragesHelper));
 
         }
-        public List<DeviceLog> GetDeviceLogs(int? utcDate)
+        public async Task<List<DeviceLog>> GetDeviceLogsAsync(int? utcDate)
         {
             var res = new List<DeviceLog>();
 
             if (utcDate == null)
             {
-                res = _dataStoragePlugin.Operations.AllAsync().Result;
+                res = await _dataStoragePlugin.Operations.AllAsync();
             }
             else
             {

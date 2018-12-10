@@ -2,6 +2,7 @@ import { IModel } from '../../../common/Identity';
 
 export interface IState extends IModel {
     devicesLogs: IDeviceLogsUIFormat[];
+    isInitial: boolean;
 }
 
 export interface IDeviceLogsUIFormat {
@@ -17,6 +18,7 @@ export interface ILog {
 
 export const getInitialState = (): IState => {
     return {
+        isInitial: true,
         devicesLogs: [],
         errors: [],
         isFetching: false

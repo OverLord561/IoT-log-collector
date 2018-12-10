@@ -22,7 +22,8 @@ export const homeReducer = (state = initialState, action) => {
         case types.LOAD_DEVICE_LOGS: {
             return {
                 ...state,
-                devicesLogs: action.devicesLogs
+                devicesLogs: action.devicesLogs,
+                isInitial: action.isInitial
             };
         }
 

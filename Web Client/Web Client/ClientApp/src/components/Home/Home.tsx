@@ -37,7 +37,16 @@ class Home extends React.Component<IProps, any> {
 
   componentDidMount() {
     const Utc = moment().format("X");
-    this.props.loadLogData(Utc);
+
+    this.props.loadLogData(Utc, true);
+  }
+
+  componentDidUpdate(prevProps: IProps, prevState: any) {
+
+    if (JSON.stringify(this.props.devicesLogs) !== JSON.stringify(prevProps.devicesLogs)) {
+      const Utc = moment().format("X");
+      this.props.loadLogData(Utc, false);
+    }
   }
 
   @autobind
@@ -111,7 +120,7 @@ const mapStateToProps = (state: IApplicationState): IStateToProps => {
   return {
     authorized: state.signIn.authorized,
     isFetching: state.home.isFetching,
-    devicesLogs: state.home.devicesLogs
+    devicesLogs: state.home.devicesLogs,
   };
 };
 

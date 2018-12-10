@@ -9,12 +9,12 @@ namespace MSSQlDataProviderPlugin
 {
     public class MSSQLDataProviderPlugin : IDataStoragePlugin
     {
-        private static readonly MSSQLDbContext _dbContext;
+        private readonly MSSQLDbContext _dbContext;
 
         public string PluginName => "MSSQLDSPlugin";
 
 
-        static MSSQLDataProviderPlugin()
+        public MSSQLDataProviderPlugin()
         {
 
             var builder = new ConfigurationBuilder()

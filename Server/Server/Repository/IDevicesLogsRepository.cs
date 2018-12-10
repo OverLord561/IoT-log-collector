@@ -1,10 +1,11 @@
 ﻿using DataProviderCommon;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Server.Repository
 {
     public interface IDevicesLogsRepository
     {
-        List<DeviceLog> GetDeviceLogs(int? utcDate);
+        Task<List<DeviceLog>> GetDeviceLogsAsync(int? utcDate);
     }
 }

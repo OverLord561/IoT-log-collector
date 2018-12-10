@@ -6,11 +6,7 @@ import { IDeviceLogsUIFormat } from './homeState';
 const samsungLogs: IDeviceLogsUIFormat = {
     deviceName: 'Samsung. Back end error',
     logs: [
-        {
-            hour: 'Page A',
-            temperature: 4000,
-            humidity: 2400,
-        },
+        { hour: 'Page A', temperature: 4000, humidity: 2400, },
         { hour: 'Page B', temperature: 3000, humidity: 1398 },
         { hour: 'Page C', temperature: 2000, humidity: 9800 },
         { hour: 'Page D', temperature: 2780, humidity: 3908 },
@@ -22,8 +18,8 @@ const samsungLogs: IDeviceLogsUIFormat = {
 
 const data = [samsungLogs];
 
-export const LoadLogData = (date: number) => (dispatch: any, getStore: any) => {
-    const URL = globalTypes.IoTServer_BASE_URL.concat(types.LOAD_LOGS_BY_DATE(date));
+export const LoadLogData = (date: string, isInitial: boolean) => (dispatch: any, getStore: any) => {
+    const URL = globalTypes.IoTServer_BASE_URL.concat(types.LOAD_LOGS_BY_DATE(date, isInitial));
 
     dispatch({
         type: globalTypes.IS_FETCHING,
@@ -43,7 +39,8 @@ export const LoadLogData = (date: number) => (dispatch: any, getStore: any) => {
             });
             dispatch({
                 type: types.LOAD_DEVICE_LOGS,
-                devicesLogs: response.data.logs
+                devicesLogs: response.data.logs,
+                isInitial,
             });
 
         }).catch(error => {
@@ -52,7 +49,8 @@ export const LoadLogData = (date: number) => (dispatch: any, getStore: any) => {
             console.log(error);
             dispatch({
                 type: types.LOAD_DEVICE_LOGS,
-                devicesLogs: data
+                devicesLogs: data,
+                isInitial,
             });
         });
 };

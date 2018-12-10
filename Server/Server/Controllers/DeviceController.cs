@@ -46,25 +46,31 @@ namespace Server.Controllers
         [Route("write-log")]
         public async Task<IActionResult> WriteLog([FromBody] string smthFromDevice)
         {
-            for (var i = 0; i < 10; i++)
+            try
             {
-                var generalPluginInfo = JsonConvert.DeserializeObject<StandardizedMessageFromDevice>(smthFromDevice);
-
-                var plugin = _devicePluginsHelper.GetDevicePlugin(generalPluginInfo.PluginName);/* SamsungDPlugin*/
-
-                if (plugin == null)
+                for (var i = 0; i < 9; i++)
                 {
-                    throw new ArgumentNullException(nameof(plugin));
+                    var generalPluginInfo = JsonConvert.DeserializeObject<StandardizedMessageFromDevice>(smthFromDevice);
+
+                    var plugin = _devicePluginsHelper.GetDevicePlugin(generalPluginInfo.PluginName);/* SamsungDPlugin*/
+
+                    if (plugin == null)
+                    {
+                        throw new ArgumentNullException(nameof(plugin));
+                    }
+
+                    var standardizedDevice = plugin.ConverterToStandard(smthFromDevice);
+
+                    standardizedDevice.DateStamp = standardizedDevice.DateStamp.AddHours(i);
+
+                    await _dataStoragePlugin.Operations.AddAsync(standardizedDevice);
+
+                    _synchronyHelper.UpdateCounter();
                 }
-
-                var standardizedDevice = plugin.ConverterToStandard(smthFromDevice);
-
-                standardizedDevice.DateStamp = standardizedDevice.DateStamp.AddHours(i);
-
-                await _dataStoragePlugin.Operations.AddAsync(standardizedDevice);
-
-                _synchronyHelper.UpdateCounter();
-
+            }
+            catch (Exception ex)
+            {
+                var errors = ex;
             }
 
             return Ok("success");
@@ -73,17 +79,35 @@ namespace Server.Controllers
         [HttpGet]
         [Route("get-logs")]
         [EnableCors("AllowSpecificOrigin")]
-        public IActionResult GetLogs(int? utcDate)
+        public async Task<IActionResult> GetLogs(int? utcDate, bool isInitial)
         {
-            _synchronyHelper.EventSlim.Wait();
+            try
+            {
+                var logsForUI = new List<IDeviceLogsUIFormat>();
+                if (!isInitial)
+                {
+                    _synchronyHelper.EventSlim.Wait();
 
-            var logs = _deviceLogsRepository.GetDeviceLogs(utcDate);
-            var logsForUI = _devicesLogsService.PrepareLogsForUI(logs);           
+                    var logs = await _deviceLogsRepository.GetDeviceLogsAsync(utcDate);
+                    logsForUI = _devicesLogsService.PrepareLogsForUI(logs);
+                    _synchronyHelper.EventSlim.Reset();
+                }
+                else
+                {
+                    var logs = await _deviceLogsRepository.GetDeviceLogsAsync(utcDate);
+                    logsForUI = _devicesLogsService.PrepareLogsForUI(logs);
+                }
 
-            _synchronyHelper.EventSlim.Reset();
 
-            return new JsonResult(new { StatusCode = StatusCodes.Status200OK, Logs = logsForUI });
+
+                return new JsonResult(new { StatusCode = StatusCodes.Status200OK, Logs = logsForUI });
+            }
+            catch (Exception ex)
+            {
+                var error = ex;
+
+                return Ok("success");
+            }
         }
-
     }
 }
