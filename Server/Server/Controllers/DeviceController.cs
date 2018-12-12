@@ -2,16 +2,11 @@
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
-using Server.Extensions;
+using Server.Helpers;
 using Server.Repository;
 using Server.Services;
-using Server.SynchronyHelpers;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Server.Controllers
@@ -20,23 +15,17 @@ namespace Server.Controllers
     [ApiController]
     public class DeviceController : ControllerBase
     {
-        private readonly IDataStoragePlugin _dataStoragePlugin;
-        private readonly DeviceHelperType _devicePluginsHelper;
         private readonly SynchronyHelper _synchronyHelper;
         private readonly IDevicesLogsRepository _deviceLogsRepository;
         private readonly IDevicesLogsService _devicesLogsService;
 
 
-        public DeviceController(IConfiguration configuration,
-            DataStoragesHelperType dataStoragesHelper,
-            DeviceHelperType devicePluginsHelper,
+        public DeviceController(
             SynchronyHelper synchronyHelper,
             IDevicesLogsRepository deviceLogsRepository,
             IDevicesLogsService devicesLogsService
             )
         {
-            _dataStoragePlugin = dataStoragesHelper.GetDataStoragePlugin() ?? throw new ArgumentNullException(nameof(dataStoragesHelper));
-            _devicePluginsHelper = devicePluginsHelper;
             _synchronyHelper = synchronyHelper;
             _deviceLogsRepository = deviceLogsRepository;
             _devicesLogsService = devicesLogsService;
@@ -48,25 +37,7 @@ namespace Server.Controllers
         {
             try
             {
-                for (var i = 0; i < 9; i++)
-                {
-                    var generalPluginInfo = JsonConvert.DeserializeObject<StandardizedMessageFromDevice>(smthFromDevice);
-
-                    var plugin = _devicePluginsHelper.GetDevicePlugin(generalPluginInfo.PluginName);/* SamsungDPlugin*/
-
-                    if (plugin == null)
-                    {
-                        throw new ArgumentNullException(nameof(plugin));
-                    }
-
-                    var standardizedDevice = plugin.ConverterToStandard(smthFromDevice);
-
-                    standardizedDevice.DateStamp = standardizedDevice.DateStamp.AddHours(i);
-
-                    await _dataStoragePlugin.Operations.AddAsync(standardizedDevice);
-
-                    _synchronyHelper.UpdateCounter();
-                }
+                await _deviceLogsRepository.WriteLog(smthFromDevice, 0);
             }
             catch (Exception ex)
             {
@@ -78,7 +49,7 @@ namespace Server.Controllers
 
         [HttpGet]
         [Route("get-logs")]
-        [EnableCors("AllowSpecificOrigin")]
+        [EnableCors("AllowSPAAccess")]
         public async Task<IActionResult> GetLogs(int? utcDate, bool isInitial)
         {
             try
@@ -90,6 +61,7 @@ namespace Server.Controllers
 
                     var logs = await _deviceLogsRepository.GetDeviceLogsAsync(utcDate);
                     logsForUI = _devicesLogsService.PrepareLogsForUI(logs);
+
                     _synchronyHelper.EventSlim.Reset();
                 }
                 else
@@ -97,8 +69,6 @@ namespace Server.Controllers
                     var logs = await _deviceLogsRepository.GetDeviceLogsAsync(utcDate);
                     logsForUI = _devicesLogsService.PrepareLogsForUI(logs);
                 }
-
-
 
                 return new JsonResult(new { StatusCode = StatusCodes.Status200OK, Logs = logsForUI });
             }

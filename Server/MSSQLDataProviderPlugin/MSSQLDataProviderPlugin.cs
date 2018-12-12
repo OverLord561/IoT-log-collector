@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using MSSQLDataProviderPlugin;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 
 namespace MSSQlDataProviderPlugin
@@ -29,7 +30,10 @@ namespace MSSQlDataProviderPlugin
 
             _dbContext = new MSSQLDbContext(optionsBuilder.Options);
 
-            _dbContext.Database.Migrate();
+            if (_dbContext.Database.GetPendingMigrations().Any())
+            {
+                _dbContext.Database.Migrate();
+            }
 
         }
 

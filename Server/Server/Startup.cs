@@ -6,14 +6,12 @@ using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.ViewComponents;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Server.Models;
+using Server.Helpers;
 using Server.Repository;
 using Server.Services;
-using Server.SynchronyHelpers;
 using SimpleInjector;
 using SimpleInjector.Integration.AspNetCore.Mvc;
 using SimpleInjector.Lifestyles;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -41,7 +39,7 @@ namespace Server
         {
             services.AddCors(options =>
             {
-                options.AddPolicy("AllowSpecificOrigin",
+                options.AddPolicy("AllowSPAAccess",
                     builder => builder.WithOrigins("http://localhost:60365", "https://localhost:44344"));
             });
             services.AddMvc();
@@ -61,8 +59,7 @@ namespace Server
             }
 
             container.Verify();
-            app.UseCors("AllowSpecificOrigin");
-
+            app.UseCors("AllowSPAAccess");
 
             // to redirect HTTP requests to HTTPS
             app.UseHttpsRedirection();

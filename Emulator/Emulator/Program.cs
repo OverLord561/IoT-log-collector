@@ -16,6 +16,7 @@ namespace Emulator
     class Program
     {
         static readonly Container container;
+        static int counter = 0;
 
         static Program()
         {
@@ -43,22 +44,34 @@ namespace Emulator
             //                });
             //}
 
-            var uploadTasks = new List<Task>();
-            for (var i = 0; i < 1; i++)
-            {
-                var res = container.GetInstance<IHttpClient>()
-                            .Post<string, string>("api/log-collector/write-log",
-                            "{\"PluginName\":\"SamsungDPlugin\",\"DeviceData\":{\"Temperature\":10.0,\"Humidity\":10.0}}");
+            //var uploadTasks = new List<Task>();
+            //for (var i = 0; i < 1; i++)
+            //{
+            //    var res = container.GetInstance<IHttpClient>()
+            //                .Post<string, string>("api/log-collector/write-log",
+            //                "{\"PluginName\":\"SamsungDPlugin\",\"DeviceData\":{\"Temperature\":10.0,\"Humidity\":10.0}}");
 
-                uploadTasks.Add(res);
-            }
+            //    uploadTasks.Add(res);
+            //}
+            Parallel.For(1, 4001, Method);
+
+
             stopwatch.Start();
 
-            Task.WhenAll(uploadTasks).Wait();
+            //Task.WhenAll(uploadTasks).Wait();
 
             Console.WriteLine("Time elapsed: {0}", stopwatch.Elapsed);
 
             Console.ReadLine();
+        }
+
+        static async void Method(int x)
+        {
+            var res = await container.GetInstance<IHttpClient>()
+                        .Post<string, string>("api/log-collector/write-log",
+                        "{\"PluginName\":\"SamsungDPlugin\",\"DeviceData\":{\"Temperature\":10.0,\"Humidity\":10.0}}");
+                     
+
         }
     }
 }

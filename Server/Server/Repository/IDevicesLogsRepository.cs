@@ -7,5 +7,7 @@ namespace Server.Repository
     public interface IDevicesLogsRepository
     {
         Task<List<DeviceLog>> GetDeviceLogsAsync(int? utcDate);
+
+        Task<bool> WriteLog(string messageFromDevice, int? counter);
     }
 }
