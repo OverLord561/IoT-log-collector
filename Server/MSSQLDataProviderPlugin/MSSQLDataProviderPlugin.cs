@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using MSSQLDataProviderPlugin;
+using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -39,5 +40,9 @@ namespace MSSQlDataProviderPlugin
 
         public IDataStorageOperationsOperations Operations => new Repository(_dbContext);
 
+        public object Clone()
+        {
+            return MemberwiseClone();
+        }
     }
 }

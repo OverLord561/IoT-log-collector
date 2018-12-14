@@ -1,6 +1,7 @@
 ﻿using DataProviderCommon;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -35,5 +36,10 @@ namespace MySQLDataProviderPlugin
         }
 
         public IDataStorageOperationsOperations Operations => new Repository(_dbContext);
+
+        public object Clone()
+        {
+            return MemberwiseClone();
+        }
     }
 }

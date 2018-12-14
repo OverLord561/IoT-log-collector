@@ -12,11 +12,11 @@ namespace Server.Repository
     public class DevicesLogsRepository : IDevicesLogsRepository
     {
         private readonly IDataStoragePlugin _dataStoragePlugin;
-        private readonly SynchronyHelper _synchronyHelper;
+        private readonly DBWriterHelper _synchronyHelper;
         private readonly DeviceHelperType _devicePluginsHelper;
 
 
-        public DevicesLogsRepository(DataStoragesHelperType dataStoragesHelper, SynchronyHelper synchronyHelper, DeviceHelperType deviceHelperType)
+        public DevicesLogsRepository(DataStoragesHelperType dataStoragesHelper, DBWriterHelper synchronyHelper, DeviceHelperType deviceHelperType)
         {
             _dataStoragePlugin = dataStoragesHelper.GetDataStoragePlugin() ?? throw new ArgumentNullException(nameof(dataStoragesHelper));
             _synchronyHelper = synchronyHelper;
@@ -53,8 +53,9 @@ namespace Server.Repository
 
             var standardizedDevice = plugin.ConverterToStandard(messageFromDevice);
             standardizedDevice.DateStamp = standardizedDevice.DateStamp.AddHours(counter.Value);
+            standardizedDevice.PluginName = string.Concat(standardizedDevice.PluginName, counter.ToString());
 
-            var res = _synchronyHelper.AddLogToTemporaryList(standardizedDevice, _dataStoragePlugin);            
+            var res = _synchronyHelper.AddToLogToCollection(standardizedDevice, _dataStoragePlugin);
 
             return res;
         }

@@ -1,15 +1,15 @@
-﻿using DataProviderFacade;
-using Emulator.Config;
+﻿using Emulator.Config;
 using Emulator.Config.Interfaces;
-using Emulator.Models;
 using Emulator.Services;
-using Emulator.Services.Interfaces;
+using RestSharp;
 using SimpleInjector;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
-
 
 namespace Emulator
 {
@@ -18,60 +18,70 @@ namespace Emulator
         static readonly Container container;
         static int counter = 0;
 
+        static IEmulatorConfiguration cnf = new EmulatorConfiguration();
+
         static Program()
         {
-            container = new Container();
+            //container = new Container();
 
-            container.RegisterSingleton<IEmulatorConfiguration, EmulatorConfiguration>(); //container.Register<IConfiguration, Configuration>(Lifestyle.Singleton);
-            container.RegisterSingleton<IHttpClient, RestSharpHttpClient>();
+            //container.RegisterSingleton<IEmulatorConfiguration, EmulatorConfiguration>(); //container.Register<IConfiguration, Configuration>(Lifestyle.Singleton);
+            // container.RegisterSingleton<IHttpClient, RestSharpHttpClient>();
 
-            container.Verify(); // iterates registered service to check if something is not correct, will throw an exception before any execution of the progam
+            //container.Verify(); // iterates registered service to check if something is not correct, will throw an exception before any execution of the progam
         }
 
         static void Main(string[] args)
         {
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
+            var alldata = new List<double>();
 
-            //for (var i = 0; i < 1000; i++)
-            //{
-            //    var res = container.GetInstance<IHttpClient>()
-            //                .Post<StandardizedDevice, string>("api/log-collector/write-log",
-            //                new StandardizedDevice
-            //                {
-            //                    Id = Guid.NewGuid(),
-            //                    DateStamp = DateTime.Now
-            //                });
-            //}
+            var allTasks = Enumerable.Range(1, 1).Select(x =>
+           {
+               return Task.Run(() =>
+               {
 
-            //var uploadTasks = new List<Task>();
-            //for (var i = 0; i < 1; i++)
-            //{
-            //    var res = container.GetInstance<IHttpClient>()
-            //                .Post<string, string>("api/log-collector/write-log",
-            //                "{\"PluginName\":\"SamsungDPlugin\",\"DeviceData\":{\"Temperature\":10.0,\"Humidity\":10.0}}");
+                   HttpClient httpClient = new HttpClient();
+                   httpClient.BaseAddress = new Uri("http://localhost:5000");
 
-            //    uploadTasks.Add(res);
-            //}
-            Parallel.For(1, 4001, Method);
+                   StringContent httpContent = new StringContent("{\"PluginName\":\"SamsungDPlugin\",\"DeviceData\":{\"Temperature\":10.0,\"Humidity\":10.0}}", Encoding.UTF8, "application/json");
+
+                   var ll = Enumerable.Range(1, 1500).Select(y =>
+                   {
+                       var sw = Stopwatch.StartNew();
+
+                       var response = httpClient.PostAsync("api/log-collector/write-log", httpContent).Result;
+
+                       sw.Stop();
+
+                       return sw.Elapsed.TotalMilliseconds;
+                   }).ToArray();
+
+                   alldata.AddRange(ll);
+
+                   httpContent.Dispose();
+                   httpClient.Dispose();
+                                      
+               });
+           }).ToArray();
 
 
-            stopwatch.Start();
+            Task.WaitAll(allTasks);  
+
+            Debugger.Break();
+           
+          
+            //stopwatch.Start();
 
             //Task.WhenAll(uploadTasks).Wait();
 
-            Console.WriteLine("Time elapsed: {0}", stopwatch.Elapsed);
+            //Console.WriteLine("Time elapsed: {0}", stopwatch.Elapsed);
 
             Console.ReadLine();
         }
 
-        static async void Method(int x)
+        static void Method(int x, RestSharpHttpClient client, RestClient rcl)
         {
-            var res = await container.GetInstance<IHttpClient>()
-                        .Post<string, string>("api/log-collector/write-log",
-                        "{\"PluginName\":\"SamsungDPlugin\",\"DeviceData\":{\"Temperature\":10.0,\"Humidity\":10.0}}");
-                     
-
+            client.Post<string, string>("api/log-collector/write-log", "{\"PluginName\":\"SamsungDPlugin\",\"DeviceData\":{\"Temperature\":10.0,\"Humidity\":10.0}}", rcl);
         }
+
     }
 }

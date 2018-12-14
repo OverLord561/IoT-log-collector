@@ -1,6 +1,8 @@
-﻿namespace DataProviderCommon
+﻿using System;
+
+namespace DataProviderCommon
 {
-    public interface IDataStoragePlugin
+    public interface IDataStoragePlugin: ICloneable
     {
         string PluginName { get;}
 

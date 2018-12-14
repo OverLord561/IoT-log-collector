@@ -12,10 +12,13 @@ using Server.Services;
 using SimpleInjector;
 using SimpleInjector.Integration.AspNetCore.Mvc;
 using SimpleInjector.Lifestyles;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Runtime.Loader;
+using System.Threading;
 
 namespace Server
 {
@@ -49,7 +52,7 @@ namespace Server
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IApplicationLifetime applicationLifetime)
         {
             InitializeContainer(app, env);
 
@@ -61,10 +64,26 @@ namespace Server
             container.Verify();
             app.UseCors("AllowSPAAccess");
 
+            applicationLifetime.ApplicationStopping.Register(() =>
+            {
+                OnShutdown(container.GetInstance<CollectionOfLogs>().resetEventSlim);
+            });
+
+
             // to redirect HTTP requests to HTTPS
             app.UseHttpsRedirection();
             //создается единственный в приложении маршрут, который позволит сопоставлять запросы с контроллерами и их методами.
             app.UseMvc();
+        }
+
+        private void OnShutdown(ManualResetEventSlim resetEventSlim)
+        {
+            while (true)
+            {
+                Debugger.Break();
+
+                resetEventSlim.Wait();
+            }
         }
 
         #region SimpleInjector
@@ -93,9 +112,10 @@ namespace Server
             //container.Register<IFirstRepository, FirstRepository<First>>(Lifestyle.Scoped);
             container.Register<DataStoragesHelperType>();
             container.Register<DeviceHelperType>();
-            container.RegisterSingleton<SynchronyHelper>();
+            container.RegisterSingleton<DBWriterHelper>();
             container.Register<IDevicesLogsRepository, DevicesLogsRepository>();
             container.Register<IDevicesLogsService, DevicesLogsService>();
+            container.RegisterSingleton<CollectionOfLogs>();
 
             // Allow Simple Injector to resolve services from ASP.NET Core.
 
@@ -103,7 +123,6 @@ namespace Server
 
             container.AutoCrossWireAspNetComponents(app);
         }
-
 
         #endregion
 
