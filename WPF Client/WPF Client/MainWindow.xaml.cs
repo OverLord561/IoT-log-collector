@@ -22,7 +22,7 @@ namespace WPF_Client
     {
         public MainWindow()
         {
-            InitializeComponent();
+            InitializeComponent();            
         }
     }
 }

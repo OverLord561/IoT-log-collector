@@ -10,16 +10,16 @@ namespace Server.Helpers
 {
     public class CollectionOfLogs
     {
-        public ManualResetEventSlim resetEventSlim;
-        static object _locker = new object();
-        int _count = 5; // TODO: get it from appsettings.json
+        public readonly ManualResetEvent resetEvent;
+        readonly object _locker = new object();
+        int _count = 100; // TODO: get it from appsettings.json
 
         List<MyTuple> _allTuples { get; set; }
         Queue<MyTuple> _helperQueue;
 
         public CollectionOfLogs()
         {
-            resetEventSlim = new ManualResetEventSlim(false);
+            resetEvent = new ManualResetEvent(false);
 
             MyTuple initialTuple = new MyTuple(new List<DeviceLog>(_count), null);
 
@@ -55,6 +55,8 @@ namespace Server.Helpers
 
                     RemoveTupleFromQueue();
 
+                    //Console.WriteLine(_allTuples.Count);
+
                     return new MyTuple(temporaryObj.ToList(), dataplugin);
                 }
             }
@@ -76,7 +78,16 @@ namespace Server.Helpers
                     return currentCollection;
                 }
 
-                if (_allTuples.All(tuple => tuple.Logs.Count == _count)) // all collections all full
+                var emptyCollection = _allTuples.FirstOrDefault(tuple => !tuple.Logs.Any()); // return empty collection
+
+                if (emptyCollection != null)
+                {
+                   AddTupleToQueue(emptyCollection);
+
+                    return emptyCollection;
+                }
+
+                if (_allTuples.All(tuple => tuple.Logs.Count == _count)) // all collections all full add new 
                 {
                     MyTuple newTuple = new MyTuple(newCollection, null);
                     _allTuples.Add(newTuple);
@@ -85,16 +96,7 @@ namespace Server.Helpers
 
 
                     return newTuple;
-                }
-
-                var emptyCollection = _allTuples.FirstOrDefault(tuple => !tuple.Logs.Any()); // return empty collection
-
-                if (emptyCollection != null)
-                {
-                    AddTupleToQueue(emptyCollection);
-
-                    return emptyCollection;
-                }
+                }               
 
                 MyTuple newTuple2 = new MyTuple(newCollection, null);
                 _allTuples.Add(newTuple2);
@@ -114,7 +116,7 @@ namespace Server.Helpers
                 _helperQueue.Enqueue(myTuple);
                 if (!_helperQueue.Any())
                 {
-                    resetEventSlim.Reset();
+                    resetEvent.Reset();
                 }
             }
         }
@@ -128,7 +130,7 @@ namespace Server.Helpers
 
                 if (!_helperQueue.Any())
                 {
-                    resetEventSlim.Set();
+                    resetEvent.Set();
                 }
             }
         }

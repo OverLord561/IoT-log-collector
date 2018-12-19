@@ -1,18 +1,18 @@
 ﻿using DataProviderCommon;
-using System.Linq;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 
-namespace SamsungTemperatureControllerPlugin
+namespace XiomiPreasureControllerPlugin
 {
-    [Serializable]
-    public class SamsungTemperatureControllerPlugin : IDevicePlugin
+    public class XiomiPreasureControllerPlugin : IDevicePlugin
     {
-        public string PluginPurpose => "Temperature & Humidity";
-        public string PluginName => "SamsungDPlugin";
+        public string PluginName => "XiomiDPlugin";
+
+        public string PluginPurpose => "Preasure";
 
         // Interface methods
         public DeviceLog ConverterToStandard(string message)
@@ -21,10 +21,7 @@ namespace SamsungTemperatureControllerPlugin
             var deviceData = characteristicPart["DeviceData"].ToObject<DeviceData>();
 
             Random rendom = new Random();
-
-
-            deviceData.Humidity = deviceData.Humidity * rendom.Next(1, 10);
-            deviceData.Temperature = deviceData.Temperature * rendom.Next(1, 10);
+            deviceData.Preasure = deviceData.Preasure * rendom.Next(1, 3);
 
             return new DeviceLog
             {
@@ -75,8 +72,7 @@ namespace SamsungTemperatureControllerPlugin
                 deserealizedLogs.Add(new Log
                 {
                     Hour = log.DateStamp.Hour,
-                    Temperature = deviceData.Temperature,
-                    Humidity = deviceData.Humidity
+                    Preasure = deviceData.Preasure,
                 });
             }
 
@@ -87,8 +83,7 @@ namespace SamsungTemperatureControllerPlugin
                 data.Logs.Add(new Log
                 {
                     Hour = logsPerHour.Key,
-                    Temperature = logsPerHour.Average(t => t.Temperature),
-                    Humidity = logsPerHour.Average(t => t.Humidity)
+                    Preasure = logsPerHour.Average(t => t.Preasure),
                 });
 
             }

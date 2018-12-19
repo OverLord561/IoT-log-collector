@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+    <PostBuildEvent>
+      copy "$(SolutionDir)XiomiPreasureControllerPlugin\bin\Debug\netstandard2.0\" "$(SolutionDir)Server\Plugins\$(TargetFileName)"
+    </PostBuildEvent>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DataProviderCommon\DataProviderCommon.csproj" />
+  </ItemGroup>
+
+</Project>

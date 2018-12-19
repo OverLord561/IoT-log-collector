@@ -40,7 +40,7 @@ namespace Server.Repository
             return res;
         }
 
-        public async Task<bool> WriteLog(string messageFromDevice, int? counter = 0)
+        public bool WriteLogToTemporaryCollection(string messageFromDevice)
         {
             var generalPluginInfo = JsonConvert.DeserializeObject<StandardizedMessageFromDevice>(messageFromDevice);
 
@@ -52,12 +52,12 @@ namespace Server.Repository
             }
 
             var standardizedDevice = plugin.ConverterToStandard(messageFromDevice);
-            standardizedDevice.DateStamp = standardizedDevice.DateStamp.AddHours(counter.Value);
-            standardizedDevice.PluginName = string.Concat(standardizedDevice.PluginName, counter.ToString());
+            standardizedDevice.DateStamp = standardizedDevice.DateStamp;
+            standardizedDevice.PluginName = string.Concat(standardizedDevice.PluginName);
 
             var res = _synchronyHelper.AddToLogToCollection(standardizedDevice, _dataStoragePlugin);
 
-            return res;
+            return res; 
         }
     }
 }

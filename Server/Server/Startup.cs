@@ -1,6 +1,7 @@
 ﻿using DataProviderCommon;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Hosting.Internal;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.ViewComponents;
@@ -16,9 +17,12 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.Loader;
 using System.Threading;
+using System.Threading.Tasks;
+using GracefullShutdown;
 
 namespace Server
 {
@@ -33,18 +37,21 @@ namespace Server
                .SetBasePath(Directory.GetCurrentDirectory())
                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
 
-            Configuration = builder.Build();
+          Configuration = builder.Build();
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+
             services.AddCors(options =>
             {
                 options.AddPolicy("AllowSPAAccess",
                     builder => builder.WithOrigins("http://localhost:60365", "https://localhost:44344"));
             });
+
+            //services.AddGracefullShutdown();
             services.AddMvc();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
@@ -64,10 +71,11 @@ namespace Server
             container.Verify();
             app.UseCors("AllowSPAAccess");
 
-            applicationLifetime.ApplicationStopping.Register(() =>
-            {
-                OnShutdown(container.GetInstance<CollectionOfLogs>().resetEventSlim);
-            });
+            applicationLifetime.ApplicationStopping.Register(OnShutdown);
+
+            //app.UseGracefullShutdown(options => {
+            //    options.ShutdownTimeout = TimeSpan.FromSeconds(20);
+            //});
 
 
             // to redirect HTTP requests to HTTPS
@@ -76,14 +84,25 @@ namespace Server
             app.UseMvc();
         }
 
-        private void OnShutdown(ManualResetEventSlim resetEventSlim)
+        private void OnShutdown()
         {
-            while (true)
-            {
-                Debugger.Break();
 
-                resetEventSlim.Wait();
-            }
+            Console.WriteLine("In Shutdown 1");
+
+            Thread.Sleep(2000);
+
+            Console.WriteLine("In Shutdown 2");
+            Thread.Sleep(2000);
+
+
+            Console.WriteLine("In Shutdown 3");
+            Thread.Sleep(2000);
+
+
+            Console.WriteLine("In Shutdown 4");
+            Thread.Sleep(2000);
+
+
         }
 
         #region SimpleInjector

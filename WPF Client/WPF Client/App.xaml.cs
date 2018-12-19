@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
+using WPF_Client.ViewModels;
 
 namespace WPF_Client
 {
@@ -13,5 +9,11 @@ namespace WPF_Client
     /// </summary>
     public partial class App : Application
     {
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            var mainView = new MainWindow();
+            mainView.Show();
+            mainView.DataContext = new MainViewModel();
+        }
     }
 }

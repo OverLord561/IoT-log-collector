@@ -16,16 +16,19 @@ namespace Server.Controllers
     [ApiController]
     public class DeviceController : ControllerBase
     {
-        private readonly DBWriterHelper _synchronyHelper;
+        private readonly CollectionOfLogs _collectionOfLogs;
         private readonly IDevicesLogsRepository _deviceLogsRepository;
         private readonly IDevicesLogsService _devicesLogsService;
 
         static int count;
-        static int count2;
-
-        static object countLock = new object();
+        private readonly static object countLock = new object();
 
         static DeviceController()
+        {
+            LogCountOFRequestPerSecond();
+        }
+
+        private static void LogCountOFRequestPerSecond()
         {
             Task.Run(async () =>
             {
@@ -38,46 +41,43 @@ namespace Server.Controllers
                         cnt = count;
                         count = 0;
                     }
-                    //System.Diagnostics.Debugger.Log(0, "", $"{cnt}/s \r\n");
-                    Console.WriteLine($"{cnt}/s \r\n");
 
+                    Console.WriteLine($"{cnt}/s \r\n");
                 }
             });
         }
 
         public DeviceController(
-            DBWriterHelper synchronyHelper,
+            CollectionOfLogs collectionOfLogs,
             IDevicesLogsRepository deviceLogsRepository,
             IDevicesLogsService devicesLogsService
             )
         {
-            _synchronyHelper = synchronyHelper;
+            _collectionOfLogs = collectionOfLogs;
             _deviceLogsRepository = deviceLogsRepository;
             _devicesLogsService = devicesLogsService;
         }
 
         [HttpPost]
         [Route("write-log")]
-        public async Task<IActionResult> WriteLog( string smthFromDevice)
+        public IActionResult WriteLog(string smthFromDevice)
         {
-
             smthFromDevice = "{\"PluginName\":\"SamsungDPlugin\",\"DeviceData\":{\"Temperature\":10.0,\"Humidity\":10.0}}";
             lock (countLock)
             {
                 count++;
-                count2++;
             }
 
             try
             {
-                await _deviceLogsRepository.WriteLog(smthFromDevice, count2);
+                _deviceLogsRepository.WriteLogToTemporaryCollection(smthFromDevice);
             }
             catch (Exception ex)
             {
-                var errors = ex;
+                Console.WriteLine(ex.Message);
             }
 
-            return Ok("success");
+            return Ok("Log added to temporary collection");
         }
 
         [HttpGet]
@@ -90,26 +90,29 @@ namespace Server.Controllers
                 var logsForUI = new List<IDeviceLogsUIFormat>();
                 if (!isInitial)
                 {
-                    //_synchronyHelper.EventSlim.Wait();
+                    _collectionOfLogs.resetEvent.WaitOne();
 
-                    var logs = await _deviceLogsRepository.GetDeviceLogsAsync(utcDate);
-                    logsForUI = _devicesLogsService.PrepareLogsForUI(logs);
+                    //var logs = await _deviceLogsRepository.GetDeviceLogsAsync(utcDate);
+                    //logsForUI = _devicesLogsService.PrepareLogsForUI(logs);
 
-                    //_synchronyHelper.EventSlim.Reset();
+                    _collectionOfLogs.resetEvent.Reset();
                 }
                 else
                 {
-                    var logs = await _deviceLogsRepository.GetDeviceLogsAsync(utcDate);
-                    logsForUI = _devicesLogsService.PrepareLogsForUI(logs);
+                    //var logs = await _deviceLogsRepository.GetDeviceLogsAsync(utcDate);
+                    //logsForUI = _devicesLogsService.PrepareLogsForUI(logs);
                 }
+
+                var logs = await _deviceLogsRepository.GetDeviceLogsAsync(utcDate);
+                logsForUI = _devicesLogsService.PrepareLogsForUI(logs);
 
                 return new JsonResult(new { StatusCode = StatusCodes.Status200OK, Logs = logsForUI });
             }
             catch (Exception ex)
             {
-                var error = ex;
+                Console.WriteLine(ex.Message);
 
-                return Ok("success");
+                return BadRequest(ex.Message);
             }
         }
     }

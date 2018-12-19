@@ -40,9 +40,9 @@ namespace Emulator
                {
 
                    HttpClient httpClient = new HttpClient();
-                   httpClient.BaseAddress = new Uri("http://localhost:5000");
+                   httpClient.BaseAddress = new Uri("https://localhost:44373");
 
-                   StringContent httpContent = new StringContent("{\"PluginName\":\"SamsungDPlugin\",\"DeviceData\":{\"Temperature\":10.0,\"Humidity\":10.0}}", Encoding.UTF8, "application/json");
+                   StringContent httpContent = new StringContent("{\"PluginName\":\"SamsungDPlugin\",\"DeviceData\":{\"Temperature\":30.0,\"Humidity\":40.0}}", Encoding.UTF8, "application/json");
 
                    var ll = Enumerable.Range(1, 1500).Select(y =>
                    {

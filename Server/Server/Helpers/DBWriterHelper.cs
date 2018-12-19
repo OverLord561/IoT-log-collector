@@ -21,7 +21,7 @@ namespace Server.Helpers
             {
                 while (true)
                 {
-                    Thread.Sleep(1000);
+                    Thread.Sleep(100);
 
                     WriteToDB().ConfigureAwait(false);
                 }
@@ -54,8 +54,7 @@ namespace Server.Helpers
                 var tuple = _collectionOfLogs.GetLogsToInsert();
 
                 if (tuple != null)
-                {
-                    //Console.WriteLine("Write to db \r\n");
+                {                    
                     return await tuple.DataStoragePlugin.Operations.AddRangeAsync(tuple.Logs).ConfigureAwait(false);
                 }
 
