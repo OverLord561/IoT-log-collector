@@ -4,22 +4,30 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using DataProviderCommon;
+using Microsoft.Extensions.Configuration;
 using Server.Models;
 
 namespace Server.Helpers
 {
     public class CollectionOfLogs
     {
+        private readonly IConfiguration _configuration;
         public readonly ManualResetEvent resetEvent;
         readonly object _locker = new object();
-        int _count = 100; // TODO: get it from appsettings.json
+        int _count;
 
-        List<List<DeviceLog>> _allCollections { get; set; }
-        Queue<List<DeviceLog>> _helperQueue;
+        public List<List<DeviceLog>> _allCollections { get; }
+        public Queue<List<DeviceLog>> _helperQueue { get; }
 
-        public CollectionOfLogs()
+        public CollectionOfLogs(IConfiguration configuration)
         {
             resetEvent = new ManualResetEvent(false);
+            _configuration = configuration;
+
+            var userSettings = new UserSettings();
+            _configuration.Bind("userSettings", userSettings);
+
+            _count = userSettings.CapacityOfCollectionToInsert;
 
             List<DeviceLog> initialLogs = new List<DeviceLog>(_count);
             _allCollections = new List<List<DeviceLog>>() { initialLogs };
@@ -60,7 +68,7 @@ namespace Server.Helpers
             return null;
         }
 
-        private List<DeviceLog> GetWorkingCollection()
+        public List<DeviceLog> GetWorkingCollection()
         {
             lock (_locker)
             {

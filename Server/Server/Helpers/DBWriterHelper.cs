@@ -5,6 +5,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Linq;
 using Server.Repository;
+using Microsoft.Extensions.Configuration;
+using Server.Models;
 
 namespace Server.Helpers
 {
@@ -13,13 +15,16 @@ namespace Server.Helpers
     {
         private readonly CollectionOfLogs _collectionOfLogs;
         private readonly IDevicesLogsRepository _logsRepository;
+        private readonly IConfiguration _config;
 
         public DBWriterHelper(CollectionOfLogs collectionOfLogs
-            , IDevicesLogsRepository logsRepository
+            , IDevicesLogsRepository logsRepository,
+            IConfiguration configuration
             )
         {
             _collectionOfLogs = collectionOfLogs;
             _logsRepository = logsRepository;
+            _config = configuration;
 
             WriteLogsToDbByInterval();
         }
@@ -28,9 +33,12 @@ namespace Server.Helpers
         {
             Task.Run(() =>
             {
+                var userSettings = new UserSettings();
+                _config.Bind("userSettings", userSettings);
+
                 while (true)
                 {
-                    Thread.Sleep(100); //TODO Get this from appsettings
+                    Thread.Sleep(userSettings.IntervalForWritingIntoDb); //TODO Get this from appsettings
 
                     WriteToDB().ConfigureAwait(false);
                 }
