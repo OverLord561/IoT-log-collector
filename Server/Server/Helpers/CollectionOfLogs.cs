@@ -14,106 +14,95 @@ namespace Server.Helpers
         readonly object _locker = new object();
         int _count = 100; // TODO: get it from appsettings.json
 
-        List<MyTuple> _allTuples { get; set; }
-        Queue<MyTuple> _helperQueue;
+        List<List<DeviceLog>> _allCollections { get; set; }
+        Queue<List<DeviceLog>> _helperQueue;
 
         public CollectionOfLogs()
         {
             resetEvent = new ManualResetEvent(false);
 
-            MyTuple initialTuple = new MyTuple(new List<DeviceLog>(_count), null);
-
-            _allTuples = new List<MyTuple>() { initialTuple };
-            _helperQueue = new Queue<MyTuple>();
+            List<DeviceLog> initialLogs = new List<DeviceLog>(_count);
+            _allCollections = new List<List<DeviceLog>>() { initialLogs };
+            _helperQueue = new Queue<List<DeviceLog>>();
         }
 
-        public void AddLog(DeviceLog log, IDataStoragePlugin plugin)
+        public bool AddLog(DeviceLog log)
         {
             lock (_locker)
             {
-                var workingTuple = GetWorkingTuple();
+                var workingCollection = GetWorkingCollection();
 
-                workingTuple.Logs.Add(log);
-                workingTuple.DataStoragePlugin = plugin;
-
+                workingCollection.Add(log);
             }
+
+            return true;
         }
 
-        public MyTuple GetLogsToInsert()
+        public List<DeviceLog> GetLogsToInsert()
         {
             lock (_locker)
             {
-                if (_helperQueue.Any() && _helperQueue.Peek().Logs.Count == _count)
+                if (_helperQueue.Any() && _helperQueue.Peek().Count == _count)
                 {
                     var temporaryObj = new DeviceLog[_count];
 
-                    var logsToInsert = _helperQueue.Peek();
-                    logsToInsert.Logs.CopyTo(temporaryObj);
-                    IDataStoragePlugin dataplugin = (IDataStoragePlugin)logsToInsert.DataStoragePlugin.Clone();
+                    var collectionToInsert = _helperQueue.Peek();
+                    collectionToInsert.CopyTo(temporaryObj);
 
-                    logsToInsert.Logs.Clear();
+                    collectionToInsert.Clear();
 
-                    RemoveTupleFromQueue();
+                    RemoveCollectionFromQueue();
 
-                    //Console.WriteLine(_allTuples.Count);
-
-                    return new MyTuple(temporaryObj.ToList(), dataplugin);
+                    return temporaryObj.ToList();
                 }
             }
 
             return null;
         }
 
-        private MyTuple GetWorkingTuple()
+        private List<DeviceLog> GetWorkingCollection()
         {
-
             lock (_locker)
             {
-                var newCollection = new List<DeviceLog>(_count);
+                var newEmptyCollection = new List<DeviceLog>(_count);
 
-                var currentCollection = _allTuples.FirstOrDefault(tuple => tuple.Logs.Count != 0 && tuple.Logs.Count < _count); // current collection
+                var currentCollection = _allCollections.FirstOrDefault(collection => collection.Count != 0 && collection.Count < _count); // current collection
 
                 if (currentCollection != null)
                 {
                     return currentCollection;
                 }
 
-                var emptyCollection = _allTuples.FirstOrDefault(tuple => !tuple.Logs.Any()); // return empty collection
+                var emptyCollection = _allCollections.FirstOrDefault(collection => !collection.Any()); // return empty collection
 
                 if (emptyCollection != null)
                 {
-                   AddTupleToQueue(emptyCollection);
+                    AddCollectionToQueue(emptyCollection);
 
                     return emptyCollection;
                 }
 
-                if (_allTuples.All(tuple => tuple.Logs.Count == _count)) // all collections all full add new 
+                if (_allCollections.All(collection => collection.Count == _count)) // all collections all full add new 
                 {
-                    MyTuple newTuple = new MyTuple(newCollection, null);
-                    _allTuples.Add(newTuple);
+                    _allCollections.Add(newEmptyCollection);
+                    AddCollectionToQueue(newEmptyCollection);
 
-                    AddTupleToQueue(newTuple);
+                    return newEmptyCollection;
+                }
 
+                _allCollections.Add(newEmptyCollection);
+                AddCollectionToQueue(newEmptyCollection);
 
-                    return newTuple;
-                }               
-
-                MyTuple newTuple2 = new MyTuple(newCollection, null);
-                _allTuples.Add(newTuple2);
-
-                AddTupleToQueue(newTuple2);
-
-                return newTuple2;
-
+                return newEmptyCollection;
             }
 
         }
 
-        private void AddTupleToQueue(MyTuple myTuple)
+        private void AddCollectionToQueue(List<DeviceLog> collection)
         {
             lock (_locker)
             {
-                _helperQueue.Enqueue(myTuple);
+                _helperQueue.Enqueue(collection);
                 if (!_helperQueue.Any())
                 {
                     resetEvent.Reset();
@@ -121,8 +110,7 @@ namespace Server.Helpers
             }
         }
 
-
-        private void RemoveTupleFromQueue()
+        private void RemoveCollectionFromQueue()
         {
             lock (_locker)
             {

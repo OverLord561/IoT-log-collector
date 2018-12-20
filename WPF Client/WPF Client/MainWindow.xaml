@@ -3,10 +3,9 @@
         xmlns:oxy="http://oxyplot.org/wpf"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:viewModels="clr-namespace:WPF_Client.ViewModels"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"        
         xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
-        mc:Ignorable="d"
+        mc:Ignorable="d"         
         Title="MainWindow" Height="450" Width="800">
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Loaded">
@@ -25,16 +24,8 @@
                         <ColumnDefinition></ColumnDefinition>
                         <ColumnDefinition></ColumnDefinition>
                         <ColumnDefinition></ColumnDefinition>
-                    </Grid.ColumnDefinitions>                  
-
-                    <TextBlock HorizontalAlignment="Left" 
-                               TextWrapping="Wrap" 
-                               Text="{Binding Points.Count}" 
-                               VerticalAlignment="Top"
-                               Grid.Column="1" 
-                               Grid.Row="0"
-                            />
-
+                    </Grid.ColumnDefinitions> 
+                    
                     <oxy:PlotView Model="{Binding PlotModel}" Grid.Row="1" Grid.ColumnSpan="3">
                     </oxy:PlotView>
 

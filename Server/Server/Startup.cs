@@ -1,7 +1,6 @@
 ﻿using DataProviderCommon;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Hosting.Internal;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.ViewComponents;
@@ -15,14 +14,10 @@ using SimpleInjector.Integration.AspNetCore.Mvc;
 using SimpleInjector.Lifestyles;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.Loader;
 using System.Threading;
-using System.Threading.Tasks;
-using GracefullShutdown;
 
 namespace Server
 {
@@ -37,7 +32,7 @@ namespace Server
                .SetBasePath(Directory.GetCurrentDirectory())
                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
 
-          Configuration = builder.Build();
+            Configuration = builder.Build();
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -51,7 +46,6 @@ namespace Server
                     builder => builder.WithOrigins("http://localhost:60365", "https://localhost:44344"));
             });
 
-            //services.AddGracefullShutdown();
             services.AddMvc();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
@@ -72,11 +66,6 @@ namespace Server
             app.UseCors("AllowSPAAccess");
 
             applicationLifetime.ApplicationStopping.Register(OnShutdown);
-
-            //app.UseGracefullShutdown(options => {
-            //    options.ShutdownTimeout = TimeSpan.FromSeconds(20);
-            //});
-
 
             // to redirect HTTP requests to HTTPS
             app.UseHttpsRedirection();
@@ -101,7 +90,6 @@ namespace Server
 
             Console.WriteLine("In Shutdown 4");
             Thread.Sleep(2000);
-
 
         }
 
@@ -131,7 +119,7 @@ namespace Server
             //container.Register<IFirstRepository, FirstRepository<First>>(Lifestyle.Scoped);
             container.Register<DataStoragesHelperType>();
             container.Register<DeviceHelperType>();
-            container.RegisterSingleton<DBWriterHelper>();
+            container.Register<DBWriterHelper>();
             container.Register<IDevicesLogsRepository, DevicesLogsRepository>();
             container.Register<IDevicesLogsService, DevicesLogsService>();
             container.RegisterSingleton<CollectionOfLogs>();

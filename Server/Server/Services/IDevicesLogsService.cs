@@ -9,5 +9,7 @@ namespace Server.Services
     public interface IDevicesLogsService
     {
         List<IDeviceLogsUIFormat> PrepareLogsForUI(List<DeviceLog> logs);
+
+        DeviceLog ConvertStringToDeviceLog(string message);
     }
 }

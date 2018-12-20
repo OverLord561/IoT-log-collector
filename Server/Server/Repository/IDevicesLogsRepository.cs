@@ -8,6 +8,8 @@ namespace Server.Repository
     {
         Task<List<DeviceLog>> GetDeviceLogsAsync(int? utcDate);
 
-        bool WriteLogToTemporaryCollection(string messageFromDevice);
+        bool WriteLogToTemporaryCollection(DeviceLog log);
+
+        Task<bool> WriteRangeAsync(List<DeviceLog> logs);
     }
 }

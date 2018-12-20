@@ -70,7 +70,9 @@ namespace Server.Controllers
 
             try
             {
-                _deviceLogsRepository.WriteLogToTemporaryCollection(smthFromDevice);
+                var log = _devicesLogsService.ConvertStringToDeviceLog(smthFromDevice);
+
+                _deviceLogsRepository.WriteLogToTemporaryCollection(log);
             }
             catch (Exception ex)
             {

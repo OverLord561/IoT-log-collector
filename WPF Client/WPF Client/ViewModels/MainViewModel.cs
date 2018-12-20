@@ -14,6 +14,7 @@ using OxyPlot;
 using OxyPlot.Axes;
 using OxyPlot.Series;
 using WPF_Client.Commands;
+using WPF_Client.Helpers;
 using WPF_Client.Models;
 using WPF_Client.Services;
 
@@ -22,7 +23,7 @@ namespace WPF_Client.ViewModels
     public class MainViewModel : INotifyPropertyChanged
     {
         private PlotModel _plotModel;
-        private bool IsInitial = true;
+        private readonly GlobalSynchroObject _globalSynchroObject;
 
         public PlotModel PlotModel
         {
@@ -30,8 +31,10 @@ namespace WPF_Client.ViewModels
             set { _plotModel = value; OnPropertyChanged("PlotModel"); }
         }
 
-        public MainViewModel()
+
+        public MainViewModel(GlobalSynchroObject globalSynchroObject)
         {
+            _globalSynchroObject = globalSynchroObject;
 
         }
 
@@ -45,7 +48,7 @@ namespace WPF_Client.ViewModels
                   (loadedCommand = new DelegateCommand(obj =>
                  {
                      RestSharpHttpClient _client = new RestSharpHttpClient();
-                     
+
 
                      Task.Run(async () =>
                      {
@@ -54,15 +57,10 @@ namespace WPF_Client.ViewModels
 
                              Thread.Sleep(1000);
 
-                             PlotModel plotModel = null;
+                             PlotModel plotModel = new PlotModel();
 
-                             //if (PlotModel == null)
-                            // {
-                                 plotModel = new PlotModel();
-                             //}
-
-                             var response = await _client.GetAsync<Response>($"api/log-collector/get-logs?utcDate=&isInitial={IsInitial}");
-                             IsInitial = false;
+                             var response = await _client.GetAsync<Response>($"api/log-collector/get-logs?utcDate=&isInitial={_globalSynchroObject.IsIFirstStart}");
+                             _globalSynchroObject.IsIFirstStart = false;
 
                              PropertyInfo[] info = new PropertyInfo[100];
 
@@ -127,7 +125,6 @@ namespace WPF_Client.ViewModels
                                      plotModel.Series.Add(seria);
                                  }
                              }
-
 
                              PlotModel = plotModel;
 

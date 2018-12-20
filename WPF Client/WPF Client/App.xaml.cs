@@ -1,6 +1,6 @@
-﻿using System;
-using System.Windows;
-using WPF_Client.ViewModels;
+﻿using System.Windows;
+using Unity;
+using WPF_Client.Helpers;
 
 namespace WPF_Client
 {
@@ -9,11 +9,15 @@ namespace WPF_Client
     /// </summary>
     public partial class App : Application
     {
+        private IUnityContainer container;
+
         protected override void OnStartup(StartupEventArgs e)
         {
-            var mainView = new MainWindow();
-            mainView.Show();
-            mainView.DataContext = new MainViewModel();
+            container = new UnityContainer();
+            container.RegisterSingleton<GlobalSynchroObject>();
+
+            MainWindow mainWindow = container.Resolve<MainWindow>();
+            mainWindow.Show();            
         }
     }
 }
