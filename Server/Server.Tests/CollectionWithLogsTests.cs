@@ -23,95 +23,67 @@ namespace Server.Tests
         CollectionOfLogs helperCollection = new CollectionOfLogs(_config);
 
         [Fact]
-        public void SizeOfCollectionInParallelWriting()
+        public void Count_Of_Collection_Elements_In_Parallel_Writing_Should_Be_Digit()
         {
             // Arrange
+            var userSettings = new UserSettings();
+            _config.Bind("userSettings", userSettings);
 
-            var countOfCollectios = 10;
+            var countOfCalls = 1000;
+            var countOfCollectios = countOfCalls / userSettings.CapacityOfCollectionToInsert;
 
             // Act
-
-            var taskWriters = Enumerable.Range(1, 1000).Select(x =>
-            {
-                return Task.Run(() =>
-                {
-                    helperCollection.AddLog(_log);
-                });
-            }).ToArray();
-
-            Task.WaitAll(taskWriters);
+            EmulateCalls(countOfCalls);
 
             //Assert
             Assert.Equal(countOfCollectios, helperCollection._allCollections.Count);
         }
 
         [Fact]
-        public void SizeOfQueueInParallelWriting()
-        {
-            // Arrange
-
-            var sizeOFQueue = 10;
-
-            // Act
-
-            var taskWriters = Enumerable.Range(1, 1000).Select(x =>
-            {
-                return Task.Run(() =>
-                {
-                    helperCollection.AddLog(_log);
-                });
-            }).ToArray();
-
-            Task.WaitAll(taskWriters);
-
-            //Assert
-            Assert.Equal(sizeOFQueue, helperCollection._helperQueue.Count);
-        }
-
-        [Fact]
-        public void CountOfLogsInEachCollection()
+        public void Count_Of_Queue_Elements_In_Parallel_Writing_Should_Be_Digit()
         {
             // Arrange
             var userSettings = new UserSettings();
             _config.Bind("userSettings", userSettings);
 
-            var fullCollectionsCount = 10;
-            var countOfLogsInEachCollection = userSettings.CapacityOfCollectionToInsert;
+            var countOfCalls = 1000;
+            var countOFQueueElements = countOfCalls / userSettings.CapacityOfCollectionToInsert;
+
             // Act
+            EmulateCalls(countOfCalls);
 
-            var taskWriters = Enumerable.Range(1, 1000).Select(x =>
-            {
-                return Task.Run(() =>
-                {
-                    helperCollection.AddLog(_log);
-                });
-            }).ToArray();
+            //Assert
+            Assert.Equal(countOFQueueElements, helperCollection._helperQueue.Count);
+        }
 
-            Task.WaitAll(taskWriters);
+        [Fact]
+        public void Count_Of_Logs_In_Each_Collection()
+        {
+            // Arrange
+            var userSettings = new UserSettings();
+            _config.Bind("userSettings", userSettings);
+
+            var countOfCalls = 1000;
+            var fullCollectionsCount = countOfCalls / userSettings.CapacityOfCollectionToInsert;
+            var countOfLogsInEachCollection = userSettings.CapacityOfCollectionToInsert;
+
+            // Act
+            EmulateCalls(countOfCalls);
 
             //Assert
             Assert.Equal(fullCollectionsCount, helperCollection._allCollections.Count(col => col.Count == countOfLogsInEachCollection));
         }
 
         [Fact]
-        public void GetEmptyWorkingDirectory()
+        public void Get_Empty_Working_Directory()
         {
             // Arrange
-          
+            int countOfCalls = 1000;
+
             // Act
-
-            var taskWriters = Enumerable.Range(1, 1000).Select(x =>
-            {
-                return Task.Run(() =>
-                {
-                    helperCollection.AddLog(_log);
-                });
-            }).ToArray();
-
-            Task.WaitAll(taskWriters);
+            EmulateCalls(countOfCalls);
 
             helperCollection._allCollections.FirstOrDefault().Clear();
-
             var workingCollection = helperCollection.GetWorkingCollection();
 
             //Assert
@@ -119,27 +91,18 @@ namespace Server.Tests
         }
 
         [Fact]
-        public void GetCurrentWorkingDirectory()
+        public void Get_Current_Working_Directory()
         {
             // Arrange
             var userSettings = new UserSettings();
             _config.Bind("userSettings", userSettings);
-
+            int countOfCalls = 991;
             var countOfLogsInEachCollection = userSettings.CapacityOfCollectionToInsert;
+
             // Act
+            EmulateCalls(countOfCalls);
 
-            var taskWriters = Enumerable.Range(1, 991).Select(x =>
-            {
-                return Task.Run(() =>
-                {
-                    helperCollection.AddLog(_log);
-                });
-            }).ToArray();
-
-            Task.WaitAll(taskWriters);
-
-            helperCollection._allCollections.FirstOrDefault(x=>x.Count < countOfLogsInEachCollection);
-
+            helperCollection._allCollections.FirstOrDefault(x => x.Count < countOfLogsInEachCollection);
             var workingCollection = helperCollection.GetWorkingCollection();
 
             //Assert
@@ -147,21 +110,13 @@ namespace Server.Tests
         }
 
         [Fact]
-        public void GetExtraWorkingDirectory()
+        public void Get_Extra_Working_Directory()
         {
             // Arrange
+            int countOfCalls = 1000;
 
             // Act
-
-            var taskWriters = Enumerable.Range(1, 1000).Select(x =>
-            {
-                return Task.Run(() =>
-                {
-                    helperCollection.AddLog(_log);
-                });
-            }).ToArray();
-
-            Task.WaitAll(taskWriters);           
+            EmulateCalls(countOfCalls);
 
             var workingCollection = helperCollection.GetWorkingCollection();
 
@@ -169,5 +124,18 @@ namespace Server.Tests
             Assert.Empty(workingCollection);
         }
 
+        private void EmulateCalls(int countOfCalls)
+        {
+
+            var taskWriters = Enumerable.Range(1, countOfCalls).Select(x =>
+            {
+                return Task.Run(() =>
+                {
+                    helperCollection.AddLog(_log);
+                });
+            }).ToArray();
+
+            Task.WaitAll(taskWriters);
+        }
     }
 }
