@@ -39,10 +39,6 @@ namespace MSSQlDataProviderPlugin
         }
 
         public IDataStorageOperationsOperations Operations => new Repository(_dbContext);
-
-        public object Clone()
-        {
-            return MemberwiseClone();
-        }
+       
     }
 }

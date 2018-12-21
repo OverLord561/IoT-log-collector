@@ -29,7 +29,7 @@ namespace Server.Tests
         {
             // Arrange
             var repo = new DeviceLogsRepoMock();
-            var dbWriter = new DBWriterHelper(helperCollection, repo, _config);
+            var dbWriter = new DBWriterHelper(helperCollection, repo, _config).RunLogsChecker(CancellationToken.None);
             var countOfCalls = 1000;
 
             // Act
@@ -42,11 +42,11 @@ namespace Server.Tests
         }
 
         [Fact]
-        public void Helper_Queue_Should_Be_Empty()
+        public void HelperQueue_AfterWrite_IsEmpty()
         {
             // Arrange
             var repo = new DeviceLogsRepoMock();
-            var dbWriter = new DBWriterHelper(helperCollection, repo, _config);
+            var dbWriter = new DBWriterHelper(helperCollection, repo, _config).RunLogsChecker(CancellationToken.None);
             var countOfCalls = 1000;
 
             // Act
@@ -59,19 +59,19 @@ namespace Server.Tests
 
 
         [Fact]
-        public void Helper_Collection_Should_Contains_Only_Empty_Lists()
+        public void HelperCollection_AfterWrite_ContainsEmptyLists()
         {
             // Arrange
             var repo = new DeviceLogsRepoMock();
-            var dbWriter = new DBWriterHelper(helperCollection, repo, _config);
+            var dbWriter = new DBWriterHelper(helperCollection, repo, _config).RunLogsChecker(CancellationToken.None);
             var countOfCalls = 1000;
 
             // Act
             EmulateApiCalls(countOfCalls);
             var factCountInMemory = repo.logsInMemory.Count();
-
+            var res = helperCollection._allCollections.All(x => !x.Any());
             //Assert
-            Assert.True(helperCollection._allCollections.All(x => !x.Any()));
+            Assert.True(res);
         }
 
 
@@ -85,7 +85,7 @@ namespace Server.Tests
             var userSettings = new UserSettings();
             _config.Bind("userSettings", userSettings);
 
-            var dbWriter = new DBWriterHelper(helperCollection, repo, _config);
+            var dbWriter = new DBWriterHelper(helperCollection, repo, _config).RunLogsChecker(CancellationToken.None);
             var copyOfHelperCollectionAsList = new List<DeviceLog>();
 
             // Act

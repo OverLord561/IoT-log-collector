@@ -15,5 +15,15 @@ namespace DataProviderCommon
         public DateTime DateStamp { get; set; }
 
         public byte[] Message { get; set; }
+
+        public override bool Equals(object obj)
+        {
+            var another = obj as DeviceLog;
+            if (another == null)
+                return false;
+
+            return ReferenceEquals(this, another) || (Id == another.Id && PluginName == another.PluginName && DateStamp == another.DateStamp && Message == another.Message);
+        }
+
     }
 }

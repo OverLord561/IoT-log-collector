@@ -35,11 +35,6 @@ namespace MySQLDataProviderPlugin
 
         }
 
-        public IDataStorageOperationsOperations Operations => new Repository(_dbContext);
-
-        public object Clone()
-        {
-            return MemberwiseClone();
-        }
+        public IDataStorageOperationsOperations Operations => new Repository(_dbContext);        
     }
 }

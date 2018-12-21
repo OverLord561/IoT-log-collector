@@ -24,29 +24,27 @@ namespace Server.Helpers
         {
             _collectionOfLogs = collectionOfLogs;
             _logsRepository = logsRepository;
-            _config = configuration;
-
-            WriteLogsToDbByInterval();
+            _config = configuration;          
         }
 
-        public void WriteLogsToDbByInterval()
+        public Task RunLogsChecker(CancellationToken appCancellationToken)
         {
-            Task.Run(() =>
+            return Task.Run(async () =>
             {
                 var userSettings = new UserSettings();
                 _config.Bind("userSettings", userSettings);
 
-                while (true)
+                while (!appCancellationToken.IsCancellationRequested)
                 {
-                    Thread.Sleep(userSettings.IntervalForWritingIntoDb); //TODO Get this from appsettings
+                    await Task.Delay(TimeSpan.FromMilliseconds(userSettings.IntervalForWritingIntoDb));
 
-                    WriteToDB().ConfigureAwait(false);
+                    await WriteToDB();
                 }
             });
         }
 
 
-        public async Task<bool> WriteToDB()
+        private async Task<bool> WriteToDB()
         {
             try
             {

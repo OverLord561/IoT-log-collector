@@ -23,15 +23,12 @@ namespace Server.Tests
         CollectionOfLogs helperCollection = new CollectionOfLogs(_config);
 
         [Fact]
-        public void Count_Of_Collection_Elements_In_Parallel_Writing_Should_Be_Digit()
+        public void Count_Of_Collection_Elements_In_Parallel_Writing_Should_Be_Digit2()
         {
-            // Arrange
-            var userSettings = new UserSettings();
-            _config.Bind("userSettings", userSettings);
-
+            // Arrange           
             var countOfCalls = 1000;
-            var countOfCollectios = countOfCalls / userSettings.CapacityOfCollectionToInsert;
-
+            var countOfCollectios = 10;
+            
             // Act
             EmulateCalls(countOfCalls);
 
@@ -40,12 +37,11 @@ namespace Server.Tests
         }
 
         [Fact]
-        public void Count_Of_Queue_Elements_In_Parallel_Writing_Should_Be_Digit()
+        public void Count_Of_Queue_Elements_In_Parallel_Writing_Should_Be_Digit2()
         {
             // Arrange
             var userSettings = new UserSettings();
             _config.Bind("userSettings", userSettings);
-
             var countOfCalls = 1000;
             var countOFQueueElements = countOfCalls / userSettings.CapacityOfCollectionToInsert;
 
@@ -64,7 +60,7 @@ namespace Server.Tests
             _config.Bind("userSettings", userSettings);
 
             var countOfCalls = 1000;
-            var fullCollectionsCount = countOfCalls / userSettings.CapacityOfCollectionToInsert;
+            var fullCollectionsCount = 10;
             var countOfLogsInEachCollection = userSettings.CapacityOfCollectionToInsert;
 
             // Act

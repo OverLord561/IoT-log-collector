@@ -18,6 +18,7 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.Loader;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Server
 {
@@ -25,6 +26,7 @@ namespace Server
     {
         public IConfiguration Configuration;
         private Container container = new Container();
+        Task checkerTask;
 
         public Startup(IConfiguration configuration, IHostingEnvironment env)
         {
@@ -63,6 +65,10 @@ namespace Server
             }
 
             container.Verify();
+
+            var inst = container.GetInstance<DBWriterHelper>();
+            checkerTask = inst.RunLogsChecker(applicationLifetime.ApplicationStopping);
+
             app.UseCors("AllowSPAAccess");
 
             applicationLifetime.ApplicationStopping.Register(OnShutdown);
@@ -75,6 +81,8 @@ namespace Server
 
         private void OnShutdown()
         {
+
+            checkerTask.Wait(5000); //TODO use timeout from appsettings
 
             Console.WriteLine("In Shutdown 1");
 
