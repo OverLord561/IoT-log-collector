@@ -1,5 +1,6 @@
 ﻿using DataProviderCommon;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Server.Helpers;
 using Server.Models;
 using System;
@@ -14,21 +15,27 @@ namespace Server.Tests
 {
     public class CollectionWithLogsTests
     {
-        static IConfigurationRoot _config = new ConfigurationBuilder()
-                                .AddJsonFile("appsettings.json")
-                                .Build();
-
         DeviceLog _log = new DeviceLog { DateStamp = DateTime.Now, PluginName = "SamsungDPlugin" };
 
-        CollectionOfLogs helperCollection = new CollectionOfLogs(_config);
+        CollectionOfLogs helperCollection = new CollectionOfLogs(optionsAccessor);
+
+        static IOptions<UserSettings> optionsAccessor = Options.Create(
+           new UserSettings
+           {
+               DataProviderPluginName = "MySQLDSPlugin",
+               CapacityOfCollectionToInsert = 100,
+               IntervalForWritingIntoDb = 100
+           });
+
+        UserSettings _userSettings = optionsAccessor.Value;
 
         [Fact]
-        public void Count_Of_Collection_Elements_In_Parallel_Writing_Should_Be_Digit2()
+        public void CollectionOfCollections_After1000CallsFromApi_Contains10Collections()
         {
             // Arrange           
             var countOfCalls = 1000;
             var countOfCollectios = 10;
-            
+
             // Act
             EmulateCalls(countOfCalls);
 
@@ -37,13 +44,11 @@ namespace Server.Tests
         }
 
         [Fact]
-        public void Count_Of_Queue_Elements_In_Parallel_Writing_Should_Be_Digit2()
+        public void CollectionHelper_After1000CallsFromApi_ContainsQueuWith10Elements()
         {
             // Arrange
-            var userSettings = new UserSettings();
-            _config.Bind("userSettings", userSettings);
             var countOfCalls = 1000;
-            var countOFQueueElements = countOfCalls / userSettings.CapacityOfCollectionToInsert;
+            var countOFQueueElements = 10;
 
             // Act
             EmulateCalls(countOfCalls);
@@ -53,15 +58,13 @@ namespace Server.Tests
         }
 
         [Fact]
-        public void Count_Of_Logs_In_Each_Collection()
+        public void CollectionOfCollections_After1000CallsFromApi_Contains10CollectionsWith100Logs()
         {
             // Arrange
-            var userSettings = new UserSettings();
-            _config.Bind("userSettings", userSettings);
 
             var countOfCalls = 1000;
             var fullCollectionsCount = 10;
-            var countOfLogsInEachCollection = userSettings.CapacityOfCollectionToInsert;
+            var countOfLogsInEachCollection = _userSettings.CapacityOfCollectionToInsert;
 
             // Act
             EmulateCalls(countOfCalls);
@@ -71,7 +74,7 @@ namespace Server.Tests
         }
 
         [Fact]
-        public void Get_Empty_Working_Directory()
+        public void CollectionsHelper_After1000CallsFromApiAndCleaningFirstCollection_ReturnsCurrentCleanedCollection()
         {
             // Arrange
             int countOfCalls = 1000;
@@ -79,7 +82,16 @@ namespace Server.Tests
             // Act
             EmulateCalls(countOfCalls);
 
-            helperCollection._allCollections.FirstOrDefault().Clear();
+            //helperCollection._allCollections.FirstOrDefault().Clear();
+
+            var firstOrDefaultCollection = helperCollection._allCollections.FirstOrDefault();
+
+            if (firstOrDefaultCollection == null) {
+                throw new NotImplementedException();
+            }
+
+            firstOrDefaultCollection.Clear();
+
             var workingCollection = helperCollection.GetWorkingCollection();
 
             //Assert
@@ -87,13 +99,11 @@ namespace Server.Tests
         }
 
         [Fact]
-        public void Get_Current_Working_Directory()
+        public void CollectionsHelper_After991CallsFromApi_ReturnsCurrentNotFullCollection()
         {
             // Arrange
-            var userSettings = new UserSettings();
-            _config.Bind("userSettings", userSettings);
             int countOfCalls = 991;
-            var countOfLogsInEachCollection = userSettings.CapacityOfCollectionToInsert;
+            var countOfLogsInEachCollection = _userSettings.CapacityOfCollectionToInsert;
 
             // Act
             EmulateCalls(countOfCalls);
@@ -106,7 +116,7 @@ namespace Server.Tests
         }
 
         [Fact]
-        public void Get_Extra_Working_Directory()
+        public void CollectionsHelper_After1000CallsFromApi_ReturnsOneMoreCollectionForOneMoreLog()
         {
             // Arrange
             int countOfCalls = 1000;

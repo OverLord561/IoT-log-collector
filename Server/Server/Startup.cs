@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.ViewComponents;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Server.Helpers;
+using Server.Models;
 using Server.Repository;
 using Server.Services;
 using SimpleInjector;
@@ -49,7 +50,8 @@ namespace Server
             });
 
             services.AddMvc();
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
+            services.Configure<UserSettings>(Configuration.GetSection("userSettings"));
 
             IntegrateSimpleInjector(services);
         }

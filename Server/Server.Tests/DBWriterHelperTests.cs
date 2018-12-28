@@ -1,5 +1,6 @@
 ﻿using DataProviderCommon;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Server.Helpers;
 using Server.Models;
 using Server.Tests.Mocks;
@@ -14,22 +15,25 @@ namespace Server.Tests
 {
     public class DBWriterHelperTests
     {
-        static IConfigurationRoot _config = new ConfigurationBuilder()
-                                .AddJsonFile("appsettings.json")
-                                .Build();
 
-        DeviceLog _log = new DeviceLog { DateStamp = DateTime.Now, PluginName = "SamsungDPlugin" };
-        CollectionOfLogs helperCollection = new CollectionOfLogs(_config);
-
+        CollectionOfLogs helperCollection = new CollectionOfLogs(optionsAccessor);
         static object _locker = new object();
 
+        DeviceLog _log = new DeviceLog { DateStamp = DateTime.Now, PluginName = "SamsungDPlugin" };
+        static IOptions<UserSettings> optionsAccessor = Options.Create(
+            new UserSettings
+            {
+                DataProviderPluginName = "MySQLDSPlugin",
+                CapacityOfCollectionToInsert = 100,
+                IntervalForWritingIntoDb = 100
+            });
 
         [Fact]
-        public void Add_1000_Logs_To_Collection_Of_Collections_And_Write_To_Storage()
+        public void InMemoryStorage_After1000CallsFromApi_Contains1000Elements()
         {
             // Arrange
             var repo = new DeviceLogsRepoMock();
-            var dbWriter = new DBWriterHelper(helperCollection, repo, _config).RunLogsChecker(CancellationToken.None);
+            var dbWriter = new DBWriterHelper(helperCollection, repo, optionsAccessor).RunLogsChecker(CancellationToken.None);
             var countOfCalls = 1000;
 
             // Act
@@ -46,7 +50,7 @@ namespace Server.Tests
         {
             // Arrange
             var repo = new DeviceLogsRepoMock();
-            var dbWriter = new DBWriterHelper(helperCollection, repo, _config).RunLogsChecker(CancellationToken.None);
+            var dbWriter = new DBWriterHelper(helperCollection, repo, optionsAccessor).RunLogsChecker(CancellationToken.None);
             var countOfCalls = 1000;
 
             // Act
@@ -63,7 +67,7 @@ namespace Server.Tests
         {
             // Arrange
             var repo = new DeviceLogsRepoMock();
-            var dbWriter = new DBWriterHelper(helperCollection, repo, _config).RunLogsChecker(CancellationToken.None);
+            var dbWriter = new DBWriterHelper(helperCollection, repo, optionsAccessor).RunLogsChecker(CancellationToken.None);
             var countOfCalls = 1000;
 
             // Act
@@ -76,16 +80,13 @@ namespace Server.Tests
 
 
         [Fact]
-        public void Order_Of_Logs_In_Storage_Must_Be_The_Same_As_In_Adding_To_Helper_Collection()
+        public void InMemoryStorage_After1000CallsFromApi_ContainsElementsInTheSameOrderAsTheyCameFromApi()
         {
             // Arrange
             var repo = new DeviceLogsRepoMock();
             var countOfCalls = 1000;
 
-            var userSettings = new UserSettings();
-            _config.Bind("userSettings", userSettings);
-
-            var dbWriter = new DBWriterHelper(helperCollection, repo, _config).RunLogsChecker(CancellationToken.None);
+            var dbWriter = new DBWriterHelper(helperCollection, repo, optionsAccessor).RunLogsChecker(CancellationToken.None);
             var copyOfHelperCollectionAsList = new List<DeviceLog>();
 
             // Act
@@ -95,9 +96,10 @@ namespace Server.Tests
                 return Task.Run(() =>
                 {
                     DeviceLog _log = new DeviceLog { DateStamp = DateTime.Now, PluginName = "SamsungDPlugin", Id = x };
-                    helperCollection.AddLog(_log);
+                  
                     lock (_locker)
                     {
+                        helperCollection.AddLog(_log);
                         copyOfHelperCollectionAsList.Add(_log);
                     }
 
@@ -105,7 +107,7 @@ namespace Server.Tests
             }).ToArray();
 
             Task.WaitAll(taskWriters); // full the collection of collections
-            Thread.Sleep(2000);
+            Thread.Sleep(3000);
 
             var isEqual = Enumerable.SequenceEqual(repo.logsInMemory, copyOfHelperCollectionAsList);
 

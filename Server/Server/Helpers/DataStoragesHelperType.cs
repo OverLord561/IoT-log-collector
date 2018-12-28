@@ -1,30 +1,26 @@
 ﻿using DataProviderCommon;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Server.Models;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace Server.Helpers
 {
     public class DataStoragesHelperType
     {
-        private readonly IConfiguration _configuration;
         private readonly IEnumerable<IDataStoragePlugin> _dataStoragePlugins;
+        private readonly UserSettings _userSettings;
 
-        public DataStoragesHelperType(IConfiguration configuration, IEnumerable<IDataStoragePlugin> dataStoragePluginsCollection)
+        public DataStoragesHelperType(IEnumerable<IDataStoragePlugin> dataStoragePluginsCollection, IOptions<UserSettings> subOptionsAccessor)
         {
-            _configuration = configuration;
+            _userSettings = subOptionsAccessor.Value;
             _dataStoragePlugins = dataStoragePluginsCollection;
         }
 
         public IDataStoragePlugin GetDataStoragePlugin()
         {
-            var userSettings = new UserSettings();
-            _configuration.Bind("userSettings", userSettings);
 
-            return _dataStoragePlugins.FirstOrDefault(x => x.PluginName == userSettings.DataProviderPluginName);
+            return _dataStoragePlugins.FirstOrDefault(x => x.PluginName == _userSettings.DataProviderPluginName);
         }
     }
 }

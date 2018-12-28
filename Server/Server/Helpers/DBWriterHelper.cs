@@ -1,48 +1,40 @@
-﻿using DataProviderCommon;
+﻿using Microsoft.Extensions.Options;
+using Server.Models;
+using Server.Repository;
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Linq;
-using Server.Repository;
-using Microsoft.Extensions.Configuration;
-using Server.Models;
 
 namespace Server.Helpers
 {
-    //this guy is Singleton
     public class DBWriterHelper
     {
         private readonly CollectionOfLogs _collectionOfLogs;
         private readonly IDevicesLogsRepository _logsRepository;
-        private readonly IConfiguration _config;
+        private readonly UserSettings _userSettings;
 
         public DBWriterHelper(CollectionOfLogs collectionOfLogs
-            , IDevicesLogsRepository logsRepository,
-            IConfiguration configuration
-            )
+            , IDevicesLogsRepository logsRepository
+            , IOptions<UserSettings> subOptionsAccessor)
         {
             _collectionOfLogs = collectionOfLogs;
             _logsRepository = logsRepository;
-            _config = configuration;          
+
+            _userSettings = subOptionsAccessor.Value;
         }
 
         public Task RunLogsChecker(CancellationToken appCancellationToken)
         {
             return Task.Run(async () =>
             {
-                var userSettings = new UserSettings();
-                _config.Bind("userSettings", userSettings);
-
                 while (!appCancellationToken.IsCancellationRequested)
                 {
-                    await Task.Delay(TimeSpan.FromMilliseconds(userSettings.IntervalForWritingIntoDb));
+                    await Task.Delay(TimeSpan.FromMilliseconds(_userSettings.IntervalForWritingIntoDb));
 
                     await WriteToDB();
                 }
             });
         }
-
 
         private async Task<bool> WriteToDB()
         {

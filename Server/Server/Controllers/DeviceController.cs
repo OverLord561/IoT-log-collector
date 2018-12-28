@@ -7,7 +7,6 @@ using Server.Repository;
 using Server.Services;
 using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Server.Controllers
@@ -90,19 +89,12 @@ namespace Server.Controllers
             try
             {
                 var logsForUI = new List<IDeviceLogsUIFormat>();
+
                 if (!isInitial)
                 {
                     _collectionOfLogs.resetEvent.WaitOne();
 
-                    //var logs = await _deviceLogsRepository.GetDeviceLogsAsync(utcDate);
-                    //logsForUI = _devicesLogsService.PrepareLogsForUI(logs);
-
                     _collectionOfLogs.resetEvent.Reset();
-                }
-                else
-                {
-                    //var logs = await _deviceLogsRepository.GetDeviceLogsAsync(utcDate);
-                    //logsForUI = _devicesLogsService.PrepareLogsForUI(logs);
                 }
 
                 var logs = await _deviceLogsRepository.GetDeviceLogsAsync(utcDate);

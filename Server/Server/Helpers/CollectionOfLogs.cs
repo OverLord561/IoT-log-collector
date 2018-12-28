@@ -1,35 +1,27 @@
-﻿using System;
+﻿using DataProviderCommon;
+using Microsoft.Extensions.Options;
+using Server.Models;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
-using DataProviderCommon;
-using Microsoft.Extensions.Configuration;
-using Server.Models;
 
 namespace Server.Helpers
 {
     public class CollectionOfLogs
     {
-        private readonly IConfiguration _configuration;
         public readonly ManualResetEvent resetEvent;
+        private readonly UserSettings _userSettings;
         readonly object _locker = new object();
-        int _count;
 
         public List<List<DeviceLog>> _allCollections { get; }
         public Queue<List<DeviceLog>> _helperQueue { get; }
 
-        public CollectionOfLogs(IConfiguration configuration)
+        public CollectionOfLogs(IOptions<UserSettings> subOptionsAccessor)
         {
+            _userSettings = subOptionsAccessor.Value;
             resetEvent = new ManualResetEvent(false);
-            _configuration = configuration;
 
-            var userSettings = new UserSettings();
-            _configuration.Bind("userSettings", userSettings);
-
-            _count = userSettings.CapacityOfCollectionToInsert;
-
-            List<DeviceLog> initialLogs = new List<DeviceLog>(_count);
+            List<DeviceLog> initialLogs = new List<DeviceLog>(_userSettings.CapacityOfCollectionToInsert);
             _allCollections = new List<List<DeviceLog>>() { initialLogs };
             _helperQueue = new Queue<List<DeviceLog>>();
         }
@@ -50,9 +42,9 @@ namespace Server.Helpers
         {
             lock (_locker)
             {
-                if (_helperQueue.Any() && _helperQueue.Peek().Count == _count)
+                if (_helperQueue.Any() && _helperQueue.Peek().Count == _userSettings.CapacityOfCollectionToInsert)
                 {
-                    var temporaryObj = new DeviceLog[_count];
+                    var temporaryObj = new DeviceLog[_userSettings.CapacityOfCollectionToInsert];
 
                     var collectionToInsert = _helperQueue.Peek();
                     collectionToInsert.CopyTo(temporaryObj);
@@ -72,16 +64,18 @@ namespace Server.Helpers
         {
             lock (_locker)
             {
-                var newEmptyCollection = new List<DeviceLog>(_count);
+                var newEmptyCollection = new List<DeviceLog>(_userSettings.CapacityOfCollectionToInsert);
 
-                var currentCollection = _allCollections.FirstOrDefault(collection => collection.Count != 0 && collection.Count < _count); // current collection
+                var currentCollection = _allCollections
+                                        .FirstOrDefault(collection => collection.Count != 0 && collection.Count < _userSettings.CapacityOfCollectionToInsert); // current collection
 
                 if (currentCollection != null)
                 {
                     return currentCollection;
                 }
 
-                var emptyCollection = _allCollections.FirstOrDefault(collection => !collection.Any()); // return empty collection
+                var emptyCollection = _allCollections
+                                        .FirstOrDefault(collection => !collection.Any()); // return empty collection
 
                 if (emptyCollection != null)
                 {
@@ -90,7 +84,7 @@ namespace Server.Helpers
                     return emptyCollection;
                 }
 
-                if (_allCollections.All(collection => collection.Count == _count)) // all collections all full add new 
+                if (_allCollections.All(collection => collection.Count == _userSettings.CapacityOfCollectionToInsert)) // all collections all full add new 
                 {
                     _allCollections.Add(newEmptyCollection);
                     AddCollectionToQueue(newEmptyCollection);
