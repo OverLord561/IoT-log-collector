@@ -28,27 +28,20 @@ namespace Server.Services
             }
 
             var deviceLog = plugin.ConverterToStandard(messageFromDevice);
-            deviceLog.DateStamp = deviceLog.DateStamp.AddHours(-3);
+            deviceLog.DateStamp = deviceLog.DateStamp.AddHours(0);
             deviceLog.PluginName = string.Concat(deviceLog.PluginName);
 
             return deviceLog;
         }
 
-        public List<IDeviceLogsUIFormat> PrepareLogsForUI(List<DeviceLog> logs)
+        public DeviceLogsInChartFormat PrepareLogsForUI(List<DeviceLog> logs, string deviceName)
         {
-            var groups = logs.GroupBy(l => l.PluginName);
+            var group = logs.GroupBy(l => l.PluginName).FirstOrDefault(gr => gr.Key == deviceName);
 
-            List<IDeviceLogsUIFormat> devicesLogs = new List<IDeviceLogsUIFormat>();
+            IDevicePlugin plugin = _devicePluginsHelper.GetDevicePlugin(group.Key);
+            var dataForUI = group.Select(log => log).ToList();
 
-            foreach (var group in groups)
-            {
-                IDevicePlugin plugin = _devicePluginsHelper.GetDevicePlugin(group.Key);
-                var dataForUI = group.Select(log => log).ToList();
-
-                devicesLogs.Add(plugin.PrepareDataForUI(dataForUI));                
-            }
-
-            return devicesLogs;
+            return plugin.PrepareDataForUI(dataForUI);
         }
     }
 }

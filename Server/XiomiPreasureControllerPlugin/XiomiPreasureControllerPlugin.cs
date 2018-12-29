@@ -55,7 +55,7 @@ namespace XiomiPreasureControllerPlugin
             }
         }
 
-        public IDeviceLogsUIFormat PrepareDataForUI(List<DeviceLog> serializedLogs)
+        public IDeviceLogsInChartFormat PrepareDataForUI(List<DeviceLog> serializedLogs)
         {
             DeviceLogsUIFormat data = new DeviceLogsUIFormat
             {

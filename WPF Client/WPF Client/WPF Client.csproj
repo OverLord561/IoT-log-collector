@@ -76,6 +76,7 @@
     <Compile Include="Models\DeviceLogsUIFormat.cs" />
     <Compile Include="Models\Log.cs" />
     <Compile Include="Models\Response.cs" />
+    <Compile Include="Services\IHttpClient.cs" />
     <Compile Include="Services\RestSharpHttpClient.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Page Include="MainWindow.xaml">

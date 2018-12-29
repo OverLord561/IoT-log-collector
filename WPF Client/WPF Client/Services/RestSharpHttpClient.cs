@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace WPF_Client.Services
 {
-    public class RestSharpHttpClient
+    public class RestSharpHttpClient: IHttpClient
     {
         private static readonly RestClient _client;       
 
@@ -22,7 +22,7 @@ namespace WPF_Client.Services
             return res.Data;
         }
 
-        public void Post<TRequest, TResponse>(string relativeUrl, TRequest body, RestClient client)
+        public void Post<TRequest, TResponse>(string relativeUrl, TRequest body)
         {
             throw new NotImplementedException();
         }

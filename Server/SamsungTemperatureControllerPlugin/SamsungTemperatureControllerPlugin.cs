@@ -14,6 +14,8 @@ namespace SamsungTemperatureControllerPlugin
         public string PluginPurpose => "Temperature & Humidity";
         public string PluginName => "SamsungDPlugin";
 
+        public string[] AxesNames => new string[3] { "Hour", "Temperature", "Humidity" };
+
         // Interface methods
         public DeviceLog ConverterToStandard(string message)
         {
@@ -58,21 +60,29 @@ namespace SamsungTemperatureControllerPlugin
             }
         }
 
-        public IDeviceLogsUIFormat PrepareDataForUI(List<DeviceLog> serializedLogs)
+        public DeviceLogsInChartFormat PrepareDataForUI(List<DeviceLog> serializedLogs)
         {
-            DeviceLogsUIFormat data = new DeviceLogsUIFormat
+            DeviceLogsInChartFormat uiData = new DeviceLogsInChartFormat
             {
-                DeviceName = this.PluginPurpose,
-                Logs = new List<ILog>()
+                ChartName = this.PluginPurpose,
+                Logs = new List<Log>(),
+                AxesNames = AxesNames
             };
 
-            var deserealizedLogs = new List<Log>();
+            DeserealizeLogsAndAddToChartsData(serializedLogs, uiData);
+
+            return uiData;
+        }
+
+        private void DeserealizeLogsAndAddToChartsData(List<DeviceLog> serializedLogs, DeviceLogsInChartFormat uiData)
+        {
+            List<SamsungLog> samsungLogs = new List<SamsungLog>();
 
             foreach (var log in serializedLogs)
             {
                 DeviceData deviceData = ByteArrayToCharacteristics(log.Message);
 
-                deserealizedLogs.Add(new Log
+                samsungLogs.Add(new SamsungLog()
                 {
                     Hour = log.DateStamp.Hour,
                     Temperature = deviceData.Temperature,
@@ -80,20 +90,27 @@ namespace SamsungTemperatureControllerPlugin
                 });
             }
 
-            var groupedByHour = deserealizedLogs.GroupBy(h => h.Hour);
+            GroupLogsByHour(samsungLogs, uiData.Logs);
+        }
 
-            foreach (var logsPerHour in groupedByHour)
+        private void GroupLogsByHour(List<SamsungLog> samsungLogs, List<Log> logs)
+        {
+            samsungLogs = samsungLogs.GroupBy(log => log.Hour)
+                      .Select(x => new SamsungLog
+                      {
+                          Hour = x.Key,
+                          Temperature = Math.Round(x.Average(t => t.Temperature)),
+                          Humidity = Math.Round(x.Average(t => t.Humidity))
+                      })
+                      .ToList();
+
+            foreach (var sl in samsungLogs)
             {
-                data.Logs.Add(new Log
+                logs.Add(new Log
                 {
-                    Hour = logsPerHour.Key,
-                    Temperature = logsPerHour.Average(t => t.Temperature),
-                    Humidity = logsPerHour.Average(t => t.Humidity)
+                    Values = new double[3] { sl.Hour, sl.Temperature, sl.Humidity }
                 });
-
             }
-
-            return data;
         }
     }
 }

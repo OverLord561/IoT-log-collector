@@ -1,22 +1,22 @@
 import axios from 'axios';
 import * as types from './homeConstants';
 import * as globalTypes from '../../../constants/constants';
-import { IDeviceLogsUIFormat } from './homeState';
+// import { DeviceLogsInChartFormat } from './homeState';
 
-const samsungLogs: IDeviceLogsUIFormat = {
-    deviceName: 'Samsung. Back end error',
-    logs: [
-        { hour: 'Page A', temperature: 4000, humidity: 2400, },
-        { hour: 'Page B', temperature: 3000, humidity: 1398 },
-        { hour: 'Page C', temperature: 2000, humidity: 9800 },
-        { hour: 'Page D', temperature: 2780, humidity: 3908 },
-        { hour: 'Page E', temperature: 1890, humidity: 4800 },
-        { hour: 'Page F', temperature: 2390, humidity: 3800 },
-        { hour: 'Page G', temperature: 3490, humidity: 4300 }
-    ]
-};
+// const samsungLogs: DeviceLogsInChartFormat = {
+//     deviceName: 'Samsung. Back end error',
+//     logs: [
+//         { hour: 'Page A', temperature: 4000, humidity: 2400, },
+//         { hour: 'Page B', temperature: 3000, humidity: 1398 },
+//         { hour: 'Page C', temperature: 2000, humidity: 9800 },
+//         { hour: 'Page D', temperature: 2780, humidity: 3908 },
+//         { hour: 'Page E', temperature: 1890, humidity: 4800 },
+//         { hour: 'Page F', temperature: 2390, humidity: 3800 },
+//         { hour: 'Page G', temperature: 3490, humidity: 4300 }
+//     ]
+// };
 
-const data = [samsungLogs];
+// const data = [samsungLogs];
 
 export const LoadLogData = (date: string, isInitial: boolean) => (dispatch: any, getStore: any) => {
     const URL = globalTypes.IoTServer_BASE_URL.concat(types.LOAD_LOGS_BY_DATE(date, isInitial));
@@ -39,7 +39,7 @@ export const LoadLogData = (date: string, isInitial: boolean) => (dispatch: any,
             });
             dispatch({
                 type: types.LOAD_DEVICE_LOGS,
-                devicesLogs: response.data.logs,
+                chartData: response.data.chartData,
                 isInitial,
             });
 
@@ -49,7 +49,7 @@ export const LoadLogData = (date: string, isInitial: boolean) => (dispatch: any,
             console.log(error);
             dispatch({
                 type: types.LOAD_DEVICE_LOGS,
-                devicesLogs: data,
+                // devicesLogs: data,
                 isInitial,
             });
         });

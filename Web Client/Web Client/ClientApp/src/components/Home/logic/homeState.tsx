@@ -1,25 +1,23 @@
 import { IModel } from '../../../common/Identity';
 
 export interface IState extends IModel {
-    devicesLogs: IDeviceLogsUIFormat[];
+    chartData?: IDeviceLogsInChartFormat;
     isInitial: boolean;
 }
 
-export interface IDeviceLogsUIFormat {
-    deviceName: string,
+export interface IDeviceLogsInChartFormat {
+    chartName: string,
+    axesNames: string[],
     logs: ILog[]
 }
 
 export interface ILog {
-    hour: string,
-    temperature: number,
-    humidity: number,
+    values: number[];
 }
 
 export const getInitialState = (): IState => {
     return {
         isInitial: true,
-        devicesLogs: [],
         errors: [],
         isFetching: false
     };

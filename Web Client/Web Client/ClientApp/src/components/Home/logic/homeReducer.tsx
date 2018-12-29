@@ -22,7 +22,7 @@ export const homeReducer = (state = initialState, action) => {
         case types.LOAD_DEVICE_LOGS: {
             return {
                 ...state,
-                devicesLogs: action.devicesLogs,
+                chartData: action.chartData,
                 isInitial: action.isInitial
             };
         }

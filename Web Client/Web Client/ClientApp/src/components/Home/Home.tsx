@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import { IApplicationState } from "../../store/index";
 import { RouteComponentProps } from "react-router-dom";
 import * as actions from "./logic/homeActions";
-import { IDeviceLogsUIFormat, ILog } from "./logic/homeState";
+import { IDeviceLogsInChartFormat } from './logic/homeState';
 import * as moment from "moment";
 
 import {
@@ -21,7 +21,7 @@ import { GenerateRandomHex } from "../../features/commonFeature";
 interface IStateToProps {
   authorized: boolean;
   isFetching: boolean;
-  devicesLogs: IDeviceLogsUIFormat[];
+  chartData: IDeviceLogsInChartFormat;
 }
 
 const dispatchProps = {
@@ -50,17 +50,18 @@ class Home extends React.Component<IProps, any> {
   }
 
   @autobind
-  renderLines(log: ILog) {
+  renderLines() {
+
     const lines: Line[] = [];
 
-    Object.keys(log).forEach((element, iterator) => {
+    this.props.chartData.axesNames.forEach((ax, iterator) => {
       if (iterator > 0) {
         const color: string = GenerateRandomHex();
         lines.push(
           <Line
             key={iterator}
             type="monotone"
-            dataKey={element}
+            dataKey={ax.toLowerCase()}
             stroke={color}
             activeDot={{ r: 8 }}
           />
@@ -72,47 +73,57 @@ class Home extends React.Component<IProps, any> {
   }
 
   @autobind
-  renderCharts() {
-    return this.props.devicesLogs.map((deviceLogs, index) => {
-      return this.renderChart(deviceLogs, index);
+  prepareDataForChartLibrary() {
+    const logs: any = [];
+    const axesNames: string[] = this.props.chartData.axesNames;
+
+    this.props.chartData.logs.forEach((log, iterator) => {
+      const obj = {};
+
+      axesNames.forEach((ax, it) => {
+        obj[ax.toLowerCase()] = log.values[it];
+      });
+
+      logs.push(
+        obj
+      );
     });
+
+    return logs;
   }
 
   @autobind
-  renderChart(deviceLogs: IDeviceLogsUIFormat, index?: number) {
-    let XAxisName: string = "";
-    const logs: ILog[] = deviceLogs.logs;
-    let lines: Line[] = [];
+  renderChart() {
 
-    if (logs.length) {
-      const firstLog = logs[0];
-      XAxisName = Object.keys(firstLog)[0];
-
-      lines = this.renderLines(logs[0]);
-    }
+    const chartData: IDeviceLogsInChartFormat = this.props.chartData;
+    const data = this.prepareDataForChartLibrary();
 
     return (
-      <div key={index}>
-        <h1>{deviceLogs.deviceName}</h1>
+      <div>
+        <h1>{chartData.chartName}</h1>
         <LineChart
           width={600}
           height={300}
-          data={logs}
+          data={data}
           margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
         >
-          <XAxis dataKey={XAxisName} />
+          <XAxis dataKey={chartData.axesNames[0].toLowerCase()} />
           <YAxis />
           <CartesianGrid strokeDasharray="3 3" />
           <Tooltip />
           <Legend />
-          {lines}
+            {this.renderLines()}
         </LineChart>
       </div>
     );
   }
 
   public render() {
-    return <div className="home">{this.renderCharts()}</div>;
+    if (this.props.chartData) {
+      return <div className="home">{this.renderChart()}</div>;
+    }
+
+    return null;
   }
 }
 
@@ -120,7 +131,7 @@ const mapStateToProps = (state: IApplicationState): IStateToProps => {
   return {
     authorized: state.signIn.authorized,
     isFetching: state.home.isFetching,
-    devicesLogs: state.home.devicesLogs,
+    chartData: state.home.chartData as IDeviceLogsInChartFormat,
   };
 };
 

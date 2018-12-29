@@ -1,18 +1,15 @@
-﻿using System;
+﻿using OxyPlot;
+using OxyPlot.Axes;
+using OxyPlot.Series;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Input;
-using OxyPlot;
-using OxyPlot.Axes;
-using OxyPlot.Series;
 using WPF_Client.Commands;
 using WPF_Client.Helpers;
 using WPF_Client.Models;
@@ -24,6 +21,7 @@ namespace WPF_Client.ViewModels
     {
         private PlotModel _plotModel;
         private readonly GlobalSynchroObject _globalSynchroObject;
+        private readonly IHttpClient _client;
 
         public PlotModel PlotModel
         {
@@ -32,9 +30,10 @@ namespace WPF_Client.ViewModels
         }
 
 
-        public MainViewModel(GlobalSynchroObject globalSynchroObject)
+        public MainViewModel(GlobalSynchroObject globalSynchroObject, IHttpClient client)
         {
             _globalSynchroObject = globalSynchroObject;
+            _client = client;
 
         }
 
@@ -46,9 +45,7 @@ namespace WPF_Client.ViewModels
             {
                 return loadedCommand ??
                   (loadedCommand = new DelegateCommand(obj =>
-                 {
-                     RestSharpHttpClient _client = new RestSharpHttpClient();
-
+                 {                    
 
                      Task.Run(async () =>
                      {

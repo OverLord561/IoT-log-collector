@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.ViewComponents;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Server.Helpers;
 using Server.Models;
 using Server.Repository;
@@ -83,8 +84,10 @@ namespace Server
 
         private void OnShutdown()
         {
+            var userSettings = new UserSettings();
+            Configuration.Bind("userSettings", userSettings);
 
-            checkerTask.Wait(5000); //TODO use timeout from appsettings
+            checkerTask.Wait(userSettings.IntervalForWritingIntoDb * 2);
 
             Console.WriteLine("In Shutdown 1");
 

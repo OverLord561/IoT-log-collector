@@ -8,7 +8,7 @@ namespace Server.Services
 {
     public interface IDevicesLogsService
     {
-        List<IDeviceLogsUIFormat> PrepareLogsForUI(List<DeviceLog> logs);
+        DeviceLogsInChartFormat PrepareLogsForUI(List<DeviceLog> logs, string deviceName);
 
         DeviceLog ConvertStringToDeviceLog(string message);
     }

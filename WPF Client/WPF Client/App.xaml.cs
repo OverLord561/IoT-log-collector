@@ -1,6 +1,7 @@
 ﻿using System.Windows;
 using Unity;
 using WPF_Client.Helpers;
+using WPF_Client.Services;
 
 namespace WPF_Client
 {
@@ -15,6 +16,8 @@ namespace WPF_Client
         {
             container = new UnityContainer();
             container.RegisterSingleton<GlobalSynchroObject>();
+            container.RegisterSingleton<IHttpClient, RestSharpHttpClient>();
+
 
             MainWindow mainWindow = container.Resolve<MainWindow>();
             mainWindow.Show();            

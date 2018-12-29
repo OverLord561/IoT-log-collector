@@ -84,23 +84,21 @@ namespace Server.Controllers
         [HttpGet]
         [Route("get-logs")]
         [EnableCors("AllowSPAAccess")]
-        public async Task<IActionResult> GetLogs(int? utcDate, bool isInitial)
+        public async Task<IActionResult> GetLogs(int? utcDate, bool isInitial, string deviceName = "SamsungDPlugin")
         {
             try
             {
-                var logsForUI = new List<IDeviceLogsUIFormat>();
+                var logsForUI = new DeviceLogsInChartFormat();
 
                 if (!isInitial)
                 {
                     _collectionOfLogs.resetEvent.WaitOne();
-
-                    _collectionOfLogs.resetEvent.Reset();
                 }
 
                 var logs = await _deviceLogsRepository.GetDeviceLogsAsync(utcDate);
-                logsForUI = _devicesLogsService.PrepareLogsForUI(logs);
+                logsForUI = _devicesLogsService.PrepareLogsForUI(logs, deviceName);
 
-                return new JsonResult(new { StatusCode = StatusCodes.Status200OK, Logs = logsForUI });
+                return new JsonResult(new { StatusCode = StatusCodes.Status200OK, ChartData = logsForUI });
             }
             catch (Exception ex)
             {

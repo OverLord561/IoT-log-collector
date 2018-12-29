@@ -33,7 +33,7 @@ namespace Server.Helpers
 
                     await WriteToDB();
                 }
-            });
+            }, appCancellationToken);
         }
 
         private async Task<bool> WriteToDB()

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace XiomiPreasureControllerPlugin
 {
-    public class DeviceLogsUIFormat : IDeviceLogsUIFormat
+    public class DeviceLogsUIFormat : IDeviceLogsInChartFormat
     {
         public string DeviceName { get; set; }
 

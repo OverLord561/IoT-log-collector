@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace DataProviderCommon
 {
@@ -10,6 +11,8 @@ namespace DataProviderCommon
 
         DeviceLog ConverterToStandard(string message);
 
-        IDeviceLogsUIFormat PrepareDataForUI(List<DeviceLog> deviceLogs);
+        DeviceLogsInChartFormat PrepareDataForUI(List<DeviceLog> deviceLogs);
+
+        string[] AxesNames { get; }
     }
 }
