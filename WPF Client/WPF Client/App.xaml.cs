@@ -18,7 +18,6 @@ namespace WPF_Client
             container.RegisterSingleton<GlobalSynchroObject>();
             container.RegisterSingleton<IHttpClient, RestSharpHttpClient>();
 
-
             MainWindow mainWindow = container.Resolve<MainWindow>();
             mainWindow.Show();            
         }

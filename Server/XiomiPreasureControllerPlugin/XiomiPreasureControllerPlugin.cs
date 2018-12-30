@@ -14,6 +14,9 @@ namespace XiomiPreasureControllerPlugin
 
         public string PluginPurpose => "Preasure";
 
+        public string[] AxesNames => new string[2] { "Hour", "Preasure" };
+
+
         // Interface methods
         public DeviceLog ConverterToStandard(string message)
         {
@@ -55,40 +58,55 @@ namespace XiomiPreasureControllerPlugin
             }
         }
 
-        public IDeviceLogsInChartFormat PrepareDataForUI(List<DeviceLog> serializedLogs)
+        public DeviceLogsInChartFormat PrepareDataForUI(List<DeviceLog> serializedLogs)
         {
-            DeviceLogsUIFormat data = new DeviceLogsUIFormat
+            DeviceLogsInChartFormat uiData = new DeviceLogsInChartFormat
             {
-                DeviceName = this.PluginPurpose,
-                Logs = new List<ILog>()
+                ChartName = this.PluginPurpose,
+                Logs = new List<Log>(),
+                AxesNames = AxesNames
             };
 
-            var deserealizedLogs = new List<Log>();
+            DeserealizeLogsAndAddToChartsData(serializedLogs, uiData);
+
+            return uiData;
+        }
+
+        private void DeserealizeLogsAndAddToChartsData(List<DeviceLog> serializedLogs, DeviceLogsInChartFormat uiData)
+        {
+            List<XiomiLog> XiomiLogs = new List<XiomiLog>();
 
             foreach (var log in serializedLogs)
             {
                 DeviceData deviceData = ByteArrayToCharacteristics(log.Message);
 
-                deserealizedLogs.Add(new Log
+                XiomiLogs.Add(new XiomiLog()
                 {
                     Hour = log.DateStamp.Hour,
                     Preasure = deviceData.Preasure,
                 });
             }
 
-            var groupedByHour = deserealizedLogs.GroupBy(h => h.Hour);
+            GroupLogsByHour(XiomiLogs, uiData.Logs);
+        }
 
-            foreach (var logsPerHour in groupedByHour)
+        private void GroupLogsByHour(List<XiomiLog> XiomiLogs, List<Log> logs)
+        {
+            XiomiLogs = XiomiLogs.GroupBy(log => log.Hour)
+                      .Select(x => new XiomiLog
+                      {
+                          Hour = x.Key,
+                          Preasure = Math.Round(x.Average(t => t.Preasure))
+                      })
+                      .ToList();
+
+            foreach (var sl in XiomiLogs)
             {
-                data.Logs.Add(new Log
+                logs.Add(new Log
                 {
-                    Hour = logsPerHour.Key,
-                    Preasure = logsPerHour.Average(t => t.Preasure),
+                    Values = new double[2] { sl.Hour, sl.Preasure }
                 });
-
             }
-
-            return data;
         }
     }
 }

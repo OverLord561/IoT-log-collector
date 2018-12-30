@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace WPF_Client.Models
 {
     public class Response
     {
         public int StatusCode { get; set; }
-        public List<DeviceLogsUIFormat> Logs { get; set; }
+        public DeviceLogsInChartFormat ChartData { get; set; }
     }
 }

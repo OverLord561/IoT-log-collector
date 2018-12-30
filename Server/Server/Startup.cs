@@ -69,7 +69,7 @@ namespace Server
 
             container.Verify();
 
-            var inst = container.GetInstance<DBWriterHelper>();
+            var inst = container.GetInstance<LogsStorageWriter>();
             checkerTask = inst.RunLogsChecker(applicationLifetime.ApplicationStopping);
 
             app.UseCors("AllowSPAAccess");
@@ -132,7 +132,7 @@ namespace Server
             //container.Register<IFirstRepository, FirstRepository<First>>(Lifestyle.Scoped);
             container.Register<DataStoragesHelperType>();
             container.Register<DeviceHelperType>();
-            container.Register<DBWriterHelper>();
+            container.Register<LogsStorageWriter>();
             container.Register<IDevicesLogsRepository, DevicesLogsRepository>();
             container.Register<IDevicesLogsService, DevicesLogsService>();
             container.RegisterSingleton<CollectionOfLogs>();

@@ -33,7 +33,7 @@ namespace Server.Tests
         {
             // Arrange
             var repo = new DeviceLogsRepoMock();
-            var dbWriter = new DBWriterHelper(helperCollection, repo, optionsAccessor).RunLogsChecker(CancellationToken.None);
+            var dbWriter = new LogsStorageWriter(helperCollection, repo, optionsAccessor).RunLogsChecker(CancellationToken.None);
             var countOfCalls = 1000;
 
             // Act
@@ -50,7 +50,7 @@ namespace Server.Tests
         {
             // Arrange
             var repo = new DeviceLogsRepoMock();
-            var dbWriter = new DBWriterHelper(helperCollection, repo, optionsAccessor).RunLogsChecker(CancellationToken.None);
+            var dbWriter = new LogsStorageWriter(helperCollection, repo, optionsAccessor).RunLogsChecker(CancellationToken.None);
             var countOfCalls = 1000;
 
             // Act
@@ -67,7 +67,7 @@ namespace Server.Tests
         {
             // Arrange
             var repo = new DeviceLogsRepoMock();
-            var dbWriter = new DBWriterHelper(helperCollection, repo, optionsAccessor).RunLogsChecker(CancellationToken.None);
+            var dbWriter = new LogsStorageWriter(helperCollection, repo, optionsAccessor).RunLogsChecker(CancellationToken.None);
             var countOfCalls = 1000;
 
             // Act
@@ -86,7 +86,7 @@ namespace Server.Tests
             var repo = new DeviceLogsRepoMock();
             var countOfCalls = 1000;
 
-            var dbWriter = new DBWriterHelper(helperCollection, repo, optionsAccessor).RunLogsChecker(CancellationToken.None);
+            var dbWriter = new LogsStorageWriter(helperCollection, repo, optionsAccessor).RunLogsChecker(CancellationToken.None);
             var copyOfHelperCollectionAsList = new List<DeviceLog>();
 
             // Act

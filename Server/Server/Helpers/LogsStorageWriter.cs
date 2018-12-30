@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 
 namespace Server.Helpers
 {
-    public class DBWriterHelper
+    public class LogsStorageWriter
     {
         private readonly CollectionOfLogs _collectionOfLogs;
         private readonly IDevicesLogsRepository _logsRepository;
         private readonly UserSettings _userSettings;
 
-        public DBWriterHelper(CollectionOfLogs collectionOfLogs
+        public LogsStorageWriter(CollectionOfLogs collectionOfLogs
             , IDevicesLogsRepository logsRepository
             , IOptions<UserSettings> subOptionsAccessor)
         {

@@ -1,6 +1,7 @@
 ﻿using RestSharp;
 using System;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace WPF_Client.Services
 {
@@ -19,7 +20,7 @@ namespace WPF_Client.Services
 
             IRestResponse<TResponse> res = await _client.ExecuteTaskAsync<TResponse>(request);
 
-            return res.Data;
+            return JsonConvert.DeserializeObject<TResponse>(res.Content);
         }
 
         public void Post<TRequest, TResponse>(string relativeUrl, TRequest body)

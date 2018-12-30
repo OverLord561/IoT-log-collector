@@ -45,91 +45,55 @@ namespace WPF_Client.ViewModels
             {
                 return loadedCommand ??
                   (loadedCommand = new DelegateCommand(obj =>
-                 {                    
+                 {
 
                      Task.Run(async () =>
                      {
                          while (true)
                          {
-
                              Thread.Sleep(1000);
-
-                             PlotModel plotModel = new PlotModel();
-
                              var response = await _client.GetAsync<Response>($"api/log-collector/get-logs?utcDate=&isInitial={_globalSynchroObject.IsIFirstStart}");
                              _globalSynchroObject.IsIFirstStart = false;
 
-                             PropertyInfo[] info = new PropertyInfo[100];
-
                              if (response.StatusCode == (int)HttpStatusCode.OK)
                              {
-                                 var firstChartData = response.Logs.FirstOrDefault();
-
-                                 // render base elements
-                                 if (firstChartData != null)
-                                 {
-                                     plotModel.Title = firstChartData.DeviceName;
-
-                                     var firstLog = firstChartData.Logs.FirstOrDefault();
-                                     Type firstType = firstLog.GetType();
-
-                                     PropertyInfo[] properties = firstType.GetProperties();
-                                     info = properties;
-
-                                     LinearAxis xAxis = new LinearAxis();
-                                     xAxis.Position = AxisPosition.Bottom;
-                                     xAxis.Title = properties[0].Name;
-
-                                     LinearAxis yAxis = new LinearAxis();
-                                     yAxis.Position = AxisPosition.Left;
-                                     yAxis.Title = "Values";
-
-                                     plotModel.Axes.Add(xAxis);
-                                     plotModel.Axes.Add(yAxis);
-                                 }
-
-                                 plotModel.InvalidatePlot(true);
-
-                                 var collections = info.Skip(1).Select(x =>
-                                 {
-                                     return new List<DataPoint>();
-                                 }).ToArray();
-
-
-                                 foreach (var log in response.Logs[0].Logs)
-                                 {
-                                     var type = log.GetType();
-                                     var props = type.GetProperties();
-
-                                     for (int i = 1; i < props.Length; i++)
-                                     {
-                                         var key = Convert.ToDouble(props[0].GetValue(log));
-                                         var val = Convert.ToDouble(props[i].GetValue(log));
-                                         var data = new DataPoint(key, val);
-
-                                         collections[i - 1].Add(data);
-                                     }
-                                 }
-
-                                 for (var i = 0; i < collections.Length; i++)
-                                 {
-                                     var seria = new LineSeries();
-
-                                     seria.Points.AddRange(collections[i]);
-
-                                     seria.Title = info[i + 1].Name;
-
-                                     plotModel.Series.Add(seria);
-                                 }
+                                 CreateChart(response.ChartData);
                              }
-
-                             PlotModel = plotModel;
-
-                             PlotModel.InvalidatePlot(true);
                          }
                      });
                  }));
             }
+        }
+
+        private void CreateChart(DeviceLogsInChartFormat chartData)
+        {
+            PlotModel plotModel = new PlotModel();
+
+            plotModel.Title = chartData.ChartName;
+
+            LinearAxis xAxis = new LinearAxis();
+            xAxis.Position = AxisPosition.Bottom;
+            xAxis.Title = chartData.AxesNames[0].ToLower();
+
+            plotModel.Axes.Add(xAxis);
+
+            for (var y = 1; y < chartData.AxesNames.Length; y++)
+            {
+                var seria = new LineSeries();
+
+                var points = chartData.Logs.Select(log =>
+                {
+                    return new DataPoint(log.Values[0], log.Values[y]);
+                });
+
+                seria.Points.AddRange(points);
+                seria.Title = chartData.AxesNames[y].ToLower();
+
+                plotModel.Series.Add(seria);
+            }
+
+            PlotModel = plotModel;
+            PlotModel.InvalidatePlot(true);
         }
 
 

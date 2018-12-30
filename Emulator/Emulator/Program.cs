@@ -67,13 +67,6 @@ namespace Emulator
             Task.WaitAll(allTasks);  
 
             Debugger.Break();
-           
-          
-            //stopwatch.Start();
-
-            //Task.WhenAll(uploadTasks).Wait();
-
-            //Console.WriteLine("Time elapsed: {0}", stopwatch.Elapsed);
 
             Console.ReadLine();
         }
