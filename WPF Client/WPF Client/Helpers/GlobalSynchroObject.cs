@@ -1,11 +1,13 @@
-﻿namespace WPF_Client.Helpers
+﻿using System.Configuration;
+
+namespace WPF_Client.Helpers
 {
-    public class GlobalSynchroObject
+    public class GlobalObject
     {
         private bool _isFirstStart = true;
         private readonly static object _locker;
 
-        static GlobalSynchroObject()
+        static GlobalObject()
         {
             _locker = new object();
         }
@@ -27,6 +29,13 @@
                     _isFirstStart = value;
                 }
             }
+        }
+
+        public string GetChartDataUrl()
+        {
+            //TODO ADD TimeStamp and DevicePlugin Name from server settings
+            var reletiveUrl = string.Format(ConfigurationManager.AppSettings["ServerUrl"], "", IsIFirstStart, "SamsungDPlugin");
+            return reletiveUrl;
         }
     }
 }

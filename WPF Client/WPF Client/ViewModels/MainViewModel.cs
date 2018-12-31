@@ -1,12 +1,9 @@
 ﻿using OxyPlot;
 using OxyPlot.Axes;
 using OxyPlot.Series;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Net;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,7 +17,7 @@ namespace WPF_Client.ViewModels
     public class MainViewModel : INotifyPropertyChanged
     {
         private PlotModel _plotModel;
-        private readonly GlobalSynchroObject _globalSynchroObject;
+        private readonly GlobalObject _globalSynchroObject;
         private readonly IHttpClient _client;
 
         public PlotModel PlotModel
@@ -30,7 +27,7 @@ namespace WPF_Client.ViewModels
         }
 
 
-        public MainViewModel(GlobalSynchroObject globalSynchroObject, IHttpClient client)
+        public MainViewModel(GlobalObject globalSynchroObject, IHttpClient client)
         {
             _globalSynchroObject = globalSynchroObject;
             _client = client;
@@ -52,7 +49,9 @@ namespace WPF_Client.ViewModels
                          while (true)
                          {
                              Thread.Sleep(1000);
-                             var response = await _client.GetAsync<Response>($"api/log-collector/get-logs?utcDate=&isInitial={_globalSynchroObject.IsIFirstStart}");
+                           
+
+                             var response = await _client.GetAsync<Response>(_globalSynchroObject.GetChartDataUrl());
                              _globalSynchroObject.IsIFirstStart = false;
 
                              if (response.StatusCode == (int)HttpStatusCode.OK)

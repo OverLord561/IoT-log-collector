@@ -15,7 +15,7 @@ namespace WPF_Client
         protected override void OnStartup(StartupEventArgs e)
         {
             container = new UnityContainer();
-            container.RegisterSingleton<GlobalSynchroObject>();
+            container.RegisterSingleton<GlobalObject>();
             container.RegisterSingleton<IHttpClient, RestSharpHttpClient>();
 
             MainWindow mainWindow = container.Resolve<MainWindow>();
