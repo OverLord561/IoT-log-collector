@@ -48,8 +48,7 @@ namespace WPF_Client.ViewModels
                      {
                          while (true)
                          {
-                             Thread.Sleep(1000);
-                           
+                             Thread.Sleep(1000);                           
 
                              var response = await _client.GetAsync<Response>(_globalSynchroObject.GetChartDataUrl());
                              _globalSynchroObject.IsIFirstStart = false;

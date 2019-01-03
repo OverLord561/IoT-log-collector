@@ -71,6 +71,12 @@ export class NavMenu extends React.Component<IProps, any> {
             </LinkContainer>
           }
 
+          <LinkContainer to={'/manage'}>
+              <NavItem>
+                <Glyphicon glyph='qrcode' /> Manage
+              </NavItem>
+            </LinkContainer>
+
         </Nav>
       </Navbar.Collapse>
     </Navbar>;

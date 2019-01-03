@@ -1,10 +1,16 @@
 ﻿using IoTWebClient.Models;
 using IoTWebClient.Services;
 using IoTWebClient.ViewModels;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace IoTWebClient.Controllers
@@ -13,14 +19,14 @@ namespace IoTWebClient.Controllers
     {
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signInManager;
-        private readonly AuthMessageSender _authMessageSender;
+        private readonly _2FAuthService _2FAuthService;
 
 
-        public AccountController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, AuthMessageSender authMessageSender)
+        public AccountController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, _2FAuthService TwoFAuthService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
-            _authMessageSender = authMessageSender;
+            _2FAuthService = TwoFAuthService;
         }
 
         [HttpPost]
@@ -65,8 +71,6 @@ namespace IoTWebClient.Controllers
                     await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false);
                 if (result.Succeeded)
                 {
-                    HttpContext.Session.SetString("isAuthorized", "true");
-
                     return new JsonResult(
                         new
                         {
@@ -96,17 +100,81 @@ namespace IoTWebClient.Controllers
         {
             // удаляем аутентификационные куки
             await _signInManager.SignOutAsync();
-            HttpContext.Session.SetString("isAuthorized", "false");
 
             return new JsonResult(new { StatusCode = StatusCodes.Status200OK });
 
         }
 
         [HttpGet]
-        public async Task<IActionResult> SendSms()
+        public async Task<IActionResult> QrCodeURI()
         {
-            await _authMessageSender.SendSmsAsync("+380663028887", "hello word");
-            return Ok("sent");
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return BadRequest(
+                new
+                {
+                    StatusCode = StatusCodes.Status409Conflict,
+                    errors = "User does not exists" // TODO add error to model state
+                });
+
+            }
+
+            var model = new EnableAuthenticatorViewModel();
+            await _2FAuthService.LoadSharedKeyAndQrCodeUriAsync(user, model);
+
+            return new JsonResult(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                QrCodeURI = model.AuthenticatorUri,
+                SharedKey = model.SharedKey
+            });
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> EnableAuthenticator([FromBody] EnableAuthenticatorViewModel model)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                //TODO add error to model state
+                throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                await _2FAuthService.LoadSharedKeyAndQrCodeUriAsync(user, model);
+                return View(model);
+            }
+
+            // Strip spaces and hypens
+            var verificationCode = model.Code.Replace(" ", string.Empty).Replace("-", string.Empty);
+
+            try
+            {
+                var is2faTokenValid = await _userManager.VerifyTwoFactorTokenAsync(
+                    user, _userManager.Options.Tokens.AuthenticatorTokenProvider, verificationCode);
+
+                if (!is2faTokenValid)
+                {
+                    ModelState.AddModelError("Code", "Verification code is invalid.");
+                    await _2FAuthService.LoadSharedKeyAndQrCodeUriAsync(user, model);
+                    return View(model);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debugger.Break();
+            }
+
+            await _userManager.SetTwoFactorEnabledAsync(user, true);
+            //_logger.LogInformation("User with ID {UserId} has enabled 2FA with an authenticator app.", user.Id);
+            var recoveryCodes = await _userManager.GenerateNewTwoFactorRecoveryCodesAsync(user, 10);
+
+            return new JsonResult(new { StatusCode = StatusCodes.Status200OK, _2faverified = true });
+
+
         }
     }
 }

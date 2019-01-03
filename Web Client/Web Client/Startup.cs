@@ -2,13 +2,12 @@ using IoTWebClient.Models;
 using IoTWebClient.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 
 namespace Web_Client
 {
@@ -28,14 +27,24 @@ namespace Web_Client
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddIdentity<AppUser, AppRole>()
-                .AddEntityFrameworkStores<ApplicationContext>();
+                .AddEntityFrameworkStores<ApplicationContext>()
+                .AddDefaultTokenProviders();
+            
+            //services.ConfigureApplicationCookie(options =>
+            //{
+            //    // Cookie settings
+            //    options.Cookie.HttpOnly = true;
+            //    options.ExpireTimeSpan = TimeSpan.FromMinutes(15);
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            //    options.LoginPath = "/Account/Login";
+            //    //options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+            //    options.SlidingExpiration = true;
+            //});
 
-            services.AddDistributedMemoryCache();
-            services.AddSession();
+            services.AddMvc();
+            //.SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
-            services.AddSingleton<AuthMessageSender>();
+            services.AddTransient<_2FAuthService>();
 
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
@@ -54,14 +63,15 @@ namespace Web_Client
             else
             {
                 app.UseExceptionHandler("/Error");
-                app.UseHsts();
+                //app.UseHsts();
             }
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
+
+            //app.UseCookiePolicy();
             app.UseAuthentication();
-            app.UseSession();
 
             app.UseMvc(routes =>
             {

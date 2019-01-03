@@ -7,7 +7,7 @@
 
 @media (min-width: 1080px) {
 
-    .sign-up, .sign-in {
+    .sign-up, .sign-in, .manage {
         padding: 150px 250px 0 150px;
     }
 
@@ -18,7 +18,7 @@
 
 @media (max-width: 1079px) {
 
-    .sign-up, .sign-in, .home {
+    .sign-up, .sign-in, .home, .manage {
         padding: 50px 0 0 0;
     }
 }

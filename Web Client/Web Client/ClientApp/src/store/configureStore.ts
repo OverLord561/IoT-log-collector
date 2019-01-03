@@ -4,12 +4,14 @@ import { routerReducer, routerMiddleware } from 'react-router-redux';
 import * as SignUpReducer from '../components/SignUp/logic/signUpReducer';
 import * as SignInReducer from '../components/SignIn/logic/signInReducer';
 import * as HomeReducer from '../components/Home/logic/homeReducer';
+import * as ManageReducer from '../components/Manage/logic/manageReducer';
 
 export default function configureStore(history, initialState) {
   const reducers = {
     signUp: SignUpReducer.signUpReducer,
     signIn: SignInReducer.signInReducer,
-    home: HomeReducer.homeReducer
+    home: HomeReducer.homeReducer,
+    manage: ManageReducer.manageReducer
   };
 
   const middleware = [
