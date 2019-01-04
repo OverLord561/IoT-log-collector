@@ -13,8 +13,7 @@ interface IStateToProps {
 }
 
 const dispatchProps = {
-  logOut: actions.LogOut,
-
+  logOut: actions.LogOut
 };
 
 type IProps = IStateToProps & RouteComponentProps<{}> & typeof dispatchProps;
@@ -29,7 +28,7 @@ export class NavMenu extends React.Component<IProps, any> {
     event.preventDefault();
 
     this.props.logOut(() => {
-      // window.location.href = '/';
+      window.location.href = '/';
     });
   }
 
@@ -71,11 +70,13 @@ export class NavMenu extends React.Component<IProps, any> {
             </LinkContainer>
           }
 
-          <LinkContainer to={'/manage'}>
+          {this.props.authorized &&
+            <LinkContainer to={'/manage'}>
               <NavItem>
                 <Glyphicon glyph='qrcode' /> Manage
               </NavItem>
             </LinkContainer>
+          }
 
         </Nav>
       </Navbar.Collapse>

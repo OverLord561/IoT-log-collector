@@ -1,8 +1,6 @@
 ﻿using IoTWebClient.Models;
 using IoTWebClient.Services;
 using IoTWebClient.ViewModels;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -10,7 +8,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace IoTWebClient.Controllers
@@ -74,8 +71,18 @@ namespace IoTWebClient.Controllers
                     return new JsonResult(
                         new
                         {
-                            StatusCode = StatusCodes.Status201Created,
-                            User = new AppUser { Email = model.Email, UserName = model.Email }
+                            StatusCode = StatusCodes.Status200OK,
+                            User = new AppUser { Email = model.Email, UserName = model.Email, TwoFactorEnabled = false }
+                        });
+                }
+
+                if (result.RequiresTwoFactor)
+                {
+                    return new JsonResult(
+                        new
+                        {
+                            StatusCode = StatusCodes.Status100Continue,
+                            User = new AppUser { Email = model.Email, UserName = model.Email, TwoFactorEnabled = true }
                         });
                 }
                 else
@@ -138,8 +145,14 @@ namespace IoTWebClient.Controllers
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
-                //TODO add error to model state
-                throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+                return BadRequest(
+                new
+                {
+                    StatusCode = StatusCodes.Status409Conflict,
+                    errors = ModelState.Values.SelectMany(x => x.Errors)
+                                            .Select(e => e.ErrorMessage)
+                                                .ToList()
+                });
             }
 
             if (!ModelState.IsValid)
@@ -174,7 +187,116 @@ namespace IoTWebClient.Controllers
 
             return new JsonResult(new { StatusCode = StatusCodes.Status200OK, _2faverified = true });
 
+        }
 
+        [HttpGet]
+        public async Task<IActionResult> TwoFactorAuthentication()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return BadRequest(
+                new
+                {
+                    StatusCode = StatusCodes.Status409Conflict,
+                    errors = new List<string>() { $"Unable to load user. Check browser cache" }
+                });
+            }
+
+            var model = new TwoFactorAuthenticationViewModel
+            {
+                HasAuthenticator = await _userManager.GetAuthenticatorKeyAsync(user) != null,
+                Is2faEnabled = user.TwoFactorEnabled,
+                RecoveryCodesLeft = await _userManager.CountRecoveryCodesAsync(user),
+            };
+
+            return new JsonResult(new { StatusCode = StatusCodes.Status200OK, _2faData = model });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> LoginWith2fa([FromBody] LoginWith2faViewModel model, bool rememberMe, string returnUrl = null)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(
+                new
+                {
+                    StatusCode = StatusCodes.Status409Conflict,
+                    errors = ModelState.Values.SelectMany(x => x.Errors)
+                                            .Select(e => e.ErrorMessage)
+                                                .ToList()
+                });
+            }
+
+            var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
+            if (user == null)
+            {
+                //throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+                return BadRequest(
+                new
+                {
+                    StatusCode = StatusCodes.Status409Conflict,
+                    errors = new List<string>() { $"Unable to load user. Check browser cache" }
+                });
+            }
+
+            var authenticatorCode = model.TwoFactorCode.Replace(" ", string.Empty).Replace("-", string.Empty);
+
+            var result = await _signInManager.TwoFactorAuthenticatorSignInAsync(authenticatorCode, rememberMe, model.RememberMachine);
+
+            if (result.Succeeded)
+            {
+                return new JsonResult(
+                        new
+                        {
+                            StatusCode = StatusCodes.Status200OK,
+                            //User = new AppUser { Email = model.Email, UserName = model.Email, TwoFactorEnabled = false }
+                        });
+            }
+            else
+            {
+                ModelState.AddModelError(string.Empty, "Invalid authenticator code.");
+                return BadRequest(
+                new
+                {
+                    StatusCode = StatusCodes.Status409Conflict,
+                    errors = ModelState.Values.SelectMany(x => x.Errors)
+                                            .Select(e => e.ErrorMessage)
+                                                .ToList()
+                });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Disable2fa()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return BadRequest(
+                new
+                {
+                    StatusCode = StatusCodes.Status409Conflict,
+                    errors = new List<string>() { $"Unable to load user. Check browser cache" }
+                });
+            }
+
+            var disable2faResult = await _userManager.SetTwoFactorEnabledAsync(user, false);
+            if (!disable2faResult.Succeeded)
+            {
+                return BadRequest(
+                new
+                {
+                    StatusCode = StatusCodes.Status409Conflict,
+                    errors = new List<string>() { $"Unexpected error occured disabling 2FA for user with ID '{user.Id}'." }
+                });
+            }
+
+            return new JsonResult(
+                        new
+                        {
+                            StatusCode = StatusCodes.Status200OK,
+                        });
         }
     }
 }

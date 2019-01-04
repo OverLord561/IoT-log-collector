@@ -28,6 +28,14 @@ export const signInReducer = (state = initialState, action) => {
         case types.LOGIN: {
             return {
                 ...state,
+                appUser: action.appUser,
+                errors: action.errors
+            };
+        }
+
+        case types.AUTHORIZED: {
+            return {
+                ...state,
                 authorized: action.authorized,
             };
         }

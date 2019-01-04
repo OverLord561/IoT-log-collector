@@ -5,23 +5,27 @@ import { RouteComponentProps } from "react-router-dom";
 import QRCode from "qrcode.react";
 import * as actions from './logic/manageActions';
 import autobind from "autobind-decorator";
-import { IEnableAuthenticatorViewModel } from "./logic/manageState";
+import { IEnableAuthenticatorViewModel, ITwoFactorAuthenticationViewModel } from "./logic/manageState";
 
 interface IStateToProps {
     authorized: boolean;
+    errors: string[];
     isFetching: boolean;
     qrCodeURI: string;
     sharedKey: string;
-    _2faverified: boolean;
+    _2faData: ITwoFactorAuthenticationViewModel;
 }
 
 const dispatchProps = {
     loadQqCodeURI: actions.LoadQrCodeURI,
-    verify2FA: actions.Verify2FA
+    verify2FA: actions.Verify2FA,
+    load2FAData: actions.Load2FAData,
+    disable2fa: actions.Disable2fa
 };
 
 interface IInnerState {
     code: string;
+    showDisable2faSection: boolean;
 }
 
 type IProps = IStateToProps & RouteComponentProps<{}> & typeof dispatchProps;
@@ -31,16 +35,24 @@ class Manage extends React.Component<IProps, IInnerState> {
         super(props);
 
         this.state = {
-            code: ''
+            code: '',
+            showDisable2faSection: false
         };
     }
 
     componentDidMount() {
-        this.props.loadQqCodeURI();
+        this.onMount();
     }
 
     @autobind
-    onSubmitForm(event: React.FormEvent<HTMLFormElement>) {
+    onMount() {
+        this.props.load2FAData(() => {
+            this.props.loadQqCodeURI();
+        });
+    }
+
+    @autobind
+    verify2FA(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
 
         const model: IEnableAuthenticatorViewModel = {
@@ -49,7 +61,9 @@ class Manage extends React.Component<IProps, IInnerState> {
             authenticatorUri: this.props.qrCodeURI
         };
 
-        this.props.verify2FA(model);
+        this.props.verify2FA(model, () => {
+            this.onMount();
+        });
     }
 
     @autobind
@@ -58,22 +72,85 @@ class Manage extends React.Component<IProps, IInnerState> {
         this.setState({ code: event.currentTarget.value });
     }
 
-    public render() {
-        const _state = this.state;
-        return <div className="manage">
-            <h3>Two Factor enabled: {this.props._2faverified.toString()}</h3>
+    @autobind
+    showDisableSection() {
+        this.setState({
+            showDisable2faSection: true
+        });
+    }
+
+    @autobind
+    disable2fa(event: React.FormEvent<HTMLFormElement>) {
+        event.preventDefault();
+
+        this.props.disable2fa(() => {
+            this.onMount();
+            this.setState({
+                showDisable2faSection: false
+            });
+        });
+    }
+
+    @autobind
+    renderDisable2faSection() {
+        return <div>
+            <div className="alert alert-warning" role="alert">
+                <p>
+                    <span className="glyphicon glyphicon-warning-sign"></span>
+                    <strong>This action only disables 2FA.</strong>
+                </p>
+                <p>
+                    Disabling 2FA does not change the keys used in authenticator apps. If you wish to change the key
+            used in an authenticator app you should <a asp-action="ResetAuthenticatorWarning">reset your
+            authenticator keys.</a>
+                </p>
+            </div>
+
+            <div>
+                <form asp-action="Disable2fa" method="post" className="form-group" onSubmit={this.disable2fa}>
+                    <button className="btn btn-danger" type="submit" >Disable 2FA</button>
+                </form>
+            </div>
+            <div className="form-group has-error">
+                <div className="col-sm-2">
+                </div>
+                <div className="col-sm-10">
+                    {this.props.errors.map((error, index) => {
+                        return <span key={index} className="help-block">{error}</span>;
+                    })}
+                </div>
+            </div>
+        </div >;
+    }
+
+    @autobind
+    renderEnableAutentificatorSection() {
+        return <div>
+            {(this.props._2faData && this.props._2faData.is2faEnabled) &&
+                <button className="btn btn-primary" type="submit" onClick={this.showDisableSection}>Disable 2FA</button>
+            }
+            <h4>Enable authenticator</h4>
+            <div className="form-group has-error">
+                <div className="col-sm-2">
+                </div>
+                <div className="col-sm-10">
+                    {this.props.errors.map((error, index) => {
+                        return <span key={index} className="help-block">{error}</span>;
+                    })}
+                </div>
+            </div>
             <p>To use an authenticator app go through the following steps:</p>
             <ol className="list">
                 <li>
                     <p>
                         Download a two-factor authenticator app like Microsoft Authenticator for
-                <a href="https://go.microsoft.com/fwlink/?Linkid=825071">Windows Phone</a>,
-                <a href="https://go.microsoft.com/fwlink/?Linkid=825072">Android</a> and
-                <a href="https://go.microsoft.com/fwlink/?Linkid=825073">iOS</a> or
-                                                        Google Authenticator for
-                <a href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2&hl=en">Android</a> and
-                <a href="https://itunes.apple.com/us/app/google-authenticator/id388497605?mt=8">iOS</a>.
-            </p>
+                        <a href="https://go.microsoft.com/fwlink/?Linkid=825071">Windows Phone</a>,
+                        <a href="https://go.microsoft.com/fwlink/?Linkid=825072">Android</a> and
+                        <a href="https://go.microsoft.com/fwlink/?Linkid=825073">iOS</a> or
+                                                                                                                                                                            Google Authenticator for
+                        <a href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2&hl=en">Android</a> and
+                        <a href="https://itunes.apple.com/us/app/google-authenticator/id388497605?mt=8">iOS</a>.
+                    </p>
                 </li>
                 <li>
                     <p>Scan the QR Code or enter this key <kbd>{this.props.sharedKey}</kbd> into your two factor authenticator app. Spaces and casing do not matter.</p>
@@ -87,13 +164,13 @@ class Manage extends React.Component<IProps, IInnerState> {
                     <p>
                         Once you have scanned the QR code or input the key above, your two factor authentication app will provide you
                         with a unique code. Enter the code in the confirmation box below.
-            </p>
+</p>
                     <div className="row">
                         <div className="col-md-6">
-                            <form onSubmit={this.onSubmitForm}>
+                            <form onSubmit={this.verify2FA}>
                                 <div className="form-group">
                                     <label asp-for="Code" className="control-label">Verification Code</label>
-                                    <input asp-for="Code" className="form-control" autoComplete="off" value={_state.code} onChange={this.onCodeChanged} />
+                                    <input asp-for="Code" className="form-control" autoComplete="off" value={this.state.code} onChange={this.onCodeChanged} />
                                     <span asp-validation-for="Code" className="text-danger"></span>
                                 </div>
                                 <button type="submit" className="btn btn-default">Verify</button>
@@ -105,15 +182,27 @@ class Manage extends React.Component<IProps, IInnerState> {
             </ol>
         </div>;
     }
+
+    public render() {
+        return <div className="manage">
+
+            {!this.state.showDisable2faSection ?
+                this.renderEnableAutentificatorSection()
+                :
+                this.renderDisable2faSection()
+            }
+        </div>;
+    }
 }
 
 const mapStateToProps = (state: IApplicationState): IStateToProps => {
     return {
         authorized: state.signIn.authorized,
+        errors: state.manage.errors,
         isFetching: state.home.isFetching,
         qrCodeURI: state.manage.qrCodeURI,
         sharedKey: state.manage.sharedKey,
-        _2faverified: state.manage._2faverified
+        _2faData: state.manage._2faData as ITwoFactorAuthenticationViewModel
     };
 };
 

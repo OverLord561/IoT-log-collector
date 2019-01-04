@@ -6,7 +6,7 @@ import * as signInTypes from '../../SignIn/logic/signInConstants';
 
 import * as globalConstants from '../../../constants/constants';
 
-export const LogOut = (goToPrevPage: any) => (dispatch: any, getStore: any) => {
+export const LogOut = (goToHome: any) => (dispatch: any, getStore: any) => {
 
     const URL = globalTypes.BASE_URL.concat(types.LOG_OUT_URL);
 
@@ -23,11 +23,11 @@ export const LogOut = (goToPrevPage: any) => (dispatch: any, getStore: any) => {
             });
 
             dispatch({
-                type: signInTypes.LOGIN,
+                type: signInTypes.AUTHORIZED,
                 authorized: false,
-              });
+            });
 
-            // goToPrevPage();
+            goToHome();
         }).catch(error => {
             console.log(error);
         });

@@ -3,7 +3,7 @@ import { RouteComponentProps } from 'react-router-dom';
 import { connect } from 'react-redux';
 import autobind from 'autobind-decorator';
 
-import { IState, ILoginModel } from './logic/signInState';
+import { IState, ILoginModel, IAppUser, ILoginWith2faViewModel } from './logic/signInState';
 import * as actions from './logic/signInActions';
 import { IApplicationState } from '../../store/index';
 
@@ -12,25 +12,35 @@ interface IStateProps {
     authorized: boolean;
     errors: string[];
     isFetching: boolean;
+    appUser: IAppUser;
 }
 
 const dispatchProps = {
-    authorize: actions.Authorize,
+    login: actions.Login,
     setFormData: actions.SetFormData,
-    authorizeByCookie: actions.AuthorizeByCookie
+    authorizeByCookie: actions.AuthorizeByCookie,
+    loginWith2fa: actions.LoginWith2fa
 };
+
+interface IInnerState {
+    code: string;
+}
 
 type IProps = IState & IStateProps & RouteComponentProps<{}> & typeof dispatchProps;
 
-class SignIn extends React.Component<IProps, any> {
+class SignIn extends React.Component<IProps, IInnerState> {
 
     constructor(props: IProps) {
         super(props);
+
+        this.state = {
+            code: ''
+        };
     }
 
-    componentDidUpdate() {
-        this.props.authorizeByCookie();
-    }
+    // componentDidUpdate() {
+    //     this.props.authorizeByCookie();
+    // }
 
     @autobind
     setLoginData(event: React.FormEvent<HTMLInputElement>) {
@@ -48,57 +58,117 @@ class SignIn extends React.Component<IProps, any> {
     @autobind
     logIn(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
-        this.props.authorize(() => {
+        this.props.login(() => {
             this.props.history.push('/');
         });
     }
 
-    public render() {
-        return <div className="sign-in">
-            <form className="form-horizontal" onSubmit={this.logIn}>
-                <div className="form-group">
-                    <label className="control-label col-sm-2" htmlFor="email">Email:</label>
-                    <div className="col-sm-10">
-                        <input
-                            data-prop="email"
-                            value={this.props.loginModel.email} type="email" className="form-control" id="email" placeholder="Enter email" onChange={this.setLoginData} />
-                    </div>
-                </div>
-                <div className="form-group">
-                    <label className="control-label col-sm-2" htmlFor="pwd">Password:</label>
-                    <div className="col-sm-10">
-                        <input
-                            data-prop="password"
-                            value={this.props.loginModel.password} type="password" className="form-control" id="pwd" placeholder="Enter password" onChange={this.setLoginData} />
-                    </div>
-                </div>
-                <div className="form-group">
-                    <div className="col-sm-offset-2 col-sm-10">
-                        <div className="checkbox">
-                            <label><input
-                                data-prop="rememberMe"
-                                type="checkbox" onChange={this.setLoginData} checked={this.props.loginModel.rememberMe} /> Remember me</label>
+    @autobind
+    logInWith2FA(event: React.FormEvent<HTMLFormElement>) {
+        event.preventDefault();
+
+        const model: ILoginWith2faViewModel = {
+            twoFactorCode: this.state.code,
+            rememberMe: false,
+            rememberMachine: false
+        };
+
+        this.props.loginWith2fa(model);
+    }
+
+    @autobind
+    onCodeChanged(event: React.FormEvent<HTMLInputElement>) {
+
+        this.setState({ code: event.currentTarget.value });
+    }
+
+    @autobind
+    render2FASection() {
+        return <div>
+            <h2>Two-factor authentication</h2>
+            <hr />
+            <p>Your login is protected with an authenticator app. Enter your authenticator code below.</p>
+            <div className="row">
+                <div className="col-md-4">
+                    <form onSubmit={this.logInWith2FA}>
+                        <input asp-for="RememberMe" type="hidden" />
+                        <div asp-validation-summary="All" className="text-danger"></div>
+                        <div className="form-group">
+                            <label asp-for="TwoFactorCode"></label>
+                            <input asp-for="TwoFactorCode" className="form-control" autoComplete="off" onChange={this.onCodeChanged} />
+                            <span asp-validation-for="TwoFactorCode" className="text-danger"></span>
+                        </div>
+                        <div className="form-group">
+                            <button type="submit" className="btn btn-default">Log in</button>
+                        </div>
+                    </form>
+                    <div className="form-group has-error">
+                        <div className="col-sm-2">
+                        </div>
+                        <div className="col-sm-10">
+                            {this.props.errors.map((error, index) => {
+                                return <span key={index} className="help-block">{error}</span>;
+                            })}
                         </div>
                     </div>
                 </div>
-                <div className="form-group">
-                    <div className="col-sm-offset-2 col-sm-10">
-                        <button type="submit" className="btn btn-default">Submit</button>
+            </div>
+        </div>;
+    }
+
+    @autobind
+    renderSimpleLoginSection() {
+        return <form className="form-horizontal" onSubmit={this.logIn}>
+            <div className="form-group">
+                <label className="control-label col-sm-2" htmlFor="email">Email:</label>
+                <div className="col-sm-10">
+                    <input
+                        data-prop="email"
+                        value={this.props.loginModel.email} type="email" className="form-control" id="email" placeholder="Enter email" onChange={this.setLoginData} />
+                </div>
+            </div>
+            <div className="form-group">
+                <label className="control-label col-sm-2" htmlFor="pwd">Password:</label>
+                <div className="col-sm-10">
+                    <input
+                        data-prop="password"
+                        value={this.props.loginModel.password} type="password" className="form-control" id="pwd" placeholder="Enter password" onChange={this.setLoginData} />
+                </div>
+            </div>
+            <div className="form-group">
+                <div className="col-sm-offset-2 col-sm-10">
+                    <div className="checkbox">
+                        <label><input
+                            data-prop="rememberMe"
+                            type="checkbox" onChange={this.setLoginData} checked={this.props.loginModel.rememberMe} /> Remember me</label>
                     </div>
                 </div>
-
-                <div className="form-group has-error">
-                    <div className="col-sm-2">
-                    </div>
-                    <div className="col-sm-10">
-                        {this.props.errors.map((error, index) => {
-                            return <span key={index} className="help-block">{error.errorMessage}</span>;
-                        })}
-                    </div>
-
+            </div>
+            <div className="form-group">
+                <div className="col-sm-offset-2 col-sm-10">
+                    <button type="submit" className="btn btn-default">Submit</button>
                 </div>
+            </div>
 
-            </form>
+            <div className="form-group has-error">
+                <div className="col-sm-2">
+                </div>
+                <div className="col-sm-10">
+                    {this.props.errors.map((error, index) => {
+                        return <span key={index} className="help-block">{error}</span>;
+                    })}
+                </div>
+            </div>
+        </form>;
+    }
+
+    public render() {
+        return <div className="sign-in">
+            {(!this.props.appUser || !this.props.appUser.twoFactorEnabled) ?
+                this.renderSimpleLoginSection()
+                :
+                this.render2FASection()
+            }
         </div>;
     }
 }
@@ -109,6 +179,7 @@ function mapStateToProps(state: IApplicationState): IStateProps {
         authorized: state.signIn.authorized,
         errors: state.signIn.errors,
         isFetching: state.signIn.isFetching,
+        appUser: state.signIn.appUser as IAppUser
     };
 }
 

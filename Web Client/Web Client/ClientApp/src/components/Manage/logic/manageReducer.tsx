@@ -26,10 +26,11 @@ export const manageReducer = (state = initialState, action) => {
                 sharedKey: action.sharedKey
             };
         }
-        case types.VERIFY_2FA: {
+
+        case types.LOAD_2FA_DATA: {
             return {
                 ...state,
-                _2faverified: action._2faverified,
+                _2faData: action._2faData,
             };
         }
 
