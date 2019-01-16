@@ -39,6 +39,13 @@ export const signInReducer = (state = initialState, action) => {
                 authorized: action.authorized,
             };
         }
+
+        case types.EXTERNAL_LOGIN_PROVIDERS: {
+            return {
+                ...state,
+                loginProviders: action.loginProviders,
+            };
+        }
         default: { return state; }
     }
 };

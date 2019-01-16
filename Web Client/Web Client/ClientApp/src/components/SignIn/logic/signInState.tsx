@@ -4,6 +4,7 @@ export interface IState extends IModel {
   loginModel: ILoginModel;
   authorized: boolean;
   appUser?: IAppUser;
+  loginProviders: ILoginProvider[];
 }
 
 export interface ILoginModel {
@@ -25,6 +26,11 @@ export interface ILoginWith2faViewModel {
   rememberMachine: boolean;
 }
 
+export interface ILoginProvider {
+  name: string;
+  displayName: string;
+}
+
 export function getInitialState(): IState {
 
   return {
@@ -36,5 +42,6 @@ export function getInitialState(): IState {
     authorized: false,
     errors: [],
     isFetching: false,
+    loginProviders: []
   };
 }

@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.ViewComponents;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using Server.Helpers;
 using Server.Models;
 using Server.Repository;
@@ -26,8 +25,8 @@ namespace Server
 {
     public class Startup
     {
-        public IConfiguration Configuration;
-        private Container container = new Container();
+        private readonly IConfiguration Configuration;
+        private readonly Container container = new Container();
         Task checkerTask;
 
         public Startup(IConfiguration configuration, IHostingEnvironment env)
@@ -66,6 +65,10 @@ namespace Server
             {
                 app.UseDeveloperExceptionPage();
             }
+            else
+            {
+                app.UseHsts(); // send HTTP Strict Transport Security Protocol (HSTS) headers to clients.
+            }
 
             container.Verify();
 
@@ -85,6 +88,7 @@ namespace Server
         private void OnShutdown()
         {
             var userSettings = new UserSettings();
+
             Configuration.Bind("userSettings", userSettings);
 
             checkerTask.Wait(userSettings.IntervalForWritingIntoDb * 2);
@@ -129,7 +133,6 @@ namespace Server
             container.RegisterMvcViewComponents(app);
 
             // Add application services. For instance:
-            //container.Register<IFirstRepository, FirstRepository<First>>(Lifestyle.Scoped);
             container.Register<DataStoragesHelperType>();
             container.Register<DeviceHelperType>();
             container.Register<LogsStorageWriter>();
@@ -168,9 +171,9 @@ namespace Server
             container.Collection.Register<IDevicePlugin>(assemblies);
 
 
-            //var t = container.GetInstance<ITestType>(); //throw SimpleInjector.ActivationException
-            //IServiceProvider provider = container;
-            //object instance = provider.GetService(typeof(ITestType)); // return null
+            // var t = container.GetInstance<ITestType>(); //throw SimpleInjector.ActivationException
+            // IServiceProvider provider = container;
+            // object instance = provider.GetService(typeof(ITestType)); // return null
         }
 
         #endregion

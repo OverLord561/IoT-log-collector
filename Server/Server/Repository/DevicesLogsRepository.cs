@@ -11,13 +11,11 @@ namespace Server.Repository
     {
         private readonly IDataStoragePlugin _dataStoragePlugin;
         private readonly CollectionOfLogs _collectionOfLogs;
-        private readonly DeviceHelperType _devicePluginsHelper;
 
-        public DevicesLogsRepository(DataStoragesHelperType dataStoragesHelper, CollectionOfLogs collectionOfLogs, DeviceHelperType deviceHelperType)
+        public DevicesLogsRepository(DataStoragesHelperType dataStoragesHelper, CollectionOfLogs collectionOfLogs)
         {
             _dataStoragePlugin = dataStoragesHelper.GetDataStoragePlugin() ?? throw new ArgumentNullException(nameof(dataStoragesHelper));
             _collectionOfLogs = collectionOfLogs;
-            _devicePluginsHelper = deviceHelperType;
         }
 
         public async Task<List<DeviceLog>> GetDeviceLogsAsync(int? utcDate)

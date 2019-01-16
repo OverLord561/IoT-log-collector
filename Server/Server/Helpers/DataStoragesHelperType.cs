@@ -19,7 +19,6 @@ namespace Server.Helpers
 
         public IDataStoragePlugin GetDataStoragePlugin()
         {
-
             return _dataStoragePlugins.FirstOrDefault(x => x.PluginName == _userSettings.DataProviderPluginName);
         }
     }

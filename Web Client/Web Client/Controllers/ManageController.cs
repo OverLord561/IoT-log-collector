@@ -16,13 +16,15 @@ namespace IoTWebClient.Controllers
     {
         private readonly UserManager<AppUser> _userManager;
         private readonly _2FAuthService _2FAuthService;
-
+        private readonly SignInManager<AppUser> _signInManager;
 
         public ManageController(UserManager<AppUser> userManager
-            , _2FAuthService twoFAuthService)
+            , _2FAuthService twoFAuthService
+            , SignInManager<AppUser> signInManager)
         {
             _userManager = userManager;
             _2FAuthService = twoFAuthService;
+            _signInManager = signInManager;
         }
 
         [HttpGet]
@@ -166,6 +168,20 @@ namespace IoTWebClient.Controllers
                         {
                             StatusCode = StatusCodes.Status200OK,
                         });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetExternalAuthentications()
+        {
+            var loginProviders = await _signInManager.GetExternalAuthenticationSchemesAsync();
+
+            return new JsonResult(
+                        new
+                        {
+                            StatusCode = StatusCodes.Status200OK,
+                            LoginProviders = loginProviders
+                        });
+
         }
 
 

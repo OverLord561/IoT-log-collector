@@ -4,6 +4,7 @@ using Server.Repository;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace Server.Helpers
 {
@@ -42,7 +43,7 @@ namespace Server.Helpers
             {
                 var collectionToInsert = _collectionOfLogs.GetLogsToInsert();
 
-                if (collectionToInsert != null)
+                if (collectionToInsert.Any())
                 {
                     return await _logsRepository.WriteRangeAsync(collectionToInsert).ConfigureAwait(false);
                 }

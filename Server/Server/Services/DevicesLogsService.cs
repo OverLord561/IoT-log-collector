@@ -29,7 +29,6 @@ namespace Server.Services
 
             var deviceLog = plugin.ConverterToStandard(messageFromDevice);
             deviceLog.DateStamp = deviceLog.DateStamp.AddHours(0);
-            deviceLog.PluginName = string.Concat(deviceLog.PluginName);
 
             return deviceLog;
         }

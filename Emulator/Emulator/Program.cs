@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -34,13 +35,16 @@ namespace Emulator
         {
             var alldata = new List<double>();
 
-            var allTasks = Enumerable.Range(1, 1).Select(x =>
+            var allTasks = Enumerable.Range(1, 10).Select(x =>
            {
                return Task.Run(() =>
                {
 
                    HttpClient httpClient = new HttpClient();
-                   httpClient.BaseAddress = new Uri("https://localhost:44373");
+                   httpClient.BaseAddress = new Uri("http://localhost:5000");
+                   httpClient.DefaultRequestHeaders
+                         .Accept
+                         .Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
                    StringContent httpContent = new StringContent("{\"PluginName\":\"SamsungDPlugin\",\"DeviceData\":{\"Temperature\":30.0,\"Humidity\":40.0}}", Encoding.UTF8, "application/json");
 
@@ -48,7 +52,7 @@ namespace Emulator
                    {
                        var sw = Stopwatch.StartNew();
 
-                       var response = httpClient.PostAsync("api/log-collector/write-log", httpContent).Result;
+                       var res = httpClient.PostAsync("api/log-collector/write-log", httpContent).Result;
 
                        sw.Stop();
 
@@ -59,21 +63,16 @@ namespace Emulator
 
                    httpContent.Dispose();
                    httpClient.Dispose();
-                                      
+
                });
            }).ToArray();
 
 
-            Task.WaitAll(allTasks);  
+            Task.WaitAll(allTasks);
 
             Debugger.Break();
 
             Console.ReadLine();
-        }
-
-        static void Method(int x, RestSharpHttpClient client, RestClient rcl)
-        {
-            client.Post<string, string>("api/log-collector/write-log", "{\"PluginName\":\"SamsungDPlugin\",\"DeviceData\":{\"Temperature\":10.0,\"Humidity\":10.0}}", rcl);
         }
 
     }

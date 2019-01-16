@@ -1,6 +1,8 @@
 ﻿using IoTWebClient.Models;
 using IoTWebClient.Services;
 using IoTWebClient.ViewModels;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -8,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace IoTWebClient.Controllers
@@ -150,18 +153,80 @@ namespace IoTWebClient.Controllers
             {
                 ModelState.AddModelError(string.Empty, "Invalid authenticator code.");
                 return BadRequest(
-                new
-                {
-                    StatusCode = StatusCodes.Status409Conflict,
-                    errors = GetModelStateErrors()
-                });
+                    new
+                    {
+                        StatusCode = StatusCodes.Status409Conflict,
+                        errors = GetModelStateErrors()
+                    });
             }
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [EnableCors("AllowGoogleLoginProvider")]
+
+        public IActionResult ExternalLogin([FromBody] ExternalLoginViewModel model)
+        {
+            // Request a redirect to the external login provider.
+            var redirectUrl = Url.Action(nameof(ExternalLoginCallback), "Account", null);
+            var properties = _signInManager.ConfigureExternalAuthenticationProperties(model.Provider, redirectUrl);
+            return Challenge(properties, model.Provider);
+        }
+
+        [HttpGet]
+        [EnableCors("AllowGoogleLoginProvider")]
+
+        public async Task<IActionResult> ExternalLoginCallback(string returnUrl = null, string remoteError = null)
+        {
+            if (remoteError != null)
+            {
+                return BadRequest(
+                     new
+                     {
+                         StatusCode = StatusCodes.Status409Conflict,
+                         errors = SetSpecificError($"Error from external provider: {remoteError}")
+                     });
+            }
+            var info = await _signInManager.GetExternalLoginInfoAsync();
+            if (info == null)
+            {
+                return RedirectToAction(nameof(Login));
+            }
+
+            // Sign in the user with this external login provider if the user already has a login.
+            var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor: true);
+            if (result.Succeeded)
+            {
+                return new JsonResult(
+                        new
+                        {
+                            StatusCode = StatusCodes.Status200OK,
+                            //TODO add user info
+                        });
+            }
+
+            // If the user does not have an account, then ask the user to create an account.
+            var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+
+            return new JsonResult(
+                       new
+                       {
+                           StatusCode = StatusCodes.Status200OK,
+                           //TODO add user info
+                       });
+
+            //return View("ExternalLogin", new ExternalLoginViewModel { Email = email });
+
         }
 
         private IEnumerable<string> GetModelStateErrors()
         {
             return ModelState.Values.SelectMany(x => x.Errors)
                                            .Select(e => e.ErrorMessage);
+        }
+        private List<string> SetSpecificError(string message)
+        {
+            return new List<string>(1) { message };
         }
 
     }

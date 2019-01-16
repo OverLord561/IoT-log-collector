@@ -10,6 +10,6 @@ namespace Server.Services
     {
         DeviceLogsInChartFormat PrepareLogsForUI(List<DeviceLog> logs, string deviceName);
 
-        DeviceLog ConvertStringToDeviceLog(string message);
+        DeviceLog ConvertStringToDeviceLog(string messageFromDevice);
     }
 }

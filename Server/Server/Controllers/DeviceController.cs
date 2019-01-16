@@ -7,6 +7,8 @@ using Server.Repository;
 using Server.Services;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Server.Controllers
@@ -46,6 +48,14 @@ namespace Server.Controllers
             });
         }
 
+        private static void IncrementCount()
+        {
+            lock (countLock)
+            {
+                count++;
+            }
+        }
+
         public DeviceController(
             CollectionOfLogs collectionOfLogs,
             IDevicesLogsRepository deviceLogsRepository,
@@ -59,13 +69,17 @@ namespace Server.Controllers
 
         [HttpPost]
         [Route("write-log")]
-        public IActionResult WriteLog(string smthFromDevice)
+        public async Task<IActionResult> WriteLogAsync(string smthFromDevice)
         {
-            smthFromDevice = "{\"PluginName\":\"SamsungDPlugin\",\"DeviceData\":{\"Temperature\":10.0,\"Humidity\":10.0}}";
-            lock (countLock)
+            // TODO handle application/json request
+            using (StreamReader reader = new StreamReader(Request.Body, Encoding.UTF8)) // sdsd
             {
-                count++;
+                smthFromDevice = await reader.ReadToEndAsync();
             }
+
+
+            IncrementCount();
+
 
             try
             {
@@ -88,15 +102,13 @@ namespace Server.Controllers
         {
             try
             {
-                var logsForUI = new DeviceLogsInChartFormat();
-
                 if (!isInitial)
                 {
                     _collectionOfLogs.resetEvent.WaitOne();
                 }
 
                 var logs = await _deviceLogsRepository.GetDeviceLogsAsync(utcDate);
-                logsForUI = _devicesLogsService.PrepareLogsForUI(logs, deviceName);
+                DeviceLogsInChartFormat logsForUI = _devicesLogsService.PrepareLogsForUI(logs, deviceName);
 
                 return new JsonResult(new { StatusCode = StatusCodes.Status200OK, ChartData = logsForUI });
             }

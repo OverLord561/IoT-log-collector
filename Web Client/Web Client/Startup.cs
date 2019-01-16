@@ -1,5 +1,6 @@
 using IoTWebClient.Models;
 using IoTWebClient.Services;
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -23,23 +24,25 @@ namespace Web_Client
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowGoogleLoginProvider",
+                    builder => builder.WithOrigins("https://accounts.google.com", "http://localhost:60366")
+                    .AllowAnyHeader());
+            });
+
             services.AddDbContext<ApplicationContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddIdentity<AppUser, AppRole>()
                 .AddEntityFrameworkStores<ApplicationContext>()
                 .AddDefaultTokenProviders();
-            
-            //services.ConfigureApplicationCookie(options =>
-            //{
-            //    // Cookie settings
-            //    options.Cookie.HttpOnly = true;
-            //    options.ExpireTimeSpan = TimeSpan.FromMinutes(15);
 
-            //    options.LoginPath = "/Account/Login";
-            //    //options.AccessDeniedPath = "/Identity/Account/AccessDenied";
-            //    options.SlidingExpiration = true;
-            //});
+            services.AddAuthentication().AddGoogle(googleOptions =>
+            {
+                googleOptions.ClientId = Configuration["Authentication:Google:ClientId"];
+                googleOptions.ClientSecret = Configuration["Authentication:Google:ClientSecret"];
+            });//
 
             services.AddMvc();
             //.SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
@@ -63,8 +66,10 @@ namespace Web_Client
             else
             {
                 app.UseExceptionHandler("/Error");
-                //app.UseHsts();
+                app.UseHsts(); // send HTTP Strict Transport Security Protocol (HSTS) headers to clients.
             }
+
+            app.UseCors("AllowGoogleLoginProvider");
 
             //app.UseHttpsRedirection();
             app.UseStaticFiles();
