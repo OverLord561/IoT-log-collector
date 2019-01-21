@@ -71,7 +71,7 @@ namespace Server.Controllers
         [Route("write-log")]
         public async Task<IActionResult> WriteLogAsync(string smthFromDevice)
         {
-            // TODO handle application/json request
+            // TODO handle application/json request.
             using (StreamReader reader = new StreamReader(Request.Body, Encoding.UTF8)) // sdsd
             {
                 smthFromDevice = await reader.ReadToEndAsync();

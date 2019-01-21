@@ -93,6 +93,7 @@ namespace XiomiPreasureControllerPlugin
         private void GroupLogsByHour(List<XiomiLog> XiomiLogs, List<Log> logs)
         {
             XiomiLogs = XiomiLogs.GroupBy(log => log.Hour)
+                      .OrderBy(log => log.Key)
                       .Select(x => new XiomiLog
                       {
                           Hour = x.Key,

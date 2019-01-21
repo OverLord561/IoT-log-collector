@@ -46,7 +46,7 @@ namespace Server
             services.AddCors(options =>
             {
                 options.AddPolicy("AllowSPAAccess",
-                    builder => builder.WithOrigins("http://localhost:60365", "https://localhost:44344"));
+                    builder => builder.WithOrigins("http://localhost:60365", "https://localhost:44344", "https://localhost:60366"));
             });
 
             services.AddMvc();
@@ -83,6 +83,8 @@ namespace Server
             app.UseHttpsRedirection();
             //создается единственный в приложении маршрут, который позволит сопоставлять запросы с контроллерами и их методами.
             app.UseMvc();
+
+            app.UseExceptionHandler();
         }
 
         private void OnShutdown()

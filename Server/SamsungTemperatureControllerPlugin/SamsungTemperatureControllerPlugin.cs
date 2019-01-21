@@ -96,6 +96,7 @@ namespace SamsungTemperatureControllerPlugin
         private void GroupLogsByHour(List<SamsungLog> samsungLogs, List<Log> logs)
         {
             samsungLogs = samsungLogs.GroupBy(log => log.Hour)
+                      .OrderBy(log=> log.Key)
                       .Select(x => new SamsungLog
                       {
                           Hour = x.Key,

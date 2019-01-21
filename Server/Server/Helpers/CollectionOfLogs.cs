@@ -57,7 +57,7 @@ namespace Server.Helpers
                 }
             }
 
-            return null;
+            return new List<DeviceLog>();
         }
 
         public List<DeviceLog> GetWorkingCollection()

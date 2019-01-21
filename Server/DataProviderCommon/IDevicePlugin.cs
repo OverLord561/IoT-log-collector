@@ -11,7 +11,7 @@ namespace DataProviderCommon
 
         DeviceLog ConverterToStandard(string message);
 
-        DeviceLogsInChartFormat PrepareDataForUI(List<DeviceLog> deviceLogs);
+        DeviceLogsInChartFormat PrepareDataForUI(List<DeviceLog> serializedLogs);
 
         string[] AxesNames { get; }
     }

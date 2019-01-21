@@ -1,13 +1,9 @@
 ﻿using DataProviderCommon;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Server.Helpers;
 using Server.Models;
 using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -15,19 +11,26 @@ namespace Server.Tests
 {
     public class CollectionWithLogsTests
     {
-        DeviceLog _log = new DeviceLog { DateStamp = DateTime.Now, PluginName = "SamsungDPlugin" };
+        private readonly DeviceLog _log;
+        private readonly CollectionOfLogs _helperCollection;
+        private readonly IOptions<UserSettings> _optionsAccessor;
+        private readonly UserSettings _userSettings;
 
-        CollectionOfLogs helperCollection = new CollectionOfLogs(optionsAccessor);
+        public CollectionWithLogsTests()
+        {
+            _log = new DeviceLog { DateStamp = DateTime.Now, PluginName = "SamsungDPlugin" };
+            _optionsAccessor = Options
+                .Create(new UserSettings
+                {
+                    DataProviderPluginName = "MySQLDSPlugin",
+                    CapacityOfCollectionToInsert = 100,
+                    IntervalForWritingIntoDb = 100
+                });
 
-        static IOptions<UserSettings> optionsAccessor = Options.Create(
-           new UserSettings
-           {
-               DataProviderPluginName = "MySQLDSPlugin",
-               CapacityOfCollectionToInsert = 100,
-               IntervalForWritingIntoDb = 100
-           });
+            _helperCollection = new CollectionOfLogs(_optionsAccessor);
+            _userSettings = _optionsAccessor.Value;
+        }
 
-        UserSettings _userSettings = optionsAccessor.Value;
 
         [Fact]
         public void CollectionOfCollections_After1000CallsFromApi_Contains10Collections()
@@ -40,7 +43,7 @@ namespace Server.Tests
             EmulateCalls(countOfCalls);
 
             //Assert
-            Assert.Equal(countOfCollectios, helperCollection._allCollections.Count);
+            Assert.Equal(countOfCollectios, _helperCollection._allCollections.Count);
         }
 
         [Fact]
@@ -54,7 +57,7 @@ namespace Server.Tests
             EmulateCalls(countOfCalls);
 
             //Assert
-            Assert.Equal(countOFQueueElements, helperCollection._helperQueue.Count);
+            Assert.Equal(countOFQueueElements, _helperCollection._helperQueue.Count);
         }
 
         [Fact]
@@ -70,7 +73,7 @@ namespace Server.Tests
             EmulateCalls(countOfCalls);
 
             //Assert
-            Assert.Equal(fullCollectionsCount, helperCollection._allCollections.Count(col => col.Count == countOfLogsInEachCollection));
+            Assert.Equal(fullCollectionsCount, _helperCollection._allCollections.Count(col => col.Count == countOfLogsInEachCollection));
         }
 
         [Fact]
@@ -82,17 +85,16 @@ namespace Server.Tests
             // Act
             EmulateCalls(countOfCalls);
 
-            //helperCollection._allCollections.FirstOrDefault().Clear();
+            var firstOrDefaultCollection = _helperCollection._allCollections.FirstOrDefault();
 
-            var firstOrDefaultCollection = helperCollection._allCollections.FirstOrDefault();
-
-            if (firstOrDefaultCollection == null) {
+            if (firstOrDefaultCollection == null)
+            {
                 throw new NotImplementedException();
             }
 
             firstOrDefaultCollection.Clear();
 
-            var workingCollection = helperCollection.GetWorkingCollection();
+            var workingCollection = _helperCollection.GetWorkingCollection();
 
             //Assert
             Assert.Empty(workingCollection);
@@ -108,8 +110,8 @@ namespace Server.Tests
             // Act
             EmulateCalls(countOfCalls);
 
-            helperCollection._allCollections.FirstOrDefault(x => x.Count < countOfLogsInEachCollection);
-            var workingCollection = helperCollection.GetWorkingCollection();
+            _helperCollection._allCollections.FirstOrDefault(x => x.Count < countOfLogsInEachCollection);
+            var workingCollection = _helperCollection.GetWorkingCollection();
 
             //Assert
             Assert.NotEmpty(workingCollection);
@@ -124,7 +126,7 @@ namespace Server.Tests
             // Act
             EmulateCalls(countOfCalls);
 
-            var workingCollection = helperCollection.GetWorkingCollection();
+            var workingCollection = _helperCollection.GetWorkingCollection();
 
             //Assert
             Assert.Empty(workingCollection);
@@ -137,7 +139,7 @@ namespace Server.Tests
             {
                 return Task.Run(() =>
                 {
-                    helperCollection.AddLog(_log);
+                    _helperCollection.AddLog(_log);
                 });
             }).ToArray();
 

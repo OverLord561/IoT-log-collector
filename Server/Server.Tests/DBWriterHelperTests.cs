@@ -1,5 +1,4 @@
 ﻿using DataProviderCommon;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Server.Helpers;
 using Server.Models;
@@ -15,31 +14,37 @@ namespace Server.Tests
 {
     public class DBWriterHelperTests
     {
+        private readonly CollectionOfLogs _helperCollection;
+        private readonly DeviceLog _log;
+        private readonly IOptions<UserSettings> _optionsAccessor;
 
-        CollectionOfLogs helperCollection = new CollectionOfLogs(optionsAccessor);
         static object _locker = new object();
 
-        DeviceLog _log = new DeviceLog { DateStamp = DateTime.Now, PluginName = "SamsungDPlugin" };
-        static IOptions<UserSettings> optionsAccessor = Options.Create(
-            new UserSettings
-            {
-                DataProviderPluginName = "MySQLDSPlugin",
-                CapacityOfCollectionToInsert = 100,
-                IntervalForWritingIntoDb = 100
-            });
+        public DBWriterHelperTests()
+        {
+            _log = new DeviceLog { DateStamp = DateTime.Now, PluginName = "SamsungDPlugin" };
+            _optionsAccessor = Options
+                .Create(new UserSettings
+                {
+                    DataProviderPluginName = "MySQLDSPlugin",
+                    CapacityOfCollectionToInsert = 100,
+                    IntervalForWritingIntoDb = 100
+                });
+            _helperCollection = new CollectionOfLogs(_optionsAccessor);
+        }
 
         [Fact]
         public void InMemoryStorage_After1000CallsFromApi_Contains1000Elements()
         {
             // Arrange
             var repo = new DeviceLogsRepoMock();
-            var dbWriter = new LogsStorageWriter(helperCollection, repo, optionsAccessor).RunLogsChecker(CancellationToken.None);
+            new LogsStorageWriter(_helperCollection, repo, _optionsAccessor).RunLogsChecker(CancellationToken.None);
             var countOfCalls = 1000;
 
             // Act
             EmulateApiCalls(countOfCalls);
 
-            var factCountInMemory = repo.logsInMemory.Count();
+            var factCountInMemory = repo.logsInMemory.Count;
 
             //Assert
             Assert.Equal(countOfCalls, factCountInMemory);
@@ -50,15 +55,14 @@ namespace Server.Tests
         {
             // Arrange
             var repo = new DeviceLogsRepoMock();
-            var dbWriter = new LogsStorageWriter(helperCollection, repo, optionsAccessor).RunLogsChecker(CancellationToken.None);
+            new LogsStorageWriter(_helperCollection, repo, _optionsAccessor).RunLogsChecker(CancellationToken.None);
             var countOfCalls = 1000;
 
             // Act
             EmulateApiCalls(countOfCalls);
-            var factCountInMemory = repo.logsInMemory.Count();
 
             //Assert
-            Assert.Empty(helperCollection._helperQueue);
+            Assert.Empty(_helperCollection._helperQueue);
         }
 
 
@@ -67,13 +71,12 @@ namespace Server.Tests
         {
             // Arrange
             var repo = new DeviceLogsRepoMock();
-            var dbWriter = new LogsStorageWriter(helperCollection, repo, optionsAccessor).RunLogsChecker(CancellationToken.None);
+            new LogsStorageWriter(_helperCollection, repo, _optionsAccessor).RunLogsChecker(CancellationToken.None);
             var countOfCalls = 1000;
 
             // Act
             EmulateApiCalls(countOfCalls);
-            var factCountInMemory = repo.logsInMemory.Count();
-            var res = helperCollection._allCollections.All(x => !x.Any());
+            bool res = _helperCollection._allCollections.All(x => !x.Any());
             //Assert
             Assert.True(res);
         }
@@ -86,7 +89,7 @@ namespace Server.Tests
             var repo = new DeviceLogsRepoMock();
             var countOfCalls = 1000;
 
-            var dbWriter = new LogsStorageWriter(helperCollection, repo, optionsAccessor).RunLogsChecker(CancellationToken.None);
+            new LogsStorageWriter(_helperCollection, repo, _optionsAccessor).RunLogsChecker(CancellationToken.None);
             var copyOfHelperCollectionAsList = new List<DeviceLog>();
 
             // Act
@@ -95,12 +98,12 @@ namespace Server.Tests
             {
                 return Task.Run(() =>
                 {
-                    DeviceLog _log = new DeviceLog { DateStamp = DateTime.Now, PluginName = "SamsungDPlugin", Id = x };
-                  
+                    var log = new DeviceLog { DateStamp = DateTime.Now, PluginName = "SamsungDPlugin", Id = x };
+
                     lock (_locker)
                     {
-                        helperCollection.AddLog(_log);
-                        copyOfHelperCollectionAsList.Add(_log);
+                        _helperCollection.AddLog(log);
+                        copyOfHelperCollectionAsList.Add(log);
                     }
 
                 });
@@ -122,7 +125,7 @@ namespace Server.Tests
             {
                 return Task.Run(() =>
                 {
-                    helperCollection.AddLog(_log);
+                    _helperCollection.AddLog(_log);
                 });
             }).ToArray();
 
