@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Server.Helpers;
 using Server.Repository;
 using Server.Services;
+using Server.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -118,6 +119,26 @@ namespace Server.Controllers
 
                 return BadRequest(ex.Message);
             }
+        }
+
+        [HttpGet]
+        [Route("get-sever-settings")]
+        [EnableCors("AllowSPAAccess")]
+        public IActionResult GetServerSettings()
+        {
+            IEnumerable<ServerSettingViewModel> serverSettings = _devicesLogsService.GetServerSettings();
+
+            return new JsonResult(new { StatusCode = StatusCodes.Status200OK, ServerSettings = serverSettings });
+        }
+
+        [HttpPost]
+        [Route("update-sever-settings")]
+        [EnableCors("AllowSPAAccess")]
+        public IActionResult SetServerSettings([FromBody] List<ServerSettingViewModel> serverSettings)
+        {
+           // IEnumerable<ServerSettingViewModel> serverSettings = _devicesLogsService.GetServerSettings();
+
+            return new JsonResult(new { StatusCode = StatusCodes.Status200OK });
         }
     }
 }

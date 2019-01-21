@@ -83,8 +83,7 @@ namespace Server
             app.UseHttpsRedirection();
             //создается единственный в приложении маршрут, который позволит сопоставлять запросы с контроллерами и их методами.
             app.UseMvc();
-
-            app.UseExceptionHandler();
+           
         }
 
         private void OnShutdown()

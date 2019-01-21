@@ -1,18 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using DataProviderCommon;
+﻿using DataProviderCommon;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Server.Helpers;
+using Server.Models;
+using Server.ViewModels;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Server.Services
 {
     public class DevicesLogsService : IDevicesLogsService
     {
         private readonly DeviceHelperType _devicePluginsHelper;
-        public DevicesLogsService(DeviceHelperType devicePluginsHelper)
+        private readonly UserSettings _userSettings;
+
+        public DevicesLogsService(DeviceHelperType devicePluginsHelper, IOptions<UserSettings> subOptionsAccessor)
         {
+            _userSettings = subOptionsAccessor.Value;
             _devicePluginsHelper = devicePluginsHelper;
         }
 
@@ -32,6 +37,34 @@ namespace Server.Services
 
             return deviceLog;
         }
+
+        public IEnumerable<ServerSettingViewModel> GetServerSettings()
+        {
+            return new List<ServerSettingViewModel>() {
+                new ServerSettingViewModel()
+                {
+                    Name = "DataStoragePlugin",
+                    Value = _userSettings.DataProviderPluginName,
+                    DisplayName = "Data storage plugin",
+                    IsEditable = false
+                },
+                new ServerSettingViewModel()
+                {
+                    Name = "BulkInsertCapacity",
+                    DisplayName = "Bulk insert capacity",
+                    Value = _userSettings.CapacityOfCollectionToInsert.ToString(),
+                    IsEditable = true
+                },
+                new ServerSettingViewModel()
+                {
+                    Name = "BulkInsertInterval",
+                    DisplayName = "Bulk insert interval",
+                    Value = _userSettings.IntervalForWritingIntoDb.ToString(),
+                    IsEditable = true
+                }
+            };
+        }
+
 
         public DeviceLogsInChartFormat PrepareLogsForUI(List<DeviceLog> logs, string deviceName)
         {

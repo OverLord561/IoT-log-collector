@@ -27,6 +27,13 @@ export const homeReducer = (state = initialState, action) => {
             };
         }
 
+        case types.SERVER_SETTINGS: {
+            return {
+                ...state,
+                serverSettings: action.serverSettings,
+            };
+        }
+
         default: { return state; }
     }
 };

@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import { IApplicationState } from "../../store/index";
 import { RouteComponentProps } from "react-router-dom";
 import * as actions from "./logic/homeActions";
-import { IDeviceLogsInChartFormat } from './logic/homeState';
+import { IDeviceLogsInChartFormat, IServerSettingViewModel } from './logic/homeState';
 import * as moment from "moment";
 
 import {
@@ -22,10 +22,14 @@ interface IStateToProps {
   authorized: boolean;
   isFetching: boolean;
   chartData: IDeviceLogsInChartFormat;
+  serverSettings: IServerSettingViewModel[];
 }
 
 const dispatchProps = {
-  loadLogData: actions.LoadLogData
+  loadLogData: actions.LoadLogData,
+  getServerSettings: actions.GetServerSettings,
+  updateServerSettings: actions.UpdateServerSettings,
+  setServerSettings: actions.SetServerSettings,
 };
 
 type IProps = IStateToProps & RouteComponentProps<{}> & typeof dispatchProps;
@@ -38,6 +42,7 @@ class Home extends React.Component<IProps, any> {
   componentDidMount() {
     const Utc = moment().format("X");
 
+    this.props.getServerSettings();
     this.props.loadLogData(Utc, true);
   }
 
@@ -99,7 +104,7 @@ class Home extends React.Component<IProps, any> {
     const data = this.prepareDataForChartLibrary();
 
     return (
-      <div>
+      <div className="row home">
         <h1>{chartData.chartName}</h1>
         <LineChart
           width={600}
@@ -112,15 +117,69 @@ class Home extends React.Component<IProps, any> {
           <CartesianGrid strokeDasharray="3 3" />
           <Tooltip />
           <Legend />
-            {this.renderLines()}
+          {this.renderLines()}
         </LineChart>
       </div>
     );
   }
 
+  @autobind
+  updateServerSettings(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    this.props.updateServerSettings(this.props.serverSettings);
+  }
+
+  @autobind
+  setServerSetting(setting: IServerSettingViewModel, index: number, event: React.FormEvent<HTMLInputElement>) {
+      const copy = this.props.serverSettings.slice();
+
+      copy[index].value = event.currentTarget.value;
+
+      this.props.setServerSettings(copy);
+  }
+
+  @autobind
+  renderServerSettings() {
+
+    return <div className="row home">
+      <form className="form-horizontal" onSubmit={this.updateServerSettings}>
+
+        {this.props.serverSettings.map((setting, index) => {
+          return <div className="form-group" key={index}>
+            <label className="control-label col-sm-2" >{setting.displayName}:</label>
+            <div className="col-sm-10">
+              <input type="text"
+                className="form-control"
+                placeholder={setting.name}
+                value={setting.value}
+                readOnly={!setting.isEditable}
+                pattern="^[0-9]+$"
+                onChange={(e) => { this.setServerSetting(setting, index, e); }}
+              />
+            </div>
+          </div>;
+        })}
+        <div className="form-group">
+          <div className="col-sm-offset-2 col-sm-10">
+            <button type="text" className="btn btn-default">Submit</button>
+          </div>
+        </div>
+      </form>
+    </div>;
+  }
+
   public render() {
     if (this.props.chartData) {
-      return <div className="home">{this.renderChart()}</div>;
+      return <div>
+        {this.props.chartData &&
+          this.renderChart()
+        }
+        <hr />
+        {this.props.serverSettings &&
+          this.renderServerSettings()
+        }
+      </div>;
     }
 
     return null;
@@ -132,6 +191,7 @@ const mapStateToProps = (state: IApplicationState): IStateToProps => {
     authorized: state.signIn.authorized,
     isFetching: state.home.isFetching,
     chartData: state.home.chartData as IDeviceLogsInChartFormat,
+    serverSettings: state.home.serverSettings
   };
 };
 
