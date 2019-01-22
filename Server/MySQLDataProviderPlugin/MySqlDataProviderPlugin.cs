@@ -13,6 +13,9 @@ namespace MySQLDataProviderPlugin
         private readonly MySQLDbContext _dbContext;
         public string PluginName => "MySQLDSPlugin";
 
+        public string DisplayName => "My SQL";
+
+
         public MySQLDataProviderPlugin()
         {
 

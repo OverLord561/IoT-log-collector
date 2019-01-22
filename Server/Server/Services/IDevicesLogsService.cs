@@ -14,5 +14,7 @@ namespace Server.Services
         DeviceLog ConvertStringToDeviceLog(string messageFromDevice);
 
         IEnumerable<ServerSettingViewModel> GetServerSettings();
+
+        IEnumerable<DataStoragePluginViewModel> GetDataStoragePlugins();
     }
 }

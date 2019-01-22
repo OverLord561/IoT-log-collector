@@ -6,6 +6,8 @@ namespace DataProviderCommon
     {
         string PluginName { get;}
 
+        string DisplayName { get;  }
+
         IDataStorageOperationsOperations Operations { get; }
     }
 }

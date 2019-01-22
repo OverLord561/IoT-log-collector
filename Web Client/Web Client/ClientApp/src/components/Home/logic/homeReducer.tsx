@@ -9,10 +9,10 @@ export const homeReducer = (state = initialState, action) => {
     switch (action.type) {
         case globalConstants.ADD_VALIDATION_ERROR: {
             return {
-              ...state,
-              errors: action.errors,
+                ...state,
+                errors: action.errors,
             };
-          }
+        }
         case globalConstants.IS_FETCHING: {
             return {
                 ...state,
@@ -31,6 +31,13 @@ export const homeReducer = (state = initialState, action) => {
             return {
                 ...state,
                 serverSettings: action.serverSettings,
+            };
+        }
+
+        case types.DATASTORAGE_PLUGINS: {
+            return {
+                ...state,
+                dataStoragePlugins: action.dataStoragePlugins,
             };
         }
 

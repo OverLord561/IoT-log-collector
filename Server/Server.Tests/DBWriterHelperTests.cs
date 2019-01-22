@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Options;
 using Server.Helpers;
 using Server.Models;
+using Server.Services;
 using Server.Tests.Mocks;
 using System;
 using System.Collections.Generic;
@@ -17,6 +18,7 @@ namespace Server.Tests
         private readonly CollectionOfLogs _helperCollection;
         private readonly DeviceLog _log;
         private readonly IOptions<UserSettings> _optionsAccessor;
+        private readonly AppSettingsModifier _appSettingsModifier;
 
         static object _locker = new object();
 
@@ -30,7 +32,9 @@ namespace Server.Tests
                     CapacityOfCollectionToInsert = 100,
                     IntervalForWritingIntoDb = 100
                 });
-            _helperCollection = new CollectionOfLogs(_optionsAccessor);
+            _appSettingsModifier = new AppSettingsModifier();
+
+            _helperCollection = new CollectionOfLogs(_optionsAccessor, _appSettingsModifier);
         }
 
         [Fact]
@@ -38,7 +42,7 @@ namespace Server.Tests
         {
             // Arrange
             var repo = new DeviceLogsRepoMock();
-            new LogsStorageWriter(_helperCollection, repo, _optionsAccessor).RunLogsChecker(CancellationToken.None);
+            new LogsStorageWriter(_helperCollection, repo, _optionsAccessor, _appSettingsModifier).RunLogsChecker(CancellationToken.None);
             var countOfCalls = 1000;
 
             // Act
@@ -55,7 +59,7 @@ namespace Server.Tests
         {
             // Arrange
             var repo = new DeviceLogsRepoMock();
-            new LogsStorageWriter(_helperCollection, repo, _optionsAccessor).RunLogsChecker(CancellationToken.None);
+            new LogsStorageWriter(_helperCollection, repo, _optionsAccessor, _appSettingsModifier).RunLogsChecker(CancellationToken.None);
             var countOfCalls = 1000;
 
             // Act
@@ -71,7 +75,7 @@ namespace Server.Tests
         {
             // Arrange
             var repo = new DeviceLogsRepoMock();
-            new LogsStorageWriter(_helperCollection, repo, _optionsAccessor).RunLogsChecker(CancellationToken.None);
+            new LogsStorageWriter(_helperCollection, repo, _optionsAccessor, _appSettingsModifier).RunLogsChecker(CancellationToken.None);
             var countOfCalls = 1000;
 
             // Act
@@ -89,7 +93,7 @@ namespace Server.Tests
             var repo = new DeviceLogsRepoMock();
             var countOfCalls = 1000;
 
-            new LogsStorageWriter(_helperCollection, repo, _optionsAccessor).RunLogsChecker(CancellationToken.None);
+            new LogsStorageWriter(_helperCollection, repo, _optionsAccessor, _appSettingsModifier).RunLogsChecker(CancellationToken.None);
             var copyOfHelperCollectionAsList = new List<DeviceLog>();
 
             // Act

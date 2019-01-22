@@ -1,7 +1,9 @@
 ﻿using DataProviderCommon;
 using Microsoft.Extensions.Options;
 using Server.Models;
+using Server.Services;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 
@@ -9,21 +11,34 @@ namespace Server.Helpers
 {
     public class CollectionOfLogs
     {
+        private readonly AppSettingsModifier _appSettingsModifier;
+
         public readonly ManualResetEvent resetEvent;
-        private readonly UserSettings _userSettings;
+        private UserSettings _userSettings;
         readonly object _locker = new object();
+        private bool AreUserSettingsUpdated;
+
 
         public List<List<DeviceLog>> _allCollections { get; }
         public Queue<List<DeviceLog>> _helperQueue { get; }
 
-        public CollectionOfLogs(IOptions<UserSettings> subOptionsAccessor)
+        public CollectionOfLogs(IOptions<UserSettings> subOptionsAccessor, AppSettingsModifier appSettingsModifier)
         {
             _userSettings = subOptionsAccessor.Value;
             resetEvent = new ManualResetEvent(false);
 
+            _appSettingsModifier = appSettingsModifier;
+            appSettingsModifier.NotifyDependentEntetiesEvent += HandleUserSettingsUpdate;
+
             List<DeviceLog> initialLogs = new List<DeviceLog>(_userSettings.CapacityOfCollectionToInsert);
             _allCollections = new List<List<DeviceLog>>() { initialLogs };
             _helperQueue = new Queue<List<DeviceLog>>();
+        }
+
+        private void HandleUserSettingsUpdate()
+        {
+            _userSettings = _appSettingsModifier.GetServerSettings();
+            AreUserSettingsUpdated = true;
         }
 
         public bool AddLog(DeviceLog log)
@@ -42,8 +57,9 @@ namespace Server.Helpers
         {
             lock (_locker)
             {
-                if (_helperQueue.Any() && _helperQueue.Peek().Count == _userSettings.CapacityOfCollectionToInsert)
+                if (AreUserSettingsUpdated || (_helperQueue.Any() && _helperQueue.Peek().Count == _userSettings.CapacityOfCollectionToInsert) )
                 {
+                    AreUserSettingsUpdated = false;
                     var temporaryObj = new DeviceLog[_userSettings.CapacityOfCollectionToInsert];
 
                     var collectionToInsert = _helperQueue.Peek();
@@ -97,7 +113,6 @@ namespace Server.Helpers
 
                 return newEmptyCollection;
             }
-
         }
 
         private void AddCollectionToQueue(List<DeviceLog> collection)

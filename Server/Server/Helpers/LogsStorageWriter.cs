@@ -5,21 +5,30 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Linq;
+using Server.Services;
+using System.Diagnostics;
 
 namespace Server.Helpers
 {
     public class LogsStorageWriter
     {
+        private readonly AppSettingsModifier _appSettingsModifier;
         private readonly CollectionOfLogs _collectionOfLogs;
         private readonly IDevicesLogsRepository _logsRepository;
-        private readonly UserSettings _userSettings;
+        private UserSettings _userSettings;
+
 
         public LogsStorageWriter(CollectionOfLogs collectionOfLogs
             , IDevicesLogsRepository logsRepository
-            , IOptions<UserSettings> subOptionsAccessor)
+            , IOptions<UserSettings> subOptionsAccessor
+            , AppSettingsModifier appSettingsModifier
+            )
         {
             _collectionOfLogs = collectionOfLogs;
             _logsRepository = logsRepository;
+
+            _appSettingsModifier = appSettingsModifier;
+            appSettingsModifier.NotifyDependentEntetiesEvent += HandleUserSettingsUpdate;
 
             _userSettings = subOptionsAccessor.Value;
         }
@@ -55,6 +64,13 @@ namespace Server.Helpers
             }
 
             return false;
+        }
+
+        private async void HandleUserSettingsUpdate()
+        {
+            _userSettings = _appSettingsModifier.GetServerSettings();
+
+            await WriteToDB();
         }
     }
 }

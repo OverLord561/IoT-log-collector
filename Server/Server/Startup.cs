@@ -46,7 +46,11 @@ namespace Server
             services.AddCors(options =>
             {
                 options.AddPolicy("AllowSPAAccess",
-                    builder => builder.WithOrigins("http://localhost:60365", "https://localhost:44344", "https://localhost:60366"));
+                    builder => builder
+                    .WithOrigins("http://localhost:60365", "https://localhost:44344", "https://localhost:60366")
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                );
             });
 
             services.AddMvc();
@@ -139,7 +143,9 @@ namespace Server
             container.Register<LogsStorageWriter>();
             container.Register<IDevicesLogsRepository, DevicesLogsRepository>();
             container.Register<IDevicesLogsService, DevicesLogsService>();
+
             container.RegisterSingleton<CollectionOfLogs>();
+            container.RegisterSingleton<AppSettingsModifier>();
 
             // Allow Simple Injector to resolve services from ASP.NET Core.
 

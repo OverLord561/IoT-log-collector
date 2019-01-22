@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Options;
 using Server.Helpers;
 using Server.Models;
+using Server.Services;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -15,6 +16,7 @@ namespace Server.Tests
         private readonly CollectionOfLogs _helperCollection;
         private readonly IOptions<UserSettings> _optionsAccessor;
         private readonly UserSettings _userSettings;
+        private readonly AppSettingsModifier _appSettingsModifier;
 
         public CollectionWithLogsTests()
         {
@@ -26,8 +28,9 @@ namespace Server.Tests
                     CapacityOfCollectionToInsert = 100,
                     IntervalForWritingIntoDb = 100
                 });
+            _appSettingsModifier = new AppSettingsModifier();
 
-            _helperCollection = new CollectionOfLogs(_optionsAccessor);
+            _helperCollection = new CollectionOfLogs(_optionsAccessor, _appSettingsModifier);
             _userSettings = _optionsAccessor.Value;
         }
 

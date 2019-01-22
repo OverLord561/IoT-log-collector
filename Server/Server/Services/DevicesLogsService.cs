@@ -6,6 +6,7 @@ using Server.Models;
 using Server.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace Server.Services
@@ -14,11 +15,14 @@ namespace Server.Services
     {
         private readonly DeviceHelperType _devicePluginsHelper;
         private readonly UserSettings _userSettings;
+        private readonly DataStoragesHelperType _dataStoragesHelper;
 
-        public DevicesLogsService(DeviceHelperType devicePluginsHelper, IOptions<UserSettings> subOptionsAccessor)
+        public DevicesLogsService(DeviceHelperType devicePluginsHelper, IOptionsSnapshot<UserSettings> subOptionsAccessor
+            , DataStoragesHelperType dataStoragesHelper)
         {
             _userSettings = subOptionsAccessor.Value;
             _devicePluginsHelper = devicePluginsHelper;
+            _dataStoragesHelper = dataStoragesHelper;
         }
 
         public DeviceLog ConvertStringToDeviceLog(string messageFromDevice)
@@ -36,6 +40,11 @@ namespace Server.Services
             deviceLog.DateStamp = deviceLog.DateStamp.AddHours(0);
 
             return deviceLog;
+        }
+
+        public IEnumerable<DataStoragePluginViewModel> GetDataStoragePlugins()
+        {
+            return _dataStoragesHelper.GetDataStoragePluginNames();
         }
 
         public IEnumerable<ServerSettingViewModel> GetServerSettings()
@@ -65,7 +74,6 @@ namespace Server.Services
             };
         }
 
-
         public DeviceLogsInChartFormat PrepareLogsForUI(List<DeviceLog> logs, string deviceName)
         {
             var group = logs.GroupBy(l => l.PluginName).FirstOrDefault(gr => gr.Key == deviceName);
@@ -75,5 +83,6 @@ namespace Server.Services
 
             return plugin.PrepareDataForUI(dataForUI);
         }
+        
     }
 }

@@ -15,6 +15,8 @@ namespace MSSQlDataProviderPlugin
 
         public string PluginName => "MSSQLDSPlugin";
 
+        public string DisplayName => "MS SQL Server";
+
 
         public MSSQLDataProviderPlugin()
         {
@@ -39,6 +41,6 @@ namespace MSSQlDataProviderPlugin
         }
 
         public IDataStorageOperationsOperations Operations => new Repository(_dbContext);
-       
+
     }
 }

@@ -71,7 +71,7 @@ namespace Web_Client
 
             app.UseCors("AllowGoogleLoginProvider");
 
-            //app.UseHttpsRedirection();
+            app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
 

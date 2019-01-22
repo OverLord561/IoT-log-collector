@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import { IApplicationState } from "../../store/index";
 import { RouteComponentProps } from "react-router-dom";
 import * as actions from "./logic/homeActions";
-import { IDeviceLogsInChartFormat, IServerSettingViewModel } from './logic/homeState';
+import { IDeviceLogsInChartFormat, IServerSettingViewModel, IDataStoragePlugin } from './logic/homeState';
 import * as moment from "moment";
 
 import {
@@ -23,13 +23,17 @@ interface IStateToProps {
   isFetching: boolean;
   chartData: IDeviceLogsInChartFormat;
   serverSettings: IServerSettingViewModel[];
+  dataStoragePlugins: string[];
 }
 
 const dispatchProps = {
   loadLogData: actions.LoadLogData,
   getServerSettings: actions.GetServerSettings,
   updateServerSettings: actions.UpdateServerSettings,
+  updateDataStoragePlugin: actions.UpdateDataStoragePlugin,
   setServerSettings: actions.SetServerSettings,
+  setDataStoragePlugins: actions.SetDataStoragePlugins,
+  getDataStoragePlugins: actions.GetDataStoragePlugins
 };
 
 type IProps = IStateToProps & RouteComponentProps<{}> & typeof dispatchProps;
@@ -43,6 +47,7 @@ class Home extends React.Component<IProps, any> {
     const Utc = moment().format("X");
 
     this.props.getServerSettings();
+    this.props.getDataStoragePlugins();
     this.props.loadLogData(Utc, true);
   }
 
@@ -132,11 +137,34 @@ class Home extends React.Component<IProps, any> {
 
   @autobind
   setServerSetting(setting: IServerSettingViewModel, index: number, event: React.FormEvent<HTMLInputElement>) {
-      const copy = this.props.serverSettings.slice();
+    const copy = this.props.serverSettings.slice();
 
-      copy[index].value = event.currentTarget.value;
+    copy[index].value = event.currentTarget.value;
 
-      this.props.setServerSettings(copy);
+    this.props.setServerSettings(copy);
+  }
+
+  @autobind
+  updateDataStoragePlugin(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    const selectedPlugin = this.props.dataStoragePlugins.find(plugin => plugin.isSelected);
+
+    this.props.updateDataStoragePlugin(selectedPlugin);
+  }
+
+  @autobind
+  setDataStoragePlugins(plugin: IDataStoragePlugin, index: number, event: React.FormEvent<HTMLInputElement>) {
+    const copy = this.props.dataStoragePlugins.slice();
+
+    copy.forEach(element => {
+      element.isSelected = false;
+    });
+
+    copy[index].isSelected = true;
+
+    this.props.setDataStoragePlugins(copy);
+
   }
 
   @autobind
@@ -162,7 +190,36 @@ class Home extends React.Component<IProps, any> {
         })}
         <div className="form-group">
           <div className="col-sm-offset-2 col-sm-10">
-            <button type="text" className="btn btn-default">Submit</button>
+            <button type="text" className="btn btn-default">Submit server settings</button>
+          </div>
+        </div>
+      </form>
+    </div>;
+  }
+
+  @autobind
+  renderDataStoragePlugins() {
+
+    return <div className="row home">
+      <form className="form-horizontal" onSubmit={this.updateDataStoragePlugin}>
+
+        {this.props.dataStoragePlugins.map((plugin, index) => {
+          return <div className="radio" key={index}>
+            <label>
+              <input
+                type="radio"
+                name="datastorageplugin"
+                checked={plugin.isSelected}
+                onChange={(e) => { this.setDataStoragePlugins(plugin, index, e); }}
+              />
+
+              {plugin.displayName}
+            </label>
+          </div>;
+        })}
+        <div className="form-group">
+          <div className="col-sm-offset-2 col-sm-10">
+            <button type="text" className="btn btn-default">Submit data storage plugin</button>
           </div>
         </div>
       </form>
@@ -179,6 +236,10 @@ class Home extends React.Component<IProps, any> {
         {this.props.serverSettings &&
           this.renderServerSettings()
         }
+        <hr />
+        {this.props.dataStoragePlugins &&
+          this.renderDataStoragePlugins()
+        }
       </div>;
     }
 
@@ -191,7 +252,8 @@ const mapStateToProps = (state: IApplicationState): IStateToProps => {
     authorized: state.signIn.authorized,
     isFetching: state.home.isFetching,
     chartData: state.home.chartData as IDeviceLogsInChartFormat,
-    serverSettings: state.home.serverSettings
+    serverSettings: state.home.serverSettings,
+    dataStoragePlugins: state.home.dataStoragePlugins,
   };
 };
 

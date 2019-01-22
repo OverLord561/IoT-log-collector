@@ -3,7 +3,8 @@ import { IModel } from '../../../common/Identity';
 export interface IState extends IModel {
     chartData?: IDeviceLogsInChartFormat;
     isInitial: boolean;
-    serverSettings: IServerSettingViewModel[]
+    serverSettings: IServerSettingViewModel[],
+    dataStoragePlugins: string[];
 }
 
 export interface IDeviceLogsInChartFormat {
@@ -23,11 +24,18 @@ export interface IServerSettingViewModel {
     isEditable: boolean;
 }
 
+export interface IDataStoragePlugin {
+    displayName: string;
+    value: string;
+    isSelected: boolean;
+}
+
 export const getInitialState = (): IState => {
     return {
         isInitial: true,
         errors: [],
         isFetching: false,
-        serverSettings: []
+        serverSettings: [],
+        dataStoragePlugins: []
     };
 };

@@ -21,6 +21,7 @@ namespace Server.Controllers
         private readonly CollectionOfLogs _collectionOfLogs;
         private readonly IDevicesLogsRepository _deviceLogsRepository;
         private readonly IDevicesLogsService _devicesLogsService;
+        private readonly AppSettingsModifier _appSettingsModifier;
 
         static int count;
         private readonly static object countLock = new object();
@@ -60,12 +61,16 @@ namespace Server.Controllers
         public DeviceController(
             CollectionOfLogs collectionOfLogs,
             IDevicesLogsRepository deviceLogsRepository,
-            IDevicesLogsService devicesLogsService
+            IDevicesLogsService devicesLogsService,
+            AppSettingsModifier appSettingsModifier
+
+
             )
         {
             _collectionOfLogs = collectionOfLogs;
             _deviceLogsRepository = deviceLogsRepository;
             _devicesLogsService = devicesLogsService;
+            _appSettingsModifier = appSettingsModifier;
         }
 
         [HttpPost]
@@ -131,14 +136,43 @@ namespace Server.Controllers
             return new JsonResult(new { StatusCode = StatusCodes.Status200OK, ServerSettings = serverSettings });
         }
 
-        [HttpPost]
+
+        [HttpGet]
+        [Route("get-datastorageplugins-settings")]
+        [EnableCors("AllowSPAAccess")]
+        public IActionResult GetDataStoragePlugins()
+        {
+            var plugins = _devicesLogsService.GetDataStoragePlugins();
+
+            return new JsonResult(new { StatusCode = StatusCodes.Status200OK, DataStoragePlugins = plugins });
+        }
+
+        [HttpPut]
+        [Route("update-datastorageplugins-settings")]
+        [EnableCors("AllowSPAAccess")]
+        public IActionResult UpdateCurrentDataStoragePlugin([FromBody] DataStoragePluginViewModel dataStoragePlugin)
+        {
+            bool succeeded = _appSettingsModifier.UpdateDataStoragePlugin(dataStoragePlugin);
+
+            return new JsonResult(new { StatusCode = StatusCodes.Status200OK, Succeede = succeeded });
+        }
+
+        [HttpPut]
         [Route("update-sever-settings")]
         [EnableCors("AllowSPAAccess")]
         public IActionResult SetServerSettings([FromBody] List<ServerSettingViewModel> serverSettings)
         {
-           // IEnumerable<ServerSettingViewModel> serverSettings = _devicesLogsService.GetServerSettings();
+            try
+            {
+                bool succeeded = _appSettingsModifier.UpdateServerSettings(serverSettings);
 
-            return new JsonResult(new { StatusCode = StatusCodes.Status200OK });
+                return new JsonResult(new { StatusCode = StatusCodes.Status200OK, Succeede = succeeded });
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

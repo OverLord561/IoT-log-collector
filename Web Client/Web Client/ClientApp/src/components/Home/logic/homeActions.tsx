@@ -1,7 +1,7 @@
 import axios from 'axios';
 import * as types from './homeConstants';
 import * as globalTypes from '../../../constants/constants';
-import { IServerSettingViewModel } from './homeState';
+import { IServerSettingViewModel, IDataStoragePlugin } from './homeState';
 
 export const LoadLogData = (date: string, isInitial: boolean) => (dispatch: any, getStore: any) => {
     const URL = globalTypes.IoTServer_BASE_URL.concat(types.LOAD_LOGS_BY_DATE(date, isInitial));
@@ -69,15 +69,69 @@ export const GetServerSettings = () => (dispatch: any, getStore: any) => {
         });
 };
 
-export const UpdateServerSettings = (serverSettings: IServerSettingViewModel[]) => (dispatch: any, getStore: any) => {
-    const URL = globalTypes.IoTServer_BASE_URL.concat(types.SET_SERVER_SETTINGS_URL);
+export const GetDataStoragePlugins = () => (dispatch: any, getStore: any) => {
+    const URL = globalTypes.IoTServer_BASE_URL.concat(types.GET_DATASTORAGE_PLUGINS_URL);
 
     dispatch({
         type: globalTypes.IS_FETCHING,
         isFetching: true,
     });
 
-    axios.post(URL, serverSettings)
+    axios.get(URL)
+        .then(response => {
+
+            dispatch({
+                type: globalTypes.IS_FETCHING,
+                isFetching: false,
+            });
+            dispatch({
+                type: types.DATASTORAGE_PLUGINS,
+                dataStoragePlugins: response.data.dataStoragePlugins,
+            });
+
+        }).catch(error => {
+            dispatch({
+                type: globalTypes.IS_FETCHING,
+                isFetching: false,
+            });
+            console.log(error);
+        });
+};
+
+export const UpdateServerSettings = (serverSettings: IServerSettingViewModel[]) => (dispatch: any, getStore: any) => {
+    const URL = globalTypes.IoTServer_BASE_URL.concat(types.UPDATE_SERVER_SETTINGS_URL);
+
+    dispatch({
+        type: globalTypes.IS_FETCHING,
+        isFetching: true,
+    });
+
+    axios.put(URL, serverSettings)
+        .then(response => {
+
+            dispatch({
+                type: globalTypes.IS_FETCHING,
+                isFetching: false,
+            });
+
+        }).catch(error => {
+            dispatch({
+                type: globalTypes.IS_FETCHING,
+                isFetching: false,
+            });
+            console.log(error);
+        });
+};
+
+export const UpdateDataStoragePlugin = (dataStoragePlugin: IDataStoragePlugin) => (dispatch: any, getStore: any) => {
+    const URL = globalTypes.IoTServer_BASE_URL.concat(types.UPDATE_DATASTORAGE_PLUGINS_URL);
+
+    dispatch({
+        type: globalTypes.IS_FETCHING,
+        isFetching: true,
+    });
+
+    axios.put(URL, dataStoragePlugin)
         .then(response => {
 
             dispatch({
@@ -98,5 +152,12 @@ export const SetServerSettings = (serverSettings: IServerSettingViewModel[]) => 
     dispatch({
         type: types.SERVER_SETTINGS,
         serverSettings
+    });
+};
+
+export const SetDataStoragePlugins = (dataStoragePlugins: IDataStoragePlugin[]) => (dispatch: any, getStore: any) => {
+    dispatch({
+        type: types.DATASTORAGE_PLUGINS,
+        dataStoragePlugins
     });
 };
