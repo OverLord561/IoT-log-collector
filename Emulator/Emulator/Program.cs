@@ -35,13 +35,13 @@ namespace Emulator
         {
             var alldata = new List<double>();
 
-            var allTasks = Enumerable.Range(1, 10).Select(x =>
+            var allTasks = Enumerable.Range(1, 2).Select(x =>
            {
                return Task.Run(() =>
                {
 
                    HttpClient httpClient = new HttpClient();
-                   httpClient.BaseAddress = new Uri("http://localhost:5000");
+                   httpClient.BaseAddress = new Uri("https://localhost:44373");
                    httpClient.DefaultRequestHeaders
                          .Accept
                          .Add(new MediaTypeWithQualityHeaderValue("application/json"));

@@ -12,14 +12,13 @@ namespace Server.Helpers
     {
         private readonly IEnumerable<IDataStoragePlugin> _dataStoragePlugins;
         private UserSettings _userSettings;
-        private readonly AppSettingsModifier _appSettingsModifier;
+        private readonly AppSettingsAccessor _appSettingsModifier;
 
-        public DataStoragesHelperType(IEnumerable<IDataStoragePlugin> dataStoragePluginsCollection
-            , IOptions<UserSettings> subOptionsAccessor
-            , AppSettingsModifier appSettingsModifier
+        public DataStoragesHelperType(IEnumerable<IDataStoragePlugin> dataStoragePluginsCollection            
+            , AppSettingsAccessor appSettingsModifier
             )
         {
-            _userSettings = subOptionsAccessor.Value;
+            _userSettings = appSettingsModifier.GetServerSettings();
             _appSettingsModifier = appSettingsModifier;
             _dataStoragePlugins = dataStoragePluginsCollection;
 

@@ -170,80 +170,88 @@ class Home extends React.Component<IProps, any> {
   @autobind
   renderServerSettings() {
 
-    return <div className="row home">
-      <form className="form-horizontal" onSubmit={this.updateServerSettings}>
+    return <div className="col-sm-6">
+      <fieldset>
+        <legend>Server settings</legend>
+        <form className="form-horizontal" onSubmit={this.updateServerSettings}>
 
-        {this.props.serverSettings.map((setting, index) => {
-          return <div className="form-group" key={index}>
-            <label className="control-label col-sm-2" >{setting.displayName}:</label>
-            <div className="col-sm-10">
-              <input type="text"
-                className="form-control"
-                placeholder={setting.name}
-                value={setting.value}
-                readOnly={!setting.isEditable}
-                pattern="^[0-9]+$"
-                onChange={(e) => { this.setServerSetting(setting, index, e); }}
-              />
+          {this.props.serverSettings.map((setting, index) => {
+            return <div className="form-group" key={index}>
+              <label className="control-label col-sm-4" >{setting.displayName}:</label>
+              <div className="col-sm-8">
+                <input type="text"
+                  className="form-control"
+                  placeholder={setting.name}
+                  value={setting.value}
+                  readOnly={!setting.isEditable}
+                  pattern="^[0-9]+$"
+                  onChange={(e) => { this.setServerSetting(setting, index, e); }}
+                />
+              </div>
+            </div>;
+          })}
+          <div className="form-group">
+            <div className="col-sm-offset-4 col-sm-8">
+              <button type="text" className="btn btn-default">Submit</button>
             </div>
-          </div>;
-        })}
-        <div className="form-group">
-          <div className="col-sm-offset-2 col-sm-10">
-            <button type="text" className="btn btn-default">Submit server settings</button>
           </div>
-        </div>
-      </form>
+        </form>
+      </fieldset>
     </div>;
   }
 
   @autobind
   renderDataStoragePlugins() {
 
-    return <div className="row home">
-      <form className="form-horizontal" onSubmit={this.updateDataStoragePlugin}>
+    return <div className="col-sm-6">
+      <fieldset>
+        <legend>Data storage settings</legend>
+        <form className="form-horizontal" onSubmit={this.updateDataStoragePlugin}>
 
-        {this.props.dataStoragePlugins.map((plugin, index) => {
-          return <div className="radio" key={index}>
-            <label>
-              <input
-                type="radio"
-                name="datastorageplugin"
-                checked={plugin.isSelected}
-                onChange={(e) => { this.setDataStoragePlugins(plugin, index, e); }}
-              />
+          {this.props.dataStoragePlugins.map((plugin, index) => {
+            return <div className="radio" key={index}>
+              <label className="col-sm-offset-2 col-sm-10">
+                <input
+                  type="radio"
+                  name="datastorageplugin"
+                  checked={plugin.isSelected}
+                  onChange={(e) => { this.setDataStoragePlugins(plugin, index, e); }}
+                />
 
-              {plugin.displayName}
-            </label>
-          </div>;
-        })}
-        <div className="form-group">
-          <div className="col-sm-offset-2 col-sm-10">
-            <button type="text" className="btn btn-default">Submit data storage plugin</button>
+                {plugin.displayName}
+              </label>
+            </div>;
+          })}
+          <br />
+          <div className="form-group">
+            <div className="col-sm-offset-2 col-sm-10">
+              <button type="text" className="btn btn-default">Submit</button>
+            </div>
           </div>
-        </div>
-      </form>
+        </form>
+      </fieldset>
     </div>;
   }
 
   public render() {
-    if (this.props.chartData) {
+
       return <div>
         {this.props.chartData &&
           this.renderChart()
         }
         <hr />
-        {this.props.serverSettings &&
-          this.renderServerSettings()
-        }
-        <hr />
-        {this.props.dataStoragePlugins &&
-          this.renderDataStoragePlugins()
-        }
-      </div>;
-    }
+        <div className="row home">
+          {this.props.serverSettings &&
+            this.renderServerSettings()
+          }
 
-    return null;
+          {this.props.dataStoragePlugins &&
+            this.renderDataStoragePlugins()
+          }
+        </div>
+        <hr />
+
+      </div>;
   }
 }
 

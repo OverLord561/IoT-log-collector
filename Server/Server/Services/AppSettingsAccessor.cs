@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using Server.Models;
 using Server.ViewModels;
 using System;
@@ -9,7 +10,7 @@ using System.Linq;
 
 namespace Server.Services
 {
-    public class AppSettingsModifier
+    public class AppSettingsAccessor
     {
         readonly object _locker = new object();
         private UserSettings _userSettings;
@@ -18,8 +19,9 @@ namespace Server.Services
         public delegate void NotifyDependentEntetiesDel();
         public event NotifyDependentEntetiesDel NotifyDependentEntetiesEvent;
 
-        public AppSettingsModifier()
+        public AppSettingsAccessor(IOptions<UserSettings> optionsAccessor)
         {
+            _userSettings = optionsAccessor.Value;
             _filePath = string.Concat(Directory.GetCurrentDirectory(), "\\appsettings.json");
         }
 
@@ -35,9 +37,9 @@ namespace Server.Services
             appSettings.UserSettings.CapacityOfCollectionToInsert = int.Parse(serverSettings.Find(x => x.Name.Equals("BulkInsertCapacity")).Value);
             appSettings.UserSettings.IntervalForWritingIntoDb = int.Parse(serverSettings.Find(x => x.Name.Equals("BulkInsertInterval")).Value);
 
-            UpdateConfigFile(appSettings);
+            var suceeded = UpdateConfigFile(appSettings);
 
-            return true;
+            return suceeded;
         }
 
         public bool UpdateDataStoragePlugin(DataStoragePluginViewModel dataStoragePlugin)
@@ -45,9 +47,9 @@ namespace Server.Services
             var appSettings = DeserealizeConfigFile();
 
             appSettings.UserSettings.DataProviderPluginName = dataStoragePlugin.Value;
-            UpdateConfigFile(appSettings);
+            var suceeded = UpdateConfigFile(appSettings);
 
-            return true;
+            return suceeded;
         }
 
         public UserSettings GetServerSettings()
@@ -69,7 +71,7 @@ namespace Server.Services
         {
             return JsonConvert.DeserializeObject<AppSettings>(File.ReadAllText(_filePath));
         }
-        private void UpdateConfigFile(AppSettings newAppSettings)
+        private bool UpdateConfigFile(AppSettings newAppSettings)
         {
             try
             {
@@ -82,6 +84,8 @@ namespace Server.Services
             catch (Exception ex)
             {
                 Debugger.Break();
+                Console.WriteLine(ex.Message);
+                return false;
             }
             
 
@@ -91,6 +95,8 @@ namespace Server.Services
             }
 
             NotifyDependentEntetiesEvent();
+
+            return true;
         }
     }
 }

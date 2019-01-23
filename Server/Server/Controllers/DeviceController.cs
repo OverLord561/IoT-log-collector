@@ -8,6 +8,7 @@ using Server.Services;
 using Server.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,7 +22,7 @@ namespace Server.Controllers
         private readonly CollectionOfLogs _collectionOfLogs;
         private readonly IDevicesLogsRepository _deviceLogsRepository;
         private readonly IDevicesLogsService _devicesLogsService;
-        private readonly AppSettingsModifier _appSettingsModifier;
+        private readonly AppSettingsAccessor _appSettingsModifier;
 
         static int count;
         private readonly static object countLock = new object();
@@ -62,7 +63,7 @@ namespace Server.Controllers
             CollectionOfLogs collectionOfLogs,
             IDevicesLogsRepository deviceLogsRepository,
             IDevicesLogsService devicesLogsService,
-            AppSettingsModifier appSettingsModifier
+            AppSettingsAccessor appSettingsModifier
 
 
             )
@@ -95,6 +96,7 @@ namespace Server.Controllers
             }
             catch (Exception ex)
             {
+                Debugger.Break();
                 Console.WriteLine(ex.Message);
             }
 
@@ -120,6 +122,8 @@ namespace Server.Controllers
             }
             catch (Exception ex)
             {
+                Debugger.Break();
+
                 Console.WriteLine(ex.Message);
 
                 return BadRequest(ex.Message);
@@ -154,7 +158,7 @@ namespace Server.Controllers
         {
             bool succeeded = _appSettingsModifier.UpdateDataStoragePlugin(dataStoragePlugin);
 
-            return new JsonResult(new { StatusCode = StatusCodes.Status200OK, Succeede = succeeded });
+            return new JsonResult(new { StatusCode = StatusCodes.Status200OK, Succeeded = succeeded });
         }
 
         [HttpPut]
@@ -166,11 +170,12 @@ namespace Server.Controllers
             {
                 bool succeeded = _appSettingsModifier.UpdateServerSettings(serverSettings);
 
-                return new JsonResult(new { StatusCode = StatusCodes.Status200OK, Succeede = succeeded });
+                return new JsonResult(new { StatusCode = StatusCodes.Status200OK, Succeeded = succeeded });
 
             }
             catch (Exception ex)
             {
+                Debugger.Break();
                 return BadRequest(ex.Message);
             }
         }

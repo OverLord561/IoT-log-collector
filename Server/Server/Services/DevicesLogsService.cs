@@ -17,10 +17,12 @@ namespace Server.Services
         private readonly UserSettings _userSettings;
         private readonly DataStoragesHelperType _dataStoragesHelper;
 
-        public DevicesLogsService(DeviceHelperType devicePluginsHelper, IOptionsSnapshot<UserSettings> subOptionsAccessor
-            , DataStoragesHelperType dataStoragesHelper)
+        public DevicesLogsService(DeviceHelperType devicePluginsHelper
+            , DataStoragesHelperType dataStoragesHelper
+            , AppSettingsAccessor appSettingsModifier
+            )
         {
-            _userSettings = subOptionsAccessor.Value;
+            _userSettings = appSettingsModifier.GetServerSettings();
             _devicePluginsHelper = devicePluginsHelper;
             _dataStoragesHelper = dataStoragesHelper;
         }
@@ -37,7 +39,9 @@ namespace Server.Services
             }
 
             var deviceLog = plugin.ConverterToStandard(messageFromDevice);
-            deviceLog.DateStamp = deviceLog.DateStamp.AddHours(0);
+
+            Random random = new Random();
+            deviceLog.DateStamp = deviceLog.DateStamp.AddHours(random.Next(1,4));
 
             return deviceLog;
         }
@@ -76,6 +80,9 @@ namespace Server.Services
 
         public DeviceLogsInChartFormat PrepareLogsForUI(List<DeviceLog> logs, string deviceName)
         {
+            if (!logs.Any()) {
+                return null;
+            }
             var group = logs.GroupBy(l => l.PluginName).FirstOrDefault(gr => gr.Key == deviceName);
 
             IDevicePlugin plugin = _devicePluginsHelper.GetDevicePlugin(group.Key);

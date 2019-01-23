@@ -11,7 +11,7 @@ namespace Server.Helpers
 {
     public class CollectionOfLogs
     {
-        private readonly AppSettingsModifier _appSettingsModifier;
+        private readonly AppSettingsAccessor _appSettingsModifier;
 
         public readonly ManualResetEvent resetEvent;
         private UserSettings _userSettings;
@@ -22,9 +22,9 @@ namespace Server.Helpers
         public List<List<DeviceLog>> _allCollections { get; }
         public Queue<List<DeviceLog>> _helperQueue { get; }
 
-        public CollectionOfLogs(IOptions<UserSettings> subOptionsAccessor, AppSettingsModifier appSettingsModifier)
+        public CollectionOfLogs(AppSettingsAccessor appSettingsModifier)
         {
-            _userSettings = subOptionsAccessor.Value;
+            _userSettings = appSettingsModifier.GetServerSettings();
             resetEvent = new ManualResetEvent(false);
 
             _appSettingsModifier = appSettingsModifier;
@@ -57,7 +57,7 @@ namespace Server.Helpers
         {
             lock (_locker)
             {
-                if (AreUserSettingsUpdated || (_helperQueue.Any() && _helperQueue.Peek().Count == _userSettings.CapacityOfCollectionToInsert) )
+                if (_helperQueue.Any() && ((AreUserSettingsUpdated) || (_helperQueue.Peek().Count == _userSettings.CapacityOfCollectionToInsert)))
                 {
                     AreUserSettingsUpdated = false;
                     var temporaryObj = new DeviceLog[_userSettings.CapacityOfCollectionToInsert];

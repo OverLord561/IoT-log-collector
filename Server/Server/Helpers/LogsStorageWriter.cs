@@ -12,16 +12,15 @@ namespace Server.Helpers
 {
     public class LogsStorageWriter
     {
-        private readonly AppSettingsModifier _appSettingsModifier;
+        private readonly AppSettingsAccessor _appSettingsModifier;
         private readonly CollectionOfLogs _collectionOfLogs;
         private readonly IDevicesLogsRepository _logsRepository;
         private UserSettings _userSettings;
 
 
         public LogsStorageWriter(CollectionOfLogs collectionOfLogs
-            , IDevicesLogsRepository logsRepository
-            , IOptions<UserSettings> subOptionsAccessor
-            , AppSettingsModifier appSettingsModifier
+            , IDevicesLogsRepository logsRepository            
+            , AppSettingsAccessor appSettingsModifier
             )
         {
             _collectionOfLogs = collectionOfLogs;
@@ -30,7 +29,7 @@ namespace Server.Helpers
             _appSettingsModifier = appSettingsModifier;
             appSettingsModifier.NotifyDependentEntetiesEvent += HandleUserSettingsUpdate;
 
-            _userSettings = subOptionsAccessor.Value;
+            _userSettings = appSettingsModifier.GetServerSettings();
         }
 
         public Task RunLogsChecker(CancellationToken appCancellationToken)
@@ -60,6 +59,7 @@ namespace Server.Helpers
             }
             catch (Exception ex)
             {
+                Debugger.Break();
                 Console.WriteLine(ex.Message);
             }
 

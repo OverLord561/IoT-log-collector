@@ -145,7 +145,7 @@ namespace Server
             container.Register<IDevicesLogsService, DevicesLogsService>();
 
             container.RegisterSingleton<CollectionOfLogs>();
-            container.RegisterSingleton<AppSettingsModifier>();
+            container.RegisterSingleton<AppSettingsAccessor>();
 
             // Allow Simple Injector to resolve services from ASP.NET Core.
 

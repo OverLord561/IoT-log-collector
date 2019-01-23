@@ -114,6 +114,10 @@ export const UpdateServerSettings = (serverSettings: IServerSettingViewModel[]) 
                 isFetching: false,
             });
 
+            if (response.data.succeeded) {
+                alert("Updated!");
+            }
+
         }).catch(error => {
             dispatch({
                 type: globalTypes.IS_FETCHING,
@@ -138,6 +142,10 @@ export const UpdateDataStoragePlugin = (dataStoragePlugin: IDataStoragePlugin) =
                 type: globalTypes.IS_FETCHING,
                 isFetching: false,
             });
+
+            if (response.data.succeeded) {
+                alert("Updated!");
+            }
 
         }).catch(error => {
             dispatch({
