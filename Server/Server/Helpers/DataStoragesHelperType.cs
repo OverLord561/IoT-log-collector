@@ -4,6 +4,7 @@ using Server.Models;
 using Server.Services;
 using Server.ViewModels;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace Server.Helpers
@@ -32,7 +33,13 @@ namespace Server.Helpers
 
         public IDataStoragePlugin GetDataStoragePlugin()
         {
-            return _dataStoragePlugins.FirstOrDefault(x => x.PluginName == _userSettings.DataProviderPluginName);
+            var name = _userSettings.DataProviderPluginName;
+            var ins = _dataStoragePlugins.FirstOrDefault(x => x.PluginName == name);
+            if (ins == null) {
+                Debugger.Break();
+            }
+            _appSettingsModifier.NotifyDependentEntetiesEvent -= HandleUserSettingsUpdate;
+            return ins;
         }
 
         public IEnumerable<DataStoragePluginViewModel> GetDataStoragePluginNames() {

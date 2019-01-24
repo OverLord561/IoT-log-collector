@@ -78,6 +78,7 @@ namespace Server.Services
                 using (StreamWriter file = File.CreateText(_filePath))
                 {
                     JsonSerializer serializer = new JsonSerializer();
+                    serializer.Formatting = Formatting.Indented;
                     serializer.Serialize(file, newAppSettings);
                 }
             }

@@ -35,7 +35,7 @@ namespace Emulator
         {
             var alldata = new List<double>();
 
-            var allTasks = Enumerable.Range(1, 2).Select(x =>
+            var allTasks = Enumerable.Range(1, 4).Select(x =>
            {
                return Task.Run(() =>
                {

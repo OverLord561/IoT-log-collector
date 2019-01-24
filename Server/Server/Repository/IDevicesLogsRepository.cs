@@ -6,9 +6,7 @@ namespace Server.Repository
 {
     public interface IDevicesLogsRepository
     {
-        Task<List<DeviceLog>> GetDeviceLogsAsync(int? utcDate);
-
-        bool WriteLogToTemporaryCollection(DeviceLog log);
+        Task<List<DeviceLog>> GetDeviceLogsAsync(int? utcDate);        
 
         Task<bool> WriteRangeAsync(List<DeviceLog> logs);
     }

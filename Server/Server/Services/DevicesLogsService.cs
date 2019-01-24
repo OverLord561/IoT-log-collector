@@ -3,11 +3,13 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Server.Helpers;
 using Server.Models;
+using Server.Repository;
 using Server.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Server.Services
 {
@@ -16,15 +18,18 @@ namespace Server.Services
         private readonly DeviceHelperType _devicePluginsHelper;
         private readonly UserSettings _userSettings;
         private readonly DataStoragesHelperType _dataStoragesHelper;
+        private readonly IDevicesLogsRepository _devicesLogsRepository;
 
         public DevicesLogsService(DeviceHelperType devicePluginsHelper
             , DataStoragesHelperType dataStoragesHelper
             , AppSettingsAccessor appSettingsModifier
+            , IDevicesLogsRepository devicesLogsRepository
             )
         {
             _userSettings = appSettingsModifier.GetServerSettings();
             _devicePluginsHelper = devicePluginsHelper;
             _dataStoragesHelper = dataStoragesHelper;
+            _devicesLogsRepository = devicesLogsRepository;
         }
 
         public DeviceLog ConvertStringToDeviceLog(string messageFromDevice)
@@ -49,6 +54,11 @@ namespace Server.Services
         public IEnumerable<DataStoragePluginViewModel> GetDataStoragePlugins()
         {
             return _dataStoragesHelper.GetDataStoragePluginNames();
+        }
+
+        public Task<List<DeviceLog>> GetDeviceLogsAsync(int? utcDate)
+        {
+            return _devicesLogsRepository.GetDeviceLogsAsync(utcDate);
         }
 
         public IEnumerable<ServerSettingViewModel> GetServerSettings()

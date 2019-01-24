@@ -43,11 +43,16 @@ class Home extends React.Component<IProps, any> {
     super(props);
   }
 
+  @autobind
+  loadSettings() {
+    this.props.getServerSettings();
+    this.props.getDataStoragePlugins();
+  }
+
   componentDidMount() {
     const Utc = moment().format("X");
 
-    this.props.getServerSettings();
-    this.props.getDataStoragePlugins();
+    this.loadSettings();
     this.props.loadLogData(Utc, true);
   }
 
@@ -132,7 +137,9 @@ class Home extends React.Component<IProps, any> {
   updateServerSettings(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    this.props.updateServerSettings(this.props.serverSettings);
+    this.props.updateServerSettings(this.props.serverSettings, () => {
+      this.loadSettings();
+    });
   }
 
   @autobind
@@ -141,7 +148,8 @@ class Home extends React.Component<IProps, any> {
 
     copy[index].value = event.currentTarget.value;
 
-    this.props.setServerSettings(copy);
+    this.props.setServerSettings(copy, () => {
+      this.loadSettings();    });
   }
 
   @autobind
@@ -236,8 +244,11 @@ class Home extends React.Component<IProps, any> {
   public render() {
 
       return <div>
-        {this.props.chartData &&
+        {this.props.chartData ?
           this.renderChart()
+          :
+          <h1>No logs for {this.props.serverSettings ? this.props.serverSettings.displayName : ''}</h1>
+
         }
         <hr />
         <div className="row home">

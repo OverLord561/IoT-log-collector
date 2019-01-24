@@ -20,7 +20,6 @@ namespace Server.Controllers
     public class DeviceController : ControllerBase
     {
         private readonly CollectionOfLogs _collectionOfLogs;
-        private readonly IDevicesLogsRepository _deviceLogsRepository;
         private readonly IDevicesLogsService _devicesLogsService;
         private readonly AppSettingsAccessor _appSettingsModifier;
 
@@ -60,16 +59,12 @@ namespace Server.Controllers
         }
 
         public DeviceController(
-            CollectionOfLogs collectionOfLogs,
-            IDevicesLogsRepository deviceLogsRepository,
-            IDevicesLogsService devicesLogsService,
-            AppSettingsAccessor appSettingsModifier
-
-
+            CollectionOfLogs collectionOfLogs
+            , IDevicesLogsService devicesLogsService
+            , AppSettingsAccessor appSettingsModifier
             )
         {
             _collectionOfLogs = collectionOfLogs;
-            _deviceLogsRepository = deviceLogsRepository;
             _devicesLogsService = devicesLogsService;
             _appSettingsModifier = appSettingsModifier;
         }
@@ -84,15 +79,14 @@ namespace Server.Controllers
                 smthFromDevice = await reader.ReadToEndAsync();
             }
 
-
             IncrementCount();
-
 
             try
             {
                 var log = _devicesLogsService.ConvertStringToDeviceLog(smthFromDevice);
 
-                _deviceLogsRepository.WriteLogToTemporaryCollection(log);
+                _collectionOfLogs.AddLog(log);
+
             }
             catch (Exception ex)
             {
@@ -115,7 +109,7 @@ namespace Server.Controllers
                     _collectionOfLogs.resetEvent.WaitOne();
                 }
 
-                var logs = await _deviceLogsRepository.GetDeviceLogsAsync(utcDate);
+                var logs = await _devicesLogsService.GetDeviceLogsAsync(utcDate);
                 DeviceLogsInChartFormat logsForUI = _devicesLogsService.PrepareLogsForUI(logs, deviceName);
 
                 return new JsonResult(new { StatusCode = StatusCodes.Status200OK, ChartData = logsForUI });

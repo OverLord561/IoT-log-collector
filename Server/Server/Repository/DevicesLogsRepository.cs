@@ -1,6 +1,7 @@
 ﻿using DataProviderCommon;
 using Server.Extensions;
 using Server.Helpers;
+using Server.Services;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -9,13 +10,26 @@ namespace Server.Repository
 {
     public class DevicesLogsRepository : IDevicesLogsRepository
     {
-        private readonly IDataStoragePlugin _dataStoragePlugin;
+        private IDataStoragePlugin _dataStoragePlugin;
         private readonly CollectionOfLogs _collectionOfLogs;
+        private readonly static object _locker = new object();
+        private readonly DataStoragesHelperType _dataStoragesHelperType;
+        private readonly AppSettingsAccessor _appSettingsAccessor;
 
-        public DevicesLogsRepository(DataStoragesHelperType dataStoragesHelper, CollectionOfLogs collectionOfLogs)
+
+        public DevicesLogsRepository(DataStoragesHelperType dataStoragesHelper, CollectionOfLogs collectionOfLogs, AppSettingsAccessor appSettingsAccessor)
         {
             _dataStoragePlugin = dataStoragesHelper.GetDataStoragePlugin() ?? throw new ArgumentNullException(nameof(dataStoragesHelper));
             _collectionOfLogs = collectionOfLogs;
+
+            _dataStoragesHelperType = dataStoragesHelper;
+            _appSettingsAccessor = appSettingsAccessor;
+            appSettingsAccessor.NotifyDependentEntetiesEvent += HandleUserSettingsUpdate;
+        }
+
+        private void HandleUserSettingsUpdate()
+        {
+            _dataStoragePlugin = _dataStoragesHelperType.GetDataStoragePlugin();
         }
 
         public async Task<List<DeviceLog>> GetDeviceLogsAsync(int? utcDate)
@@ -31,14 +45,13 @@ namespace Server.Repository
             }
         }
 
-        public bool WriteLogToTemporaryCollection(DeviceLog log)
-        {
-            return _collectionOfLogs.AddLog(log);
-        }
-
         public async Task<bool> WriteRangeAsync(List<DeviceLog> logs)
         {
-            return await _dataStoragePlugin.Operations.AddRangeAsync(logs);
+            lock (_locker)
+            {
+                return _dataStoragePlugin.Operations.AddRange(logs);
+            }
+
         }
     }
 }

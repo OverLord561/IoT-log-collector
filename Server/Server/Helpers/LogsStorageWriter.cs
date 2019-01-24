@@ -53,6 +53,7 @@ namespace Server.Helpers
 
                 if (collectionToInsert.Any())
                 {
+                    _appSettingsModifier.NotifyDependentEntetiesEvent -= HandleUserSettingsUpdate;
                     return await _logsRepository.WriteRangeAsync(collectionToInsert).ConfigureAwait(false);
                 }
 

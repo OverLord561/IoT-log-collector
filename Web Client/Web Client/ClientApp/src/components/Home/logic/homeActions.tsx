@@ -98,7 +98,7 @@ export const GetDataStoragePlugins = () => (dispatch: any, getStore: any) => {
         });
 };
 
-export const UpdateServerSettings = (serverSettings: IServerSettingViewModel[]) => (dispatch: any, getStore: any) => {
+export const UpdateServerSettings = (serverSettings: IServerSettingViewModel[], callBack) => (dispatch: any, getStore: any) => {
     const URL = globalTypes.IoTServer_BASE_URL.concat(types.UPDATE_SERVER_SETTINGS_URL);
 
     dispatch({
@@ -118,6 +118,10 @@ export const UpdateServerSettings = (serverSettings: IServerSettingViewModel[]) 
                 alert("Updated!");
             }
 
+            if (callBack) {
+                callBack();
+            }
+
         }).catch(error => {
             dispatch({
                 type: globalTypes.IS_FETCHING,
@@ -127,7 +131,7 @@ export const UpdateServerSettings = (serverSettings: IServerSettingViewModel[]) 
         });
 };
 
-export const UpdateDataStoragePlugin = (dataStoragePlugin: IDataStoragePlugin) => (dispatch: any, getStore: any) => {
+export const UpdateDataStoragePlugin = (dataStoragePlugin: IDataStoragePlugin, callBack) => (dispatch: any, getStore: any) => {
     const URL = globalTypes.IoTServer_BASE_URL.concat(types.UPDATE_DATASTORAGE_PLUGINS_URL);
 
     dispatch({
@@ -145,6 +149,10 @@ export const UpdateDataStoragePlugin = (dataStoragePlugin: IDataStoragePlugin) =
 
             if (response.data.succeeded) {
                 alert("Updated!");
+            }
+
+            if (callBack) {
+                callBack();
             }
 
         }).catch(error => {
