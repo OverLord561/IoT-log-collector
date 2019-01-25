@@ -38,7 +38,7 @@ namespace Server.Helpers
             if (ins == null) {
                 Debugger.Break();
             }
-            _appSettingsModifier.NotifyDependentEntetiesEvent -= HandleUserSettingsUpdate;
+           
             return ins;
         }
 

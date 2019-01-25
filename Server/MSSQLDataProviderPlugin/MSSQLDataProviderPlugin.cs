@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using MSSQLDataProviderPlugin;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -20,23 +21,28 @@ namespace MSSQlDataProviderPlugin
 
         public MSSQLDataProviderPlugin()
         {
-
-            var builder = new ConfigurationBuilder()
+            try {
+                var builder = new ConfigurationBuilder()
                .SetBasePath(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location))
                .AddJsonFile("msSqlDataProvider.json", optional: true, reloadOnChange: true);
 
-            var configurator = builder.Build();
+                var configurator = builder.Build();
 
-            var optionsBuilder = new DbContextOptionsBuilder<MSSQLDbContext>();
+                var optionsBuilder = new DbContextOptionsBuilder<MSSQLDbContext>();
 
-            optionsBuilder.UseSqlServer(configurator.GetConnectionString("msSQLConnectionString"));
+                optionsBuilder.UseSqlServer(configurator.GetConnectionString("msSQLConnectionString"));
 
-            _dbContext = new MSSQLDbContext(optionsBuilder.Options);
+                _dbContext = new MSSQLDbContext(optionsBuilder.Options);
 
-            if (_dbContext.Database.GetPendingMigrations().Any())
-            {
-                _dbContext.Database.Migrate();
+                if (_dbContext.Database.GetPendingMigrations().Any())
+                {
+                    _dbContext.Database.Migrate();
+                }
             }
+            catch (Exception ex) {
+                Debugger.Break();
+            }
+            
 
         }
 

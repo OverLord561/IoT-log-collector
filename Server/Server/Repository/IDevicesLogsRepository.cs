@@ -9,5 +9,7 @@ namespace Server.Repository
         Task<List<DeviceLog>> GetDeviceLogsAsync(int? utcDate);        
 
         Task<bool> WriteRangeAsync(List<DeviceLog> logs);
+
+        bool WriteRange(List<DeviceLog> logs);
     }
 }

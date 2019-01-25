@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -18,26 +19,32 @@ namespace MySQLDataProviderPlugin
 
         public MySQLDataProviderPlugin()
         {
-
-            var builder = new ConfigurationBuilder()
-               .SetBasePath(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location))
-               .AddJsonFile("mySqlDataProvider.json", optional: true, reloadOnChange: true);
-
-            var configurator = builder.Build();
-
-            var optionsBuilder = new DbContextOptionsBuilder<MySQLDbContext>();
-
-            optionsBuilder.UseMySql(configurator.GetConnectionString("mySQLConnectionString"));
-
-            _dbContext = new MySQLDbContext(optionsBuilder.Options);
-
-            if (_dbContext.Database.GetPendingMigrations().Any())
+            try
             {
-                _dbContext.Database.Migrate();
+                var builder = new ConfigurationBuilder()
+                   .SetBasePath(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location))
+                   .AddJsonFile("mySqlDataProvider.json", optional: true, reloadOnChange: true);
+
+                var configurator = builder.Build();
+
+                var optionsBuilder = new DbContextOptionsBuilder<MySQLDbContext>();
+
+                optionsBuilder.UseMySql(configurator.GetConnectionString("mySQLConnectionString"));
+
+                _dbContext = new MySQLDbContext(optionsBuilder.Options);
+
+                if (_dbContext.Database.GetPendingMigrations().Any())
+                {
+                    _dbContext.Database.Migrate();
+                }
+            }
+            catch (Exception ex)
+            {
+                Debugger.Break();
             }
 
         }
 
-        public IDataStorageOperationsOperations Operations => new Repository(_dbContext);        
+        public IDataStorageOperationsOperations Operations => new Repository(_dbContext);
     }
 }

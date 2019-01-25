@@ -49,6 +49,14 @@ class Home extends React.Component<IProps, any> {
     this.props.getDataStoragePlugins();
   }
 
+  @autobind
+  refreshDataAndSettings() {
+    this.loadSettings();
+
+    const Utc = moment().format("X");
+    this.props.loadLogData(Utc, true);
+  }
+
   componentDidMount() {
     const Utc = moment().format("X");
 
@@ -138,7 +146,7 @@ class Home extends React.Component<IProps, any> {
     event.preventDefault();
 
     this.props.updateServerSettings(this.props.serverSettings, () => {
-      this.loadSettings();
+      this.refreshDataAndSettings();
     });
   }
 
@@ -148,8 +156,7 @@ class Home extends React.Component<IProps, any> {
 
     copy[index].value = event.currentTarget.value;
 
-    this.props.setServerSettings(copy, () => {
-      this.loadSettings();    });
+    this.props.setServerSettings(copy);
   }
 
   @autobind
@@ -158,7 +165,9 @@ class Home extends React.Component<IProps, any> {
 
     const selectedPlugin = this.props.dataStoragePlugins.find(plugin => plugin.isSelected);
 
-    this.props.updateDataStoragePlugin(selectedPlugin);
+    this.props.updateDataStoragePlugin(selectedPlugin, () => {
+      this.refreshDataAndSettings();
+    });
   }
 
   @autobind
@@ -243,26 +252,26 @@ class Home extends React.Component<IProps, any> {
 
   public render() {
 
-      return <div>
-        {this.props.chartData ?
-          this.renderChart()
-          :
-          <h1>No logs for {this.props.serverSettings ? this.props.serverSettings.displayName : ''}</h1>
+    return <div>
+      {this.props.chartData ?
+        this.renderChart()
+        :
+        <h1>No logs for {this.props.serverSettings ? this.props.serverSettings.displayName : ''}</h1>
 
+      }
+      <hr />
+      <div className="row home">
+        {this.props.serverSettings &&
+          this.renderServerSettings()
         }
-        <hr />
-        <div className="row home">
-          {this.props.serverSettings &&
-            this.renderServerSettings()
-          }
 
-          {this.props.dataStoragePlugins &&
-            this.renderDataStoragePlugins()
-          }
-        </div>
-        <hr />
+        {this.props.dataStoragePlugins &&
+          this.renderDataStoragePlugins()
+        }
+      </div>
+      <hr />
 
-      </div>;
+    </div>;
   }
 }
 

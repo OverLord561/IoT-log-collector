@@ -4,6 +4,7 @@ using Server.Helpers;
 using Server.Services;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace Server.Repository
@@ -12,9 +13,7 @@ namespace Server.Repository
     {
         private IDataStoragePlugin _dataStoragePlugin;
         private readonly CollectionOfLogs _collectionOfLogs;
-        private readonly static object _locker = new object();
         private readonly DataStoragesHelperType _dataStoragesHelperType;
-        private readonly AppSettingsAccessor _appSettingsAccessor;
 
 
         public DevicesLogsRepository(DataStoragesHelperType dataStoragesHelper, CollectionOfLogs collectionOfLogs, AppSettingsAccessor appSettingsAccessor)
@@ -23,13 +22,7 @@ namespace Server.Repository
             _collectionOfLogs = collectionOfLogs;
 
             _dataStoragesHelperType = dataStoragesHelper;
-            _appSettingsAccessor = appSettingsAccessor;
-            appSettingsAccessor.NotifyDependentEntetiesEvent += HandleUserSettingsUpdate;
-        }
-
-        private void HandleUserSettingsUpdate()
-        {
-            _dataStoragePlugin = _dataStoragesHelperType.GetDataStoragePlugin();
+            //appSettingsAccessor.NotifyDependentEntetiesEvent += HandleUserSettingsUpdate;
         }
 
         public async Task<List<DeviceLog>> GetDeviceLogsAsync(int? utcDate)
@@ -47,11 +40,32 @@ namespace Server.Repository
 
         public async Task<bool> WriteRangeAsync(List<DeviceLog> logs)
         {
-            lock (_locker)
+            _dataStoragePlugin = _dataStoragesHelperType.GetDataStoragePlugin();
+            try
             {
-                return _dataStoragePlugin.Operations.AddRange(logs);
+                await _dataStoragePlugin.Operations.AddRangeAsync(logs);
+            }
+            catch (Exception ex)
+            {
+                Debugger.Break();
             }
 
+            return true;
+        }
+
+        public bool WriteRange(List<DeviceLog> logs)
+        {
+            _dataStoragePlugin = _dataStoragesHelperType.GetDataStoragePlugin();
+            try
+            {
+                _dataStoragePlugin.Operations.AddRange(logs);
+            }
+            catch (Exception ex)
+            {
+                Debugger.Break();
+            }
+
+            return true;
         }
     }
 }

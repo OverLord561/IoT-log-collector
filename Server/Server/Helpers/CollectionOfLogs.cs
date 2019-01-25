@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Options;
 using Server.Models;
 using Server.Services;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -55,23 +56,32 @@ namespace Server.Helpers
 
         public List<DeviceLog> GetLogsToInsert()
         {
-            lock (_locker)
+            try
             {
-                if (_helperQueue.Any() && ((AreUserSettingsUpdated) || (_helperQueue.Peek().Count == _userSettings.CapacityOfCollectionToInsert)))
+                lock (_locker)
                 {
-                    AreUserSettingsUpdated = false;
-                    var temporaryObj = new DeviceLog[_userSettings.CapacityOfCollectionToInsert];
+                    if (_helperQueue.Any() && ((AreUserSettingsUpdated) || (_helperQueue.Peek().Count == _userSettings.CapacityOfCollectionToInsert)))
+                    {
+                        AreUserSettingsUpdated = false;                       
 
-                    var collectionToInsert = _helperQueue.Peek();
-                    collectionToInsert.CopyTo(temporaryObj);
+                        var collectionToInsert = _helperQueue.Peek();
+                        var temporaryObj = new DeviceLog[collectionToInsert.Count];
 
-                    collectionToInsert.Clear();
+                        collectionToInsert.CopyTo(temporaryObj);
 
-                    RemoveCollectionFromQueue();
+                        collectionToInsert.Clear();
 
-                    return temporaryObj.ToList();
+                        RemoveCollectionFromQueue();
+
+                        return temporaryObj.Where(x=>x != null).ToList();
+                    }
                 }
             }
+            catch (Exception ex)
+            {
+                Debugger.Break();
+            }
+           
 
             return new List<DeviceLog>();
         }
@@ -80,38 +90,46 @@ namespace Server.Helpers
         {
             lock (_locker)
             {
-                var newEmptyCollection = new List<DeviceLog>(_userSettings.CapacityOfCollectionToInsert);
-
-                var currentCollection = _allCollections
-                                        .FirstOrDefault(collection => collection.Count != 0 && collection.Count < _userSettings.CapacityOfCollectionToInsert); // current collection
-
-                if (currentCollection != null)
+                try
                 {
-                    return currentCollection;
-                }
+                    var newEmptyCollection = new List<DeviceLog>(_userSettings.CapacityOfCollectionToInsert);
 
-                var emptyCollection = _allCollections
-                                        .FirstOrDefault(collection => !collection.Any()); // return empty collection
+                    var currentCollection = _allCollections
+                                            .FirstOrDefault(collection => collection.Count != 0 && collection.Count < _userSettings.CapacityOfCollectionToInsert); // current collection
 
-                if (emptyCollection != null)
-                {
-                    AddCollectionToQueue(emptyCollection);
+                    if (currentCollection != null)
+                    {
+                        return currentCollection;
+                    }
 
-                    return emptyCollection;
-                }
+                    var emptyCollection = _allCollections
+                                            .FirstOrDefault(collection => !collection.Any()); // return empty collection
 
-                if (_allCollections.All(collection => collection.Count == _userSettings.CapacityOfCollectionToInsert)) // all collections all full add new 
-                {
+                    if (emptyCollection != null)
+                    {
+                        AddCollectionToQueue(emptyCollection);
+
+                        return emptyCollection;
+                    }
+
+                    if (_allCollections.All(collection => collection.Count == _userSettings.CapacityOfCollectionToInsert)) // all collections all full add new 
+                    {
+                        _allCollections.Add(newEmptyCollection);
+                        AddCollectionToQueue(newEmptyCollection);
+
+                        return newEmptyCollection;
+                    }
+
                     _allCollections.Add(newEmptyCollection);
                     AddCollectionToQueue(newEmptyCollection);
 
                     return newEmptyCollection;
                 }
-
-                _allCollections.Add(newEmptyCollection);
-                AddCollectionToQueue(newEmptyCollection);
-
-                return newEmptyCollection;
+                catch (Exception ex)
+                {
+                    Debugger.Break();
+                    return new List<DeviceLog>(10000);
+                }
             }
         }
 

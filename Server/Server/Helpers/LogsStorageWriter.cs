@@ -19,7 +19,7 @@ namespace Server.Helpers
 
 
         public LogsStorageWriter(CollectionOfLogs collectionOfLogs
-            , IDevicesLogsRepository logsRepository            
+            , IDevicesLogsRepository logsRepository
             , AppSettingsAccessor appSettingsModifier
             )
         {
@@ -40,12 +40,12 @@ namespace Server.Helpers
                 {
                     await Task.Delay(TimeSpan.FromMilliseconds(_userSettings.IntervalForWritingIntoDb));
 
-                    await WriteToDB();
+                    await WriteToDBAsync();
                 }
             }, appCancellationToken);
         }
 
-        private async Task<bool> WriteToDB()
+        private async Task<bool> WriteToDBAsync()
         {
             try
             {
@@ -53,8 +53,12 @@ namespace Server.Helpers
 
                 if (collectionToInsert.Any())
                 {
-                    _appSettingsModifier.NotifyDependentEntetiesEvent -= HandleUserSettingsUpdate;
-                    return await _logsRepository.WriteRangeAsync(collectionToInsert).ConfigureAwait(false);
+
+                    //var res = await _logsRepository.WriteRangeAsync(collectionToInsert);
+                    //return res;
+
+                    return await _logsRepository.WriteRangeAsync(collectionToInsert);
+
                 }
 
             }
@@ -71,7 +75,7 @@ namespace Server.Helpers
         {
             _userSettings = _appSettingsModifier.GetServerSettings();
 
-            await WriteToDB();
+            await WriteToDBAsync();
         }
     }
 }
