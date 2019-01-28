@@ -34,5 +34,16 @@ namespace Server.Tests.Mocks
 
             return Task.FromResult(true);
         }
+
+        public bool WriteRange(List<DeviceLog> logs)
+        {
+            lock (_locker)
+            {
+                Thread.Sleep(25);
+                logsInMemory.AddRange(logs);
+            }
+
+            return true;
+        }
     }
 }

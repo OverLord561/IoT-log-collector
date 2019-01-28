@@ -17,24 +17,26 @@ namespace Server.Tests
     {
         private readonly CollectionOfLogs _helperCollection;
         private readonly DeviceLog _log;
-        private readonly IOptions<UserSettings> _optionsAccessor;
-        private readonly AppSettingsModifier _appSettingsModifier;
+        private readonly AppSettingsAccessor _appSettingsModifier;
 
         static object _locker = new object();
 
         public DBWriterHelperTests()
-        {
+        {          
+
             _log = new DeviceLog { DateStamp = DateTime.Now, PluginName = "SamsungDPlugin" };
-            _optionsAccessor = Options
+
+            var options = Options
                 .Create(new UserSettings
                 {
                     DataProviderPluginName = "MySQLDSPlugin",
                     CapacityOfCollectionToInsert = 100,
                     IntervalForWritingIntoDb = 100
                 });
-            _appSettingsModifier = new AppSettingsModifier();
 
-            _helperCollection = new CollectionOfLogs(_optionsAccessor, _appSettingsModifier);
+            _appSettingsModifier = new AppSettingsAccessor(options);
+
+            _helperCollection = new CollectionOfLogs(_appSettingsModifier);
         }
 
         [Fact]
@@ -42,7 +44,7 @@ namespace Server.Tests
         {
             // Arrange
             var repo = new DeviceLogsRepoMock();
-            new LogsStorageWriter(_helperCollection, repo, _optionsAccessor, _appSettingsModifier).RunLogsChecker(CancellationToken.None);
+            new LogsStorageWriter(_helperCollection, repo, _appSettingsModifier).RunLogsChecker(CancellationToken.None);
             var countOfCalls = 1000;
 
             // Act
@@ -59,7 +61,7 @@ namespace Server.Tests
         {
             // Arrange
             var repo = new DeviceLogsRepoMock();
-            new LogsStorageWriter(_helperCollection, repo, _optionsAccessor, _appSettingsModifier).RunLogsChecker(CancellationToken.None);
+            new LogsStorageWriter(_helperCollection, repo, _appSettingsModifier).RunLogsChecker(CancellationToken.None);
             var countOfCalls = 1000;
 
             // Act
@@ -75,7 +77,7 @@ namespace Server.Tests
         {
             // Arrange
             var repo = new DeviceLogsRepoMock();
-            new LogsStorageWriter(_helperCollection, repo, _optionsAccessor, _appSettingsModifier).RunLogsChecker(CancellationToken.None);
+            new LogsStorageWriter(_helperCollection, repo, _appSettingsModifier).RunLogsChecker(CancellationToken.None);
             var countOfCalls = 1000;
 
             // Act
@@ -93,7 +95,7 @@ namespace Server.Tests
             var repo = new DeviceLogsRepoMock();
             var countOfCalls = 1000;
 
-            new LogsStorageWriter(_helperCollection, repo, _optionsAccessor, _appSettingsModifier).RunLogsChecker(CancellationToken.None);
+            new LogsStorageWriter(_helperCollection, repo, _appSettingsModifier).RunLogsChecker(CancellationToken.None);
             var copyOfHelperCollectionAsList = new List<DeviceLog>();
 
             // Act

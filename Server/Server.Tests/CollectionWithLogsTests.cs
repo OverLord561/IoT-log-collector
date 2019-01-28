@@ -14,24 +14,21 @@ namespace Server.Tests
     {
         private readonly DeviceLog _log;
         private readonly CollectionOfLogs _helperCollection;
-        private readonly IOptions<UserSettings> _optionsAccessor;
-        private readonly UserSettings _userSettings;
-        private readonly AppSettingsModifier _appSettingsModifier;
+        private readonly AppSettingsAccessor _appSettingsModifier;
 
         public CollectionWithLogsTests()
         {
             _log = new DeviceLog { DateStamp = DateTime.Now, PluginName = "SamsungDPlugin" };
-            _optionsAccessor = Options
+            var options = Options
                 .Create(new UserSettings
                 {
                     DataProviderPluginName = "MySQLDSPlugin",
                     CapacityOfCollectionToInsert = 100,
                     IntervalForWritingIntoDb = 100
                 });
-            _appSettingsModifier = new AppSettingsModifier();
+            _appSettingsModifier = new AppSettingsAccessor(options);
 
-            _helperCollection = new CollectionOfLogs(_optionsAccessor, _appSettingsModifier);
-            _userSettings = _optionsAccessor.Value;
+            _helperCollection = new CollectionOfLogs(_appSettingsModifier);
         }
 
 
@@ -70,7 +67,7 @@ namespace Server.Tests
 
             var countOfCalls = 1000;
             var fullCollectionsCount = 10;
-            var countOfLogsInEachCollection = _userSettings.CapacityOfCollectionToInsert;
+            var countOfLogsInEachCollection = _appSettingsModifier.GetServerSettings().CapacityOfCollectionToInsert;
 
             // Act
             EmulateCalls(countOfCalls);
@@ -108,7 +105,7 @@ namespace Server.Tests
         {
             // Arrange
             int countOfCalls = 991;
-            var countOfLogsInEachCollection = _userSettings.CapacityOfCollectionToInsert;
+            var countOfLogsInEachCollection = _appSettingsModifier.GetServerSettings().CapacityOfCollectionToInsert;
 
             // Act
             EmulateCalls(countOfCalls);
