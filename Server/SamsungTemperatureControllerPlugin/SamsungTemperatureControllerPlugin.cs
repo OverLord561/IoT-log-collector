@@ -16,6 +16,8 @@ namespace SamsungTemperatureControllerPlugin
 
         public string[] AxesNames => new string[3] { "Hour", "Temperature", "Humidity" };
 
+        public string DisplayName => "Samsung temperature and humidity";
+
         // Interface methods
         public DeviceLog ConverterToStandard(string message)
         {

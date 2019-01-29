@@ -16,6 +16,8 @@ namespace XiomiPreasureControllerPlugin
 
         public string[] AxesNames => new string[2] { "Hour", "Preasure" };
 
+        public string DisplayName => "Xiomi preasure";
+
 
         // Interface methods
         public DeviceLog ConverterToStandard(string message)

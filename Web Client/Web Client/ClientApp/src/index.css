@@ -22,3 +22,12 @@
         padding: 50px 0 0 0;
     }
 }
+
+.chart .purpose {
+    text-align: center;
+}
+
+.chart .dropdown {
+    margin-top: 20px;
+    margin-bottom: 10px;
+}

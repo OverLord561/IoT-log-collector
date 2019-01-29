@@ -7,6 +7,8 @@ namespace DataProviderCommon
     {
         string PluginName { get; }
 
+        string DisplayName { get; }
+
         string PluginPurpose { get; }
 
         DeviceLog ConverterToStandard(string message);

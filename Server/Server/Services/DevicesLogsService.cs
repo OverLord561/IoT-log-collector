@@ -46,7 +46,7 @@ namespace Server.Services
             var deviceLog = plugin.ConverterToStandard(messageFromDevice);
 
             Random random = new Random();
-            deviceLog.DateStamp = deviceLog.DateStamp.AddHours(random.Next(1,4));
+            deviceLog.DateStamp = deviceLog.DateStamp.AddHours(random.Next(1,7));
 
             return deviceLog;
         }
@@ -59,6 +59,11 @@ namespace Server.Services
         public Task<List<DeviceLog>> GetDeviceLogsAsync(int? utcDate)
         {
             return _devicesLogsRepository.GetDeviceLogsAsync(utcDate);
+        }
+
+        public IEnumerable<DevicePluginViewModel> GetDevicePlugins()
+        {
+            return _devicePluginsHelper.GetDeviceluginNames();
         }
 
         public IEnumerable<ServerSettingViewModel> GetServerSettings()

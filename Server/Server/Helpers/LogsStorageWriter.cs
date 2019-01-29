@@ -1,12 +1,11 @@
-﻿using Microsoft.Extensions.Options;
-using Server.Models;
+﻿using Server.Models;
 using Server.Repository;
+using Server.Services;
 using System;
+using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Linq;
-using Server.Services;
-using System.Diagnostics;
 
 namespace Server.Helpers
 {
@@ -16,7 +15,6 @@ namespace Server.Helpers
         private readonly CollectionOfLogs _collectionOfLogs;
         private readonly IDevicesLogsRepository _logsRepository;
         private UserSettings _userSettings;
-
 
         public LogsStorageWriter(CollectionOfLogs collectionOfLogs
             , IDevicesLogsRepository logsRepository

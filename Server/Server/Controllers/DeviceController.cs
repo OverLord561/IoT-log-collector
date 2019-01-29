@@ -173,5 +173,15 @@ namespace Server.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpGet]
+        [Route("get-deviceplugins")]
+        [EnableCors("AllowSPAAccess")]
+        public IActionResult GetDevicePlugins()
+        {
+            var devicePlugins = _devicesLogsService.GetDevicePlugins();
+
+            return new JsonResult(new { StatusCode = StatusCodes.Status200OK, DevicePlugins = devicePlugins });
+        }
     }
 }

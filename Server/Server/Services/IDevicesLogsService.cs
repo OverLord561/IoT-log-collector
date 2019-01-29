@@ -17,6 +17,8 @@ namespace Server.Services
 
         IEnumerable<DataStoragePluginViewModel> GetDataStoragePlugins();
 
+        IEnumerable<DevicePluginViewModel> GetDevicePlugins();
+
         Task<List<DeviceLog>> GetDeviceLogsAsync(int? utcDate);
     }
 }

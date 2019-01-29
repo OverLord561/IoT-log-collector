@@ -41,6 +41,13 @@ export const homeReducer = (state = initialState, action) => {
             };
         }
 
+        case types.DEVICE_PLUGINS: {
+            return {
+                ...state,
+                devicePlugins: action.devicePlugins,
+            };
+        }
+
         default: { return state; }
     }
 };

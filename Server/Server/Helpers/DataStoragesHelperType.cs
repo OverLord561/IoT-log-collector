@@ -15,7 +15,7 @@ namespace Server.Helpers
         private UserSettings _userSettings;
         private readonly AppSettingsAccessor _appSettingsModifier;
 
-        public DataStoragesHelperType(IEnumerable<IDataStoragePlugin> dataStoragePluginsCollection            
+        public DataStoragesHelperType(IEnumerable<IDataStoragePlugin> dataStoragePluginsCollection
             , AppSettingsAccessor appSettingsModifier
             )
         {
@@ -35,16 +35,20 @@ namespace Server.Helpers
         {
             var name = _userSettings.DataProviderPluginName;
             var ins = _dataStoragePlugins.FirstOrDefault(x => x.PluginName == name);
-            if (ins == null) {
+
+            if (ins == null)
+            {
                 Debugger.Break();
             }
-           
+
             return ins;
         }
 
-        public IEnumerable<DataStoragePluginViewModel> GetDataStoragePluginNames() {
-            return _dataStoragePlugins.Select(x => 
-                new DataStoragePluginViewModel {
+        public IEnumerable<DataStoragePluginViewModel> GetDataStoragePluginNames()
+        {
+            return _dataStoragePlugins.Select(x =>
+                new DataStoragePluginViewModel
+                {
                     DisplayName = x.DisplayName,
                     Value = x.PluginName,
                     IsSelected = x.PluginName.Equals(_userSettings.DataProviderPluginName)

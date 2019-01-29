@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import { IApplicationState } from "../../store/index";
 import { RouteComponentProps } from "react-router-dom";
 import * as actions from "./logic/homeActions";
-import { IDeviceLogsInChartFormat, IServerSettingViewModel, IDataStoragePlugin } from './logic/homeState';
+import { IDeviceLogsInChartFormat, IServerSettingViewModel, IDataStoragePlugin, IDevicePlugin } from './logic/homeState';
 import * as moment from "moment";
 
 import {
@@ -18,12 +18,18 @@ import {
 import autobind from "autobind-decorator";
 import { GenerateRandomHex } from "../../features/commonFeature";
 
+const devicePluginDropdownId = 'devicePluginsDropdown';
+interface IState {
+  pluginsDropDownOpened: boolean;
+  selectedDevicePlugin: IDevicePlugin;
+}
 interface IStateToProps {
   authorized: boolean;
   isFetching: boolean;
   chartData: IDeviceLogsInChartFormat;
   serverSettings: IServerSettingViewModel[];
   dataStoragePlugins: string[];
+  devicePlugins: IDevicePlugin[];
 }
 
 const dispatchProps = {
@@ -33,14 +39,23 @@ const dispatchProps = {
   updateDataStoragePlugin: actions.UpdateDataStoragePlugin,
   setServerSettings: actions.SetServerSettings,
   setDataStoragePlugins: actions.SetDataStoragePlugins,
-  getDataStoragePlugins: actions.GetDataStoragePlugins
+  getDataStoragePlugins: actions.GetDataStoragePlugins,
+  getDevicePlugins: actions.GetDevicePlugins,
 };
 
 type IProps = IStateToProps & RouteComponentProps<{}> & typeof dispatchProps;
 
-class Home extends React.Component<IProps, any> {
+class Home extends React.Component<IProps, IState> {
   constructor(props: IProps) {
     super(props);
+
+    this.state = {
+      pluginsDropDownOpened: false,
+      selectedDevicePlugin: {
+        value: '',
+        displayName: 'Select plugin'
+      }
+    };
   }
 
   @autobind
@@ -54,21 +69,28 @@ class Home extends React.Component<IProps, any> {
     this.loadSettings();
 
     const Utc = moment().format("X");
-    this.props.loadLogData(Utc, true);
+    this.props.loadLogData(Utc, this.state.selectedDevicePlugin.value, true);
   }
 
   componentDidMount() {
-    const Utc = moment().format("X");
-
     this.loadSettings();
-    this.props.loadLogData(Utc, true);
+    this.props.getDevicePlugins(() => {
+      const firstPlugin: IDevicePlugin = this.props.devicePlugins[0];
+      this.setState({
+        selectedDevicePlugin: firstPlugin
+      }, () => {
+        const Utc = moment().format("X");
+        this.props.loadLogData(Utc, this.state.selectedDevicePlugin.value, true);
+      });
+    });
+
   }
 
   componentDidUpdate(prevProps: IProps, prevState: any) {
 
     if (JSON.stringify(this.props.devicesLogs) !== JSON.stringify(prevProps.devicesLogs)) {
       const Utc = moment().format("X");
-      this.props.loadLogData(Utc, false);
+      this.props.loadLogData(Utc, this.state.selectedDevicePlugin.value, false);
     }
   }
 
@@ -116,27 +138,96 @@ class Home extends React.Component<IProps, any> {
   }
 
   @autobind
+  togooglePluginsDropDown(e) {
+    e.persist();
+    if (e.target && e.target.id === devicePluginDropdownId) {
+      this.setState(
+        { pluginsDropDownOpened: !this.state.pluginsDropDownOpened }
+      );
+    } else {
+      this.setState(
+        { pluginsDropDownOpened: false }
+      );
+    }
+
+  }
+
+  @autobind
+  changeDevicePluginDataRepresentation(plugin: IDevicePlugin, e) {
+
+    this.setState({
+      selectedDevicePlugin: plugin
+    }, () => {
+      const Utc = moment().format("X");
+      this.togooglePluginsDropDown(e);
+      this.props.loadLogData(Utc, plugin.value, true);
+    });
+  }
+
+  @autobind
+  renderDevicePlugins() {
+    let dropdownClassName = "dropdown";
+
+    if (this.state.pluginsDropDownOpened) {
+
+      dropdownClassName = dropdownClassName.concat(' ').concat('open');
+    }
+
+    return <div className="col-sm-4">
+      <div className={dropdownClassName} >
+        <button
+          className="btn btn-primary dropdown-toggle"
+          type="button"
+          data-toggle="dropdown"
+          id={devicePluginDropdownId}
+          onClick={this.togooglePluginsDropDown}
+        >
+          {this.state.selectedDevicePlugin.displayName}
+          <span className="caret"></span>
+        </button>
+        <ul className="dropdown-menu">
+          {this.props.devicePlugins.map((plugin, index) => {
+            return <li key={index} onClick={(e) => {
+              this.changeDevicePluginDataRepresentation(plugin, e);
+            }}>
+              <a href="#">{plugin.displayName}</a>
+            </li>;
+          })}
+
+        </ul>
+      </div>
+    </div >;
+  }
+
+  @autobind
   renderChart() {
 
     const chartData: IDeviceLogsInChartFormat = this.props.chartData;
     const data = this.prepareDataForChartLibrary();
 
     return (
-      <div className="row home">
-        <h1>{chartData.chartName}</h1>
-        <LineChart
-          width={600}
-          height={300}
-          data={data}
-          margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-        >
-          <XAxis dataKey={chartData.axesNames[0].toLowerCase()} />
-          <YAxis />
-          <CartesianGrid strokeDasharray="3 3" />
-          <Tooltip />
-          <Legend />
-          {this.renderLines()}
-        </LineChart>
+      <div className="row home chart" onClick={this.togooglePluginsDropDown} >
+        <div className="col-sm-8">
+          <h3 className="purpose">{chartData.chartName}</h3>
+          <LineChart
+            width={600}
+            height={300}
+            data={data}
+            margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+          >
+            <XAxis dataKey={chartData.axesNames[0].toLowerCase()} />
+            <YAxis />
+            <CartesianGrid strokeDasharray="3 3" />
+            <Tooltip />
+            <Legend />
+            {this.renderLines()}
+          </LineChart>
+        </div>
+
+        {this.props.devicePlugins &&
+          this.renderDevicePlugins()
+        }
+
       </div>
     );
   }
@@ -282,6 +373,7 @@ const mapStateToProps = (state: IApplicationState): IStateToProps => {
     chartData: state.home.chartData as IDeviceLogsInChartFormat,
     serverSettings: state.home.serverSettings,
     dataStoragePlugins: state.home.dataStoragePlugins,
+    devicePlugins: state.home.devicePlugins
   };
 };
 

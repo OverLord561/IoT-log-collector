@@ -3,20 +3,16 @@ import * as types from './homeConstants';
 import * as globalTypes from '../../../constants/constants';
 import { IServerSettingViewModel, IDataStoragePlugin } from './homeState';
 
-export const LoadLogData = (date: string, isInitial: boolean) => (dispatch: any, getStore: any) => {
-    const URL = globalTypes.IoTServer_BASE_URL.concat(types.LOAD_LOGS_BY_DATE(date, isInitial));
+export const LoadLogData = (date: string, pluginName: string, isInitial: boolean) => (dispatch: any, getStore: any) => {
+    const URL = globalTypes.IoTServer_BASE_URL.concat(types.LOAD_LOGS_BY_DATE(date, pluginName, isInitial));
 
     dispatch({
         type: globalTypes.IS_FETCHING,
         isFetching: true,
     });
 
-    console.time("Call back end");
-
     axios.get(URL)
         .then(response => {
-
-            console.time("Call succeesfully back end ended");
 
             dispatch({
                 type: globalTypes.IS_FETCHING,
@@ -29,7 +25,6 @@ export const LoadLogData = (date: string, isInitial: boolean) => (dispatch: any,
             });
 
         }).catch(error => {
-            console.time("Call back end ended with erorr");
 
             console.log(error);
             dispatch({
@@ -88,6 +83,37 @@ export const GetDataStoragePlugins = () => (dispatch: any, getStore: any) => {
                 type: types.DATASTORAGE_PLUGINS,
                 dataStoragePlugins: response.data.dataStoragePlugins,
             });
+
+        }).catch(error => {
+            dispatch({
+                type: globalTypes.IS_FETCHING,
+                isFetching: false,
+            });
+            console.log(error);
+        });
+};
+
+export const GetDevicePlugins = (loadLog) => (dispatch: any, getStore: any) => {
+    const URL = globalTypes.IoTServer_BASE_URL.concat(types.GET_DEVICE_PLUGINS_URL);
+
+    dispatch({
+        type: globalTypes.IS_FETCHING,
+        isFetching: true,
+    });
+
+    axios.get(URL)
+        .then(response => {
+
+            dispatch({
+                type: globalTypes.IS_FETCHING,
+                isFetching: false,
+            });
+            dispatch({
+                type: types.DEVICE_PLUGINS,
+                devicePlugins: response.data.devicePlugins,
+            });
+
+            loadLog();
 
         }).catch(error => {
             dispatch({

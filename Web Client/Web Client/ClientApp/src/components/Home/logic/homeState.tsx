@@ -5,6 +5,7 @@ export interface IState extends IModel {
     isInitial: boolean;
     serverSettings: IServerSettingViewModel[],
     dataStoragePlugins: string[];
+    devicePlugins: IDataStoragePlugin[];
 }
 
 export interface IDeviceLogsInChartFormat {
@@ -30,12 +31,18 @@ export interface IDataStoragePlugin {
     isSelected: boolean;
 }
 
+export interface IDevicePlugin {
+    displayName: string;
+    value: string;
+}
+
 export const getInitialState = (): IState => {
     return {
         isInitial: true,
         errors: [],
         isFetching: false,
         serverSettings: [],
-        dataStoragePlugins: []
+        dataStoragePlugins: [],
+        devicePlugins: []
     };
 };
