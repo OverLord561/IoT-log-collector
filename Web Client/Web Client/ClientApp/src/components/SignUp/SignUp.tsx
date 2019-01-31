@@ -26,12 +26,14 @@ class SignUp extends React.Component<IProps, any> {
     }
 
     @autobind
-    submitForm(event: any) {
+    async submitForm(event: any) {
         event.preventDefault();
 
-        this.props.register(() => {
+        const succeeded = await this.props.register();
+
+        if (succeeded) {
             this.props.history.goBack();
-        });
+        }
     }
 
     @autobind
@@ -50,7 +52,14 @@ class SignUp extends React.Component<IProps, any> {
                     <div className="col-sm-10">
                         <input
                             data-prop="email"
-                            value={this.props.registerModel.email} type="email" className="form-control" id="email" placeholder="Enter email" onChange={this.setRegisterData} />
+                            value={this.props.registerModel.email}
+                            type="email"
+                            className="form-control"
+                            id="email"
+                            placeholder="Enter email"
+                            onChange={this.setRegisterData}
+                            autoComplete="off"
+                        />
                     </div>
                 </div>
                 <div className="form-group">
@@ -58,7 +67,14 @@ class SignUp extends React.Component<IProps, any> {
                     <div className="col-sm-10">
                         <input
                             data-prop="password"
-                            value={this.props.registerModel.password} type="password" className="form-control" id="pwd" placeholder="Enter password" onChange={this.setRegisterData} />
+                            value={this.props.registerModel.password}
+                            type="password"
+                            className="form-control"
+                            id="pwd"
+                            placeholder="Enter password"
+                            onChange={this.setRegisterData}
+                            autoComplete="off"
+                        />
                     </div>
                 </div>
 
@@ -66,8 +82,15 @@ class SignUp extends React.Component<IProps, any> {
                     <label className="control-label col-sm-2" htmlFor="conf">Confirm password:</label>
                     <div className="col-sm-10">
                         <input
-                            data-prop="confirmPassword"
-                            value={this.props.registerModel.passwordConfirm} type="password" className="form-control" id="conf" placeholder="Confirm password" onChange={this.setRegisterData} />
+                            data-prop="passwordConfirm"
+                            value={this.props.registerModel.passwordConfirm}
+                            type="password"
+                            className="form-control"
+                            id="conf"
+                            placeholder="Confirm password"
+                            autoComplete="off"
+                            onChange={this.setRegisterData}
+                        />
                     </div>
                 </div>
 

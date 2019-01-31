@@ -100,6 +100,10 @@ namespace Server.Services
             }
             var group = logs.GroupBy(l => l.PluginName).FirstOrDefault(gr => gr.Key == deviceName);
 
+            if (group == null) {
+                return null;
+            }
+
             IDevicePlugin plugin = _devicePluginsHelper.GetDevicePlugin(group.Key);
             var dataForUI = group.Select(log => log).ToList();
 

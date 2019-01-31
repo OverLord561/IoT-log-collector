@@ -46,7 +46,7 @@ export const LoadQrCodeURI = () => (dispatch: any, getStore: any) => {
         });
 };
 
-export const Verify2FA = (model: IEnableAuthenticatorViewModel, refreshPage: any) => (dispatch: any, getStore: any) => {
+export const Verify2FA = (model: IEnableAuthenticatorViewModel) => async (dispatch: any, getStore: any) => {
     const URL = globalTypes.BASE_URL.concat(types.VERIFY_2FA_URL);
 
     dispatch({
@@ -54,7 +54,7 @@ export const Verify2FA = (model: IEnableAuthenticatorViewModel, refreshPage: any
         isFetching: true,
     });
 
-    axios.post(URL, model)
+    await axios.post(URL, model)
         .then(response => {
 
             dispatch({
@@ -65,8 +65,6 @@ export const Verify2FA = (model: IEnableAuthenticatorViewModel, refreshPage: any
                 type: globalTypes.ADD_VALIDATION_ERROR,
                 errors: [],
             });
-
-            refreshPage();
 
         }).catch(error => {
 
@@ -84,7 +82,7 @@ export const Verify2FA = (model: IEnableAuthenticatorViewModel, refreshPage: any
         });
 };
 
-export const Load2FAData = (loadQqCodeURI: any) => (dispatch: any, _getStore: any) => {
+export const Load2FAData = () => async (dispatch: any, _getStore: any) => {
     const URL = globalTypes.BASE_URL.concat(types.LOAD_2FA_DATA_URL);
 
     dispatch({
@@ -92,7 +90,7 @@ export const Load2FAData = (loadQqCodeURI: any) => (dispatch: any, _getStore: an
         isFetching: true,
     });
 
-    axios.get(URL)
+    await axios.get(URL)
         .then(response => {
 
             dispatch({
@@ -108,8 +106,6 @@ export const Load2FAData = (loadQqCodeURI: any) => (dispatch: any, _getStore: an
                 errors: [],
             });
 
-            loadQqCodeURI();
-
         }).catch(error => {
 
             console.log(error);
@@ -126,7 +122,7 @@ export const Load2FAData = (loadQqCodeURI: any) => (dispatch: any, _getStore: an
         });
 };
 
-export const Disable2fa = (refreshPage: any) => (dispatch: any, _getStore: any) => {
+export const Disable2fa = () => async (dispatch: any, _getStore: any) => {
     const URL = globalTypes.BASE_URL.concat(types.DISABLE_2FA_URL);
 
     dispatch({
@@ -134,7 +130,7 @@ export const Disable2fa = (refreshPage: any) => (dispatch: any, _getStore: any) 
         isFetching: true,
     });
 
-    axios.post(URL)
+    await axios.post(URL)
         .then(response => {
 
             dispatch({
@@ -146,9 +142,6 @@ export const Disable2fa = (refreshPage: any) => (dispatch: any, _getStore: any) 
                 type: globalTypes.ADD_VALIDATION_ERROR,
                 errors: [],
             });
-
-            refreshPage();
-
         }).catch(error => {
 
             console.log(error);

@@ -24,12 +24,11 @@ export class NavMenu extends React.Component<IProps, any> {
   }
 
   @autobind
-  logOut(event: any) {
+  async logOut(event: any) {
     event.preventDefault();
 
-    this.props.logOut(() => {
-      window.location.href = '/';
-    });
+    await this.props.logOut();
+    window.location.href = '/';
   }
 
   public render() {

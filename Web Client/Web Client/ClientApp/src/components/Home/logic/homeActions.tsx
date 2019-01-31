@@ -93,7 +93,7 @@ export const GetDataStoragePlugins = () => (dispatch: any, getStore: any) => {
         });
 };
 
-export const GetDevicePlugins = (loadLog) => (dispatch: any, getStore: any) => {
+export const GetDevicePlugins = () => async (dispatch: any, getStore: any) => {
     const URL = globalTypes.IoTServer_BASE_URL.concat(types.GET_DEVICE_PLUGINS_URL);
 
     dispatch({
@@ -101,7 +101,7 @@ export const GetDevicePlugins = (loadLog) => (dispatch: any, getStore: any) => {
         isFetching: true,
     });
 
-    axios.get(URL)
+    await axios.get(URL)
         .then(response => {
 
             dispatch({
@@ -113,8 +113,6 @@ export const GetDevicePlugins = (loadLog) => (dispatch: any, getStore: any) => {
                 devicePlugins: response.data.devicePlugins,
             });
 
-            loadLog();
-
         }).catch(error => {
             dispatch({
                 type: globalTypes.IS_FETCHING,
@@ -124,7 +122,7 @@ export const GetDevicePlugins = (loadLog) => (dispatch: any, getStore: any) => {
         });
 };
 
-export const UpdateServerSettings = (serverSettings: IServerSettingViewModel[], callBack) => (dispatch: any, getStore: any) => {
+export const UpdateServerSettings = (serverSettings: IServerSettingViewModel[]) => async (dispatch: any, getStore: any) => {
     const URL = globalTypes.IoTServer_BASE_URL.concat(types.UPDATE_SERVER_SETTINGS_URL);
 
     dispatch({
@@ -132,7 +130,7 @@ export const UpdateServerSettings = (serverSettings: IServerSettingViewModel[], 
         isFetching: true,
     });
 
-    axios.put(URL, serverSettings)
+    await axios.put(URL, serverSettings)
         .then(response => {
 
             dispatch({
@@ -142,10 +140,6 @@ export const UpdateServerSettings = (serverSettings: IServerSettingViewModel[], 
 
             if (response.data.succeeded) {
                 alert("Updated!");
-            }
-
-            if (callBack) {
-                callBack();
             }
 
         }).catch(error => {
@@ -157,7 +151,7 @@ export const UpdateServerSettings = (serverSettings: IServerSettingViewModel[], 
         });
 };
 
-export const UpdateDataStoragePlugin = (dataStoragePlugin: IDataStoragePlugin, callBack) => (dispatch: any, getStore: any) => {
+export const UpdateDataStoragePlugin = (dataStoragePlugin: IDataStoragePlugin) => async (dispatch: any, getStore: any) => {
     const URL = globalTypes.IoTServer_BASE_URL.concat(types.UPDATE_DATASTORAGE_PLUGINS_URL);
 
     dispatch({
@@ -165,7 +159,7 @@ export const UpdateDataStoragePlugin = (dataStoragePlugin: IDataStoragePlugin, c
         isFetching: true,
     });
 
-    axios.put(URL, dataStoragePlugin)
+    await axios.put(URL, dataStoragePlugin)
         .then(response => {
 
             dispatch({
@@ -175,10 +169,6 @@ export const UpdateDataStoragePlugin = (dataStoragePlugin: IDataStoragePlugin, c
 
             if (response.data.succeeded) {
                 alert("Updated!");
-            }
-
-            if (callBack) {
-                callBack();
             }
 
         }).catch(error => {

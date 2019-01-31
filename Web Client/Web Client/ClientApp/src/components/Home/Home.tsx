@@ -72,18 +72,17 @@ class Home extends React.Component<IProps, IState> {
     this.props.loadLogData(Utc, this.state.selectedDevicePlugin.value, true);
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     this.loadSettings();
-    this.props.getDevicePlugins(() => {
-      const firstPlugin: IDevicePlugin = this.props.devicePlugins[0];
-      this.setState({
-        selectedDevicePlugin: firstPlugin
-      }, () => {
-        const Utc = moment().format("X");
-        this.props.loadLogData(Utc, this.state.selectedDevicePlugin.value, true);
-      });
-    });
+    await this.props.getDevicePlugins();
 
+    const firstPlugin: IDevicePlugin = this.props.devicePlugins[0];
+    this.setState({
+      selectedDevicePlugin: firstPlugin
+    }, () => {
+      const Utc = moment().format("X");
+      this.props.loadLogData(Utc, this.state.selectedDevicePlugin.value, true);
+    });
   }
 
   componentDidUpdate(prevProps: IProps, prevState: any) {
@@ -173,7 +172,13 @@ class Home extends React.Component<IProps, IState> {
       dropdownClassName = dropdownClassName.concat(' ').concat('open');
     }
 
-    return <div className="col-sm-4">
+    let colClassName = " col-sm-4";
+
+    if (!this.props.chartData) {
+      colClassName = "col-sm-offset-8".concat(colClassName);
+    }
+
+    return <div className={colClassName}>
       <div className={dropdownClassName} >
         <button
           className="btn btn-primary dropdown-toggle"
@@ -205,40 +210,30 @@ class Home extends React.Component<IProps, IState> {
     const chartData: IDeviceLogsInChartFormat = this.props.chartData;
     const data = this.prepareDataForChartLibrary();
 
-    return (
-      <div className="row home chart" onClick={this.togooglePluginsDropDown} >
-        <div className="col-sm-8">
-          <h3 className="purpose">{chartData.chartName}</h3>
-          <LineChart
-            width={600}
-            height={300}
-            data={data}
-            margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-          >
-            <XAxis dataKey={chartData.axesNames[0].toLowerCase()} />
-            <YAxis />
-            <CartesianGrid strokeDasharray="3 3" />
-            <Tooltip />
-            <Legend />
-            {this.renderLines()}
-          </LineChart>
-        </div>
-
-        {this.props.devicePlugins &&
-          this.renderDevicePlugins()
-        }
-
-      </div>
-    );
+    return <div className="col-sm-8">
+      <h3 className="purpose">{chartData.chartName}</h3>
+      <LineChart
+        width={600}
+        height={300}
+        data={data}
+        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+      >
+        <XAxis dataKey={chartData.axesNames[0].toLowerCase()} />
+        <YAxis />
+        <CartesianGrid strokeDasharray="3 3" />
+        <Tooltip />
+        <Legend />
+        {this.renderLines()}
+      </LineChart>
+    </div>;
   }
 
   @autobind
-  updateServerSettings(event: React.FormEvent<HTMLFormElement>) {
+  async updateServerSettings(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    this.props.updateServerSettings(this.props.serverSettings, () => {
-      this.refreshDataAndSettings();
-    });
+    await this.props.updateServerSettings(this.props.serverSettings);
+    this.refreshDataAndSettings();
   }
 
   @autobind
@@ -251,14 +246,13 @@ class Home extends React.Component<IProps, IState> {
   }
 
   @autobind
-  updateDataStoragePlugin(event: React.FormEvent<HTMLFormElement>) {
+  async updateDataStoragePlugin(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     const selectedPlugin = this.props.dataStoragePlugins.find(plugin => plugin.isSelected);
 
-    this.props.updateDataStoragePlugin(selectedPlugin, () => {
-      this.refreshDataAndSettings();
-    });
+    await this.props.updateDataStoragePlugin(selectedPlugin);
+    this.refreshDataAndSettings();
   }
 
   @autobind
@@ -344,12 +338,20 @@ class Home extends React.Component<IProps, IState> {
   public render() {
 
     return <div>
-      {this.props.chartData ?
-        this.renderChart()
-        :
-        <h1>No logs for {this.props.serverSettings ? this.props.serverSettings.displayName : ''}</h1>
 
-      }
+      <div className="row home chart" onClick={this.togooglePluginsDropDown} >
+
+        {this.props.chartData ?
+          this.renderChart()
+          :
+          this.props.devicePlugins &&
+          <h1>No logs for {this.state.selectedDevicePlugin.displayName}</h1>
+        }
+
+        {this.props.devicePlugins &&
+          this.renderDevicePlugins()
+        }
+      </div>
       <hr />
       <div className="row home">
         {this.props.serverSettings &&

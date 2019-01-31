@@ -59,11 +59,10 @@ class SignIn extends React.Component<IProps, IInnerState> {
     }
 
     @autobind
-    logIn(event: React.FormEvent<HTMLFormElement>) {
+    async logIn(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
-        this.props.login(() => {
-            this.props.history.push('/');
-        });
+        await this.props.login();
+        this.props.history.push('/');
     }
 
     @autobind
@@ -168,7 +167,14 @@ class SignIn extends React.Component<IProps, IInnerState> {
                         <div className="col-sm-10">
                             <input
                                 data-prop="email"
-                                value={this.props.loginModel.email} type="email" className="form-control" id="email" placeholder="Enter email" onChange={this.setLoginData} />
+                                value={this.props.loginModel.email}
+                                type="email"
+                                className="form-control"
+                                id="email"
+                                placeholder="Enter email"
+                                onChange={this.setLoginData}
+                                autoComplete="off"
+                            />
                         </div>
                     </div>
                     <div className="form-group">
@@ -176,7 +182,14 @@ class SignIn extends React.Component<IProps, IInnerState> {
                         <div className="col-sm-10">
                             <input
                                 data-prop="password"
-                                value={this.props.loginModel.password} type="password" className="form-control" id="pwd" placeholder="Enter password" onChange={this.setLoginData} />
+                                value={this.props.loginModel.password}
+                                type="password"
+                                className="form-control"
+                                id="pwd"
+                                placeholder="Enter password"
+                                onChange={this.setLoginData}
+                                autoComplete="off"
+                            />
                         </div>
                     </div>
                     <div className="form-group">

@@ -6,7 +6,7 @@ import * as signInTypes from '../../SignIn/logic/signInConstants';
 
 import * as globalConstants from '../../../constants/constants';
 
-export const LogOut = (goToHome: any) => (dispatch: any, getStore: any) => {
+export const LogOut = () => async (dispatch: any, getStore: any) => {
 
     const URL = globalTypes.BASE_URL.concat(types.LOG_OUT_URL);
 
@@ -15,7 +15,7 @@ export const LogOut = (goToHome: any) => (dispatch: any, getStore: any) => {
         isFetching: true,
     });
 
-    axios.post(URL)
+    await axios.post(URL)
         .then(response => {
             dispatch({
                 type: globalConstants.IS_FETCHING,
@@ -27,7 +27,6 @@ export const LogOut = (goToHome: any) => (dispatch: any, getStore: any) => {
                 authorized: false,
             });
 
-            goToHome();
         }).catch(error => {
             console.log(error);
         });

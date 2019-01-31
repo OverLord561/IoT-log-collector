@@ -5,6 +5,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"        
         xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+        xmlns:local="clr-namespace:Helpers"
         mc:Ignorable="d"         
         Title="MainWindow" Height="450" Width="800">
     <i:Interaction.Triggers>
@@ -35,7 +36,7 @@
                 </Grid>
 
             </TabItem>
-            <TabItem Width="150" Height="30" Header="Settings">
+            <TabItem Width="150" Height="30" Header="Settings" local:Helper.SomeProp ="someValue">
 
             </TabItem>
         </TabControl>

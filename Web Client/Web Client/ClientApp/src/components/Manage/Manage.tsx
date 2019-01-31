@@ -40,19 +40,18 @@ class Manage extends React.Component<IProps, IInnerState> {
         };
     }
 
-    componentDidMount() {
-        this.onMount();
+    async componentDidMount() {
+        await this.onMount();
     }
 
     @autobind
-    onMount() {
-        this.props.load2FAData(() => {
-            this.props.loadQqCodeURI();
-        });
+    async onMount() {
+        await this.props.load2FAData();
+        this.props.loadQqCodeURI();
     }
 
     @autobind
-    verify2FA(event: React.FormEvent<HTMLFormElement>) {
+    async verify2FA(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
 
         const model: IEnableAuthenticatorViewModel = {
@@ -61,9 +60,8 @@ class Manage extends React.Component<IProps, IInnerState> {
             authenticatorUri: this.props.qrCodeURI
         };
 
-        this.props.verify2FA(model, () => {
-            this.onMount();
-        });
+        await this.props.verify2FA(model);
+        await this.onMount();
     }
 
     @autobind
@@ -80,14 +78,14 @@ class Manage extends React.Component<IProps, IInnerState> {
     }
 
     @autobind
-    disable2fa(event: React.FormEvent<HTMLFormElement>) {
+    async disable2fa(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
 
-        this.props.disable2fa(() => {
-            this.onMount();
-            this.setState({
-                showDisable2faSection: false
-            });
+        await this.props.disable2fa();
+        await this.onMount();
+
+        this.setState({
+            showDisable2faSection: false
         });
     }
 

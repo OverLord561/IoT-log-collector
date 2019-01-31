@@ -4,7 +4,7 @@ import axios from 'axios';
 import * as globalConstants from '../../../constants/constants';
 import { IsAuthorized } from '../../../features/commonFeature';
 
-export const Login = (goToHome: any) => (dispatch: any, getStore: any) => {
+export const Login = () => async (dispatch: any, getStore: any) => {
   const URL = globalConstants.BASE_URL.concat(types.LOGIN_URL);
 
   const model: ILoginModel = getStore().signIn.loginModel;
@@ -12,7 +12,7 @@ export const Login = (goToHome: any) => (dispatch: any, getStore: any) => {
     type: globalConstants.IS_FETCHING,
     isFetching: true,
   });
-  axios.post(URL, model)
+  await axios.post(URL, model)
     .then(response => {
       dispatch({
         type: globalConstants.IS_FETCHING,
@@ -30,9 +30,6 @@ export const Login = (goToHome: any) => (dispatch: any, getStore: any) => {
           type: types.AUTHORIZED,
           authorized: true,
         });
-
-        goToHome();
-
       }
     }).catch(error => {
       dispatch({
@@ -143,7 +140,7 @@ export const ExternalLogin = (provider: string) => (dispatch: any, getStore: any
     type: globalConstants.IS_FETCHING,
     isFetching: true,
   });
-  axios.post(URL, {provider})
+  axios.post(URL, { provider })
     .then(response => {
 
       dispatch({

@@ -5,10 +5,8 @@ import * as globalTypes from '../../../constants/constants';
 
 import { IRegisterModel } from './signUpState';
 
-export const Register = (goToPrevPage: any) => (dispatch: any, getStore) => {
-
+export const Register = () => async (dispatch: any, getStore) => {
   const URL = globalTypes.BASE_URL.concat(types.REGISTER_URL);
-
   const data: IRegisterModel = getStore().signUp.registerModel;
 
   dispatch({
@@ -16,7 +14,7 @@ export const Register = (goToPrevPage: any) => (dispatch: any, getStore) => {
     isFetching: true,
   });
 
-  axios.post(URL, data)
+  await axios.post(URL, data)
     .then(response => {
       dispatch({
         type: globalTypes.IS_FETCHING,
@@ -27,7 +25,8 @@ export const Register = (goToPrevPage: any) => (dispatch: any, getStore) => {
         errors: []
       });
 
-      goToPrevPage();
+      return true;
+
     }).catch(error => {
       dispatch({
         type: globalTypes.IS_FETCHING,
@@ -40,6 +39,8 @@ export const Register = (goToPrevPage: any) => (dispatch: any, getStore) => {
           errors: error.response.data.errors,
         });
       }
+
+      return false;
     });
 };
 
