@@ -1,7 +1,7 @@
 # IoT-log-collector
 
 Requirements:
-VS 2017 15.7 or newer;
+1. VS 2017 15.7 or newer;
 .NET Core SDK 2.1.
 MS SQL;
 MySQl;
