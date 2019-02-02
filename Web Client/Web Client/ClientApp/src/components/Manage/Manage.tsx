@@ -46,8 +46,11 @@ class Manage extends React.Component<IProps, IInnerState> {
 
     @autobind
     async onMount() {
-        await this.props.load2FAData();
-        this.props.loadQqCodeURI();
+        const succeded = await this.props.load2FAData();
+
+        if (succeded) {
+            this.props.loadQqCodeURI();
+        }
     }
 
     @autobind

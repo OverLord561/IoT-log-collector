@@ -74,15 +74,19 @@ class Home extends React.Component<IProps, IState> {
 
   async componentDidMount() {
     this.loadSettings();
-    await this.props.getDevicePlugins();
+    const succeeded = await this.props.getDevicePlugins();
 
-    const firstPlugin: IDevicePlugin = this.props.devicePlugins[0];
-    this.setState({
-      selectedDevicePlugin: firstPlugin
-    }, () => {
-      const Utc = moment().format("X");
-      this.props.loadLogData(Utc, this.state.selectedDevicePlugin.value, true);
-    });
+    if (succeeded) {
+
+      const firstPlugin: IDevicePlugin = this.props.devicePlugins[0];
+      this.setState({
+        selectedDevicePlugin: firstPlugin
+      }, () => {
+        const Utc = moment().format("X");
+        this.props.loadLogData(Utc, this.state.selectedDevicePlugin.value, true);
+      });
+    }
+
   }
 
   componentDidUpdate(prevProps: IProps, prevState: any) {
@@ -232,8 +236,12 @@ class Home extends React.Component<IProps, IState> {
   async updateServerSettings(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    await this.props.updateServerSettings(this.props.serverSettings);
-    this.refreshDataAndSettings();
+    const succeeded = await this.props.updateServerSettings(this.props.serverSettings);
+
+    if (succeeded) {
+
+      this.refreshDataAndSettings();
+    }
   }
 
   @autobind
@@ -251,8 +259,11 @@ class Home extends React.Component<IProps, IState> {
 
     const selectedPlugin = this.props.dataStoragePlugins.find(plugin => plugin.isSelected);
 
-    await this.props.updateDataStoragePlugin(selectedPlugin);
-    this.refreshDataAndSettings();
+    const succeeded = await this.props.updateDataStoragePlugin(selectedPlugin);
+
+    if (succeeded) {
+      this.refreshDataAndSettings();
+    }
   }
 
   @autobind

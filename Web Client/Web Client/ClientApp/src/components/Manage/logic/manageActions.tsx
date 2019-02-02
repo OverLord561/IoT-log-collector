@@ -46,7 +46,7 @@ export const LoadQrCodeURI = () => (dispatch: any, getStore: any) => {
         });
 };
 
-export const Verify2FA = (model: IEnableAuthenticatorViewModel) => async (dispatch: any, getStore: any) => {
+export const Verify2FA = (model: IEnableAuthenticatorViewModel) => async (dispatch: any, getStore: any): Promise<boolean> => {
     const URL = globalTypes.BASE_URL.concat(types.VERIFY_2FA_URL);
 
     dispatch({
@@ -54,7 +54,7 @@ export const Verify2FA = (model: IEnableAuthenticatorViewModel) => async (dispat
         isFetching: true,
     });
 
-    await axios.post(URL, model)
+    return await axios.post(URL, model)
         .then(response => {
 
             dispatch({
@@ -65,6 +65,8 @@ export const Verify2FA = (model: IEnableAuthenticatorViewModel) => async (dispat
                 type: globalTypes.ADD_VALIDATION_ERROR,
                 errors: [],
             });
+
+            return true;
 
         }).catch(error => {
 
@@ -79,10 +81,12 @@ export const Verify2FA = (model: IEnableAuthenticatorViewModel) => async (dispat
                     errors: error.response.data.errors,
                 });
             }
+
+            return false;
         });
 };
 
-export const Load2FAData = () => async (dispatch: any, _getStore: any) => {
+export const Load2FAData = () => async (dispatch: any, _getStore: any): Promise<boolean> => {
     const URL = globalTypes.BASE_URL.concat(types.LOAD_2FA_DATA_URL);
 
     dispatch({
@@ -90,7 +94,7 @@ export const Load2FAData = () => async (dispatch: any, _getStore: any) => {
         isFetching: true,
     });
 
-    await axios.get(URL)
+    return await axios.get(URL)
         .then(response => {
 
             dispatch({
@@ -106,6 +110,7 @@ export const Load2FAData = () => async (dispatch: any, _getStore: any) => {
                 errors: [],
             });
 
+            return true;
         }).catch(error => {
 
             console.log(error);
@@ -119,10 +124,12 @@ export const Load2FAData = () => async (dispatch: any, _getStore: any) => {
                     errors: error.response.data.errors,
                 });
             }
+
+            return false;
         });
 };
 
-export const Disable2fa = () => async (dispatch: any, _getStore: any) => {
+export const Disable2fa = () => async (dispatch: any, _getStore: any): Promise<boolean> => {
     const URL = globalTypes.BASE_URL.concat(types.DISABLE_2FA_URL);
 
     dispatch({
@@ -130,7 +137,7 @@ export const Disable2fa = () => async (dispatch: any, _getStore: any) => {
         isFetching: true,
     });
 
-    await axios.post(URL)
+    return await axios.post(URL)
         .then(response => {
 
             dispatch({
@@ -142,6 +149,8 @@ export const Disable2fa = () => async (dispatch: any, _getStore: any) => {
                 type: globalTypes.ADD_VALIDATION_ERROR,
                 errors: [],
             });
+
+            return true;
         }).catch(error => {
 
             console.log(error);
@@ -155,5 +164,7 @@ export const Disable2fa = () => async (dispatch: any, _getStore: any) => {
                     errors: error.response.data.errors,
                 });
             }
+
+            return false;
         });
 };

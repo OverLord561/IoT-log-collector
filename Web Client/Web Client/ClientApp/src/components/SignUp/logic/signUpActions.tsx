@@ -5,7 +5,7 @@ import * as globalTypes from '../../../constants/constants';
 
 import { IRegisterModel } from './signUpState';
 
-export const Register = () => async (dispatch: any, getStore) => {
+export const Register = () => async (dispatch: any, getStore): Promise<boolean> => {
   const URL = globalTypes.BASE_URL.concat(types.REGISTER_URL);
   const data: IRegisterModel = getStore().signUp.registerModel;
 
@@ -14,7 +14,7 @@ export const Register = () => async (dispatch: any, getStore) => {
     isFetching: true,
   });
 
-  await axios.post(URL, data)
+  return await axios.post(URL, data)
     .then(response => {
       dispatch({
         type: globalTypes.IS_FETCHING,
@@ -26,7 +26,6 @@ export const Register = () => async (dispatch: any, getStore) => {
       });
 
       return true;
-
     }).catch(error => {
       dispatch({
         type: globalTypes.IS_FETCHING,

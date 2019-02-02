@@ -61,8 +61,11 @@ class SignIn extends React.Component<IProps, IInnerState> {
     @autobind
     async logIn(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
-        await this.props.login();
-        this.props.history.push('/');
+        const success = await this.props.login();
+
+        if (success) {
+            this.props.history.push('/');
+        }
     }
 
     @autobind

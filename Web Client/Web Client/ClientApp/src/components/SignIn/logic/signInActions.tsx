@@ -4,7 +4,7 @@ import axios from 'axios';
 import * as globalConstants from '../../../constants/constants';
 import { IsAuthorized } from '../../../features/commonFeature';
 
-export const Login = () => async (dispatch: any, getStore: any) => {
+export const Login = () => async (dispatch: any, getStore: any): Promise<boolean> => {
   const URL = globalConstants.BASE_URL.concat(types.LOGIN_URL);
 
   const model: ILoginModel = getStore().signIn.loginModel;
@@ -12,7 +12,8 @@ export const Login = () => async (dispatch: any, getStore: any) => {
     type: globalConstants.IS_FETCHING,
     isFetching: true,
   });
-  await axios.post(URL, model)
+
+  return await axios.post(URL, model)
     .then(response => {
       dispatch({
         type: globalConstants.IS_FETCHING,
@@ -31,6 +32,8 @@ export const Login = () => async (dispatch: any, getStore: any) => {
           authorized: true,
         });
       }
+
+      return true;
     }).catch(error => {
       dispatch({
         type: globalConstants.IS_FETCHING,
@@ -42,6 +45,8 @@ export const Login = () => async (dispatch: any, getStore: any) => {
           errors: error.response.data.errors,
         });
       }
+
+      return false;
     });
 };
 
