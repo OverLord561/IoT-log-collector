@@ -47,7 +47,7 @@ namespace Server
             {
                 options.AddPolicy("AllowSPAAccess",
                     builder => builder
-                    .WithOrigins("http://localhost:60365", "https://localhost:44344", "https://localhost:60366")
+                    .WithOrigins("http://localhost:60365", "https://localhost:44344", "https://localhost:60366", "http://localhost:53368")
                     .AllowAnyMethod()
                     .AllowAnyHeader()
                 );

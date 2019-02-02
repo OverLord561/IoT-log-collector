@@ -72,7 +72,7 @@ namespace Emulator
 
             Task.WaitAll(allTasks);
 
-            Debugger.Break();
+           Debugger.Break();
 
             Console.ReadLine();
         }
