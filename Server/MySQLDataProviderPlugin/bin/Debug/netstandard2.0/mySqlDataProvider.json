@@ -1,5 +1,0 @@
-{
-  "ConnectionStrings": {
-    "mySQLConnectionString": "server=localhost;port=3306;database=IoTLogCollector;uid=root;password=123456"
-  }
-}
