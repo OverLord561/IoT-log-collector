@@ -18,11 +18,14 @@ namespace DataProviderCommon
 
         public override bool Equals(object obj)
         {
-            var another = obj as DeviceLog;
-            if (another == null)
+            if (!(obj is DeviceLog another))
                 return false;
 
             return ReferenceEquals(this, another) || (Id == another.Id && PluginName == another.PluginName && DateStamp == another.DateStamp && Message == another.Message);
+        }
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
         }
 
     }

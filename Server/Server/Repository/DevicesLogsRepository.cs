@@ -1,10 +1,8 @@
 ﻿using DataProviderCommon;
 using Server.Extensions;
 using Server.Helpers;
-using Server.Services;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace Server.Repository
@@ -15,14 +13,12 @@ namespace Server.Repository
         private readonly CollectionOfLogs _collectionOfLogs;
         private readonly DataStoragesHelperType _dataStoragesHelperType;
 
-
-        public DevicesLogsRepository(DataStoragesHelperType dataStoragesHelper, CollectionOfLogs collectionOfLogs, AppSettingsAccessor appSettingsAccessor)
+        public DevicesLogsRepository(DataStoragesHelperType dataStoragesHelper, CollectionOfLogs collectionOfLogs)
         {
             _dataStoragePlugin = dataStoragesHelper.GetDataStoragePlugin() ?? throw new ArgumentNullException(nameof(dataStoragesHelper));
             _collectionOfLogs = collectionOfLogs;
 
             _dataStoragesHelperType = dataStoragesHelper;
-            //appSettingsAccessor.NotifyDependentEntetiesEvent += HandleUserSettingsUpdate;
         }
 
         public async Task<List<DeviceLog>> GetDeviceLogsAsync(int? utcDate)
@@ -47,7 +43,9 @@ namespace Server.Repository
             }
             catch (Exception ex)
             {
-                Debugger.Break();
+                //Debugger.Break();
+                Console.WriteLine(ex.Message);
+
             }
 
             return true;
@@ -62,7 +60,8 @@ namespace Server.Repository
             }
             catch (Exception ex)
             {
-                Debugger.Break();
+                //Debugger.Break();
+                Console.WriteLine(ex.Message);
             }
 
             return true;

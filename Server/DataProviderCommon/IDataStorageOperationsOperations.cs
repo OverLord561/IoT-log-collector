@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace DataProviderCommon
@@ -15,7 +14,6 @@ namespace DataProviderCommon
         Task<bool> AddRangeAsync(List<DeviceLog> standardizedDevices);
         
         bool AddRange(List<DeviceLog> standardizedDevices);
-
 
         bool Remove(DeviceLog device);
 

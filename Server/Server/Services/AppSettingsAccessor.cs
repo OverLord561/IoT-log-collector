@@ -12,16 +12,16 @@ namespace Server.Services
 {
     public class AppSettingsAccessor
     {
-        readonly object _locker = new object();
-        private UserSettings _userSettings;
-        private string _filePath;
+        private static readonly object _locker = new object();
+        private ServerSettings _serverSettings;
+        private readonly string _filePath;
 
         public delegate void NotifyDependentEntetiesDel();
         public event NotifyDependentEntetiesDel NotifyDependentEntetiesEvent;
 
-        public AppSettingsAccessor(IOptions<UserSettings> optionsAccessor)
+        public AppSettingsAccessor(IOptions<ServerSettings> optionsAccessor)
         {
-            _userSettings = optionsAccessor.Value;
+            _serverSettings = optionsAccessor.Value;
             _filePath = string.Concat(Directory.GetCurrentDirectory(), "\\appsettings.json");
         }
 
@@ -34,8 +34,8 @@ namespace Server.Services
 
             var appSettings = DeserealizeConfigFile();
 
-            appSettings.UserSettings.CapacityOfCollectionToInsert = int.Parse(serverSettings.Find(x => x.Name.Equals("BulkInsertCapacity")).Value);
-            appSettings.UserSettings.IntervalForWritingIntoDb = int.Parse(serverSettings.Find(x => x.Name.Equals("BulkInsertInterval")).Value);
+            appSettings.UserSettings.CapacityOfCollectionToInsert.Value = serverSettings.Find(x => x.Name.Equals("BulkInsertCapacity")).Value;
+            appSettings.UserSettings.IntervalForWritingIntoDb.Value = serverSettings.Find(x => x.Name.Equals("BulkInsertInterval")).Value;
 
             var suceeded = UpdateConfigFile(appSettings);
 
@@ -46,23 +46,22 @@ namespace Server.Services
         {
             var appSettings = DeserealizeConfigFile();
 
-            appSettings.UserSettings.DataProviderPluginName = dataStoragePlugin.Value;
+            appSettings.UserSettings.DataStoragePlugin.Value = dataStoragePlugin.Value;
             var suceeded = UpdateConfigFile(appSettings);
 
             return suceeded;
         }
 
-        public UserSettings GetServerSettings()
+        public ServerSettings GetServerSettings()
         {
             lock (_locker)
             {
-                return _userSettings;
+                return _serverSettings;
             }
         }
 
         bool ValidateServerSettings(IEnumerable<ServerSettingViewModel> serverSettings)
         {
-
             return serverSettings.Skip(1)
                 .All(x => int.TryParse(x.Value, out var res));
         }
@@ -77,14 +76,16 @@ namespace Server.Services
             {
                 using (StreamWriter file = File.CreateText(_filePath))
                 {
-                    JsonSerializer serializer = new JsonSerializer();
-                    serializer.Formatting = Formatting.Indented;
+                    JsonSerializer serializer = new JsonSerializer
+                    {
+                        Formatting = Formatting.Indented
+                    };
                     serializer.Serialize(file, newAppSettings);
                 }
             }
             catch (Exception ex)
             {
-                Debugger.Break();
+                //Debugger.Break();
                 Console.WriteLine(ex.Message);
                 return false;
             }
@@ -92,7 +93,7 @@ namespace Server.Services
 
             lock (_locker)
             {
-                _userSettings = newAppSettings.UserSettings;
+                _serverSettings = newAppSettings.UserSettings;
             }
 
             NotifyDependentEntetiesEvent();

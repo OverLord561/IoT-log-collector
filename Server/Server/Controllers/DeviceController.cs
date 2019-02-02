@@ -3,12 +3,10 @@ using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Server.Helpers;
-using Server.Repository;
 using Server.Services;
 using Server.ViewModels;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -72,9 +70,8 @@ namespace Server.Controllers
         [HttpPost]
         [Route("write-log")]
         public async Task<IActionResult> WriteLogAsync(string smthFromDevice)
-        {
-            // TODO handle application/json request.
-            using (StreamReader reader = new StreamReader(Request.Body, Encoding.UTF8)) // sdsd
+        {            
+            using (StreamReader reader = new StreamReader(Request.Body, Encoding.UTF8)) 
             {
                 smthFromDevice = await reader.ReadToEndAsync();
             }
@@ -90,7 +87,7 @@ namespace Server.Controllers
             }
             catch (Exception ex)
             {
-                Debugger.Break();
+                //Debugger.Break();
                 Console.WriteLine(ex.Message);
             }
 
@@ -116,7 +113,7 @@ namespace Server.Controllers
             }
             catch (Exception ex)
             {
-                Debugger.Break();
+                //Debugger.Break();
 
                 Console.WriteLine(ex.Message);
 
@@ -169,7 +166,7 @@ namespace Server.Controllers
             }
             catch (Exception ex)
             {
-                Debugger.Break();
+                //Debugger.Break();
                 return BadRequest(ex.Message);
             }
         }

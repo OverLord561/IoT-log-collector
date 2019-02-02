@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace DataProviderCommon
+﻿namespace DataProviderCommon
 {
     public interface IDataStoragePlugin
     {

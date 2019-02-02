@@ -1,5 +1,4 @@
 ﻿using DataProviderCommon;
-using Microsoft.Extensions.Options;
 using Server.Models;
 using Server.Services;
 using Server.ViewModels;
@@ -12,14 +11,14 @@ namespace Server.Helpers
     public class DataStoragesHelperType
     {
         private readonly IEnumerable<IDataStoragePlugin> _dataStoragePlugins;
-        private UserSettings _userSettings;
+        private ServerSettings _serverSettings;
         private readonly AppSettingsAccessor _appSettingsModifier;
 
         public DataStoragesHelperType(IEnumerable<IDataStoragePlugin> dataStoragePluginsCollection
             , AppSettingsAccessor appSettingsModifier
             )
         {
-            _userSettings = appSettingsModifier.GetServerSettings();
+            _serverSettings = appSettingsModifier.GetServerSettings();
             _appSettingsModifier = appSettingsModifier;
             _dataStoragePlugins = dataStoragePluginsCollection;
 
@@ -28,19 +27,13 @@ namespace Server.Helpers
 
         private void HandleUserSettingsUpdate()
         {
-            _userSettings = _appSettingsModifier.GetServerSettings();
+            _serverSettings = _appSettingsModifier.GetServerSettings();
         }
 
         public IDataStoragePlugin GetDataStoragePlugin()
         {
-            var name = _userSettings.DataProviderPluginName;
-            var ins = _dataStoragePlugins.FirstOrDefault(x => x.PluginName == name);
-
-            if (ins == null)
-            {
-                Debugger.Break();
-            }
-
+            var name = _serverSettings.DataStoragePlugin.Value;
+            var ins = _dataStoragePlugins.FirstOrDefault(x => x.PluginName == name); 
             return ins;
         }
 
@@ -51,7 +44,7 @@ namespace Server.Helpers
                 {
                     DisplayName = x.DisplayName,
                     Value = x.PluginName,
-                    IsSelected = x.PluginName.Equals(_userSettings.DataProviderPluginName)
+                    IsSelected = x.PluginName.Equals(_serverSettings.DataStoragePlugin.Value)
                 }
             );
         }

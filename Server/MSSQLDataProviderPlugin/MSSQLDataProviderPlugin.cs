@@ -40,9 +40,9 @@ namespace MSSQlDataProviderPlugin
                 }
             }
             catch (Exception ex) {
-                Debugger.Break();
+                //Debugger.Break();
+                Console.WriteLine(ex.Message);
             }
-            
 
         }
 

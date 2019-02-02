@@ -1,8 +1,10 @@
 ﻿using DataProviderCommon;
 using Microsoft.Extensions.Options;
+using Server.Extensions;
 using Server.Helpers;
 using Server.Models;
 using Server.Services;
+using Server.ViewModels;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -20,11 +22,30 @@ namespace Server.Tests
         {
             _log = new DeviceLog { DateStamp = DateTime.Now, PluginName = "SamsungDPlugin" };
             var options = Options
-                .Create(new UserSettings
+                .Create(new ServerSettings
                 {
-                    DataProviderPluginName = "MySQLDSPlugin",
-                    CapacityOfCollectionToInsert = 100,
-                    IntervalForWritingIntoDb = 100
+                    DataStoragePlugin = new ServerSettingViewModel
+                    {
+                        Name = "DataStoragePlugin",
+                        Value = "MSSQLDSPlugin",
+                        DisplayName = "Data storage plugin",
+                        IsEditable = false
+                    },
+                    CapacityOfCollectionToInsert = new ServerSettingViewModel
+                    {
+                        Name = "BulkInsertCapacity",
+                        DisplayName = "Bulk insert capacity",
+                        Value = 100.ToString(),
+                        IsEditable = true
+                    },
+                    IntervalForWritingIntoDb = new ServerSettingViewModel
+                    {
+                        Name = "BulkInsertInterval",
+                        DisplayName = "Bulk insert interval",
+                        Value = 100.ToString(),
+                        IsEditable = true
+
+                    }
                 });
             _appSettingsModifier = new AppSettingsAccessor(options);
 
@@ -67,7 +88,7 @@ namespace Server.Tests
 
             var countOfCalls = 1000;
             var fullCollectionsCount = 10;
-            var countOfLogsInEachCollection = _appSettingsModifier.GetServerSettings().CapacityOfCollectionToInsert;
+            var countOfLogsInEachCollection = _appSettingsModifier.GetServerSettings().CapacityOfCollectionToInsert.Value.ConvertToInt();
 
             // Act
             EmulateCalls(countOfCalls);
@@ -105,7 +126,7 @@ namespace Server.Tests
         {
             // Arrange
             int countOfCalls = 991;
-            var countOfLogsInEachCollection = _appSettingsModifier.GetServerSettings().CapacityOfCollectionToInsert;
+            var countOfLogsInEachCollection = _appSettingsModifier.GetServerSettings().CapacityOfCollectionToInsert.Value.ConvertToInt();
 
             // Act
             EmulateCalls(countOfCalls);

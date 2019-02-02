@@ -4,6 +4,7 @@ using Server.Helpers;
 using Server.Models;
 using Server.Services;
 using Server.Tests.Mocks;
+using Server.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,16 +23,35 @@ namespace Server.Tests
         static object _locker = new object();
 
         public DBWriterHelperTests()
-        {          
+        {
 
             _log = new DeviceLog { DateStamp = DateTime.Now, PluginName = "SamsungDPlugin" };
 
             var options = Options
-                .Create(new UserSettings
+                .Create(new ServerSettings
                 {
-                    DataProviderPluginName = "MySQLDSPlugin",
-                    CapacityOfCollectionToInsert = 100,
-                    IntervalForWritingIntoDb = 100
+                    DataStoragePlugin = new ServerSettingViewModel
+                    {
+                        Name = "DataStoragePlugin",
+                        Value = "MSSQLDSPlugin",
+                        DisplayName = "Data storage plugin",
+                        IsEditable = false
+                    },
+                    CapacityOfCollectionToInsert = new ServerSettingViewModel
+                    {
+                        Name = "BulkInsertCapacity",
+                        DisplayName = "Bulk insert capacity",
+                        Value = 100.ToString(),
+                        IsEditable = true
+                    },
+                    IntervalForWritingIntoDb = new ServerSettingViewModel
+                    {
+                        Name = "BulkInsertInterval",
+                        DisplayName = "Bulk insert interval",
+                        Value = 100.ToString(),
+                        IsEditable = true
+
+                    }
                 });
 
             _appSettingsModifier = new AppSettingsAccessor(options);

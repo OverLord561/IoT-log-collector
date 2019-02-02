@@ -6,6 +6,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"        
         xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
         xmlns:local="clr-namespace:Helpers"
+        xmlns:views="clr-namespace:WPF_Client"
         mc:Ignorable="d"         
         Title="MainWindow" Height="450" Width="800">
     <i:Interaction.Triggers>
@@ -33,12 +34,20 @@
                     <oxy:PlotView Model="{Binding PlotModel}" Grid.Row="1" Grid.ColumnSpan="3">
                     </oxy:PlotView>
 
-                </Grid>
+                </Grid> 
 
             </TabItem>
-            <TabItem Width="150" Height="30" Header="Settings" local:Helper.SomeProp ="someValue">
+            
+            <Button Width="150" Height="30"  local:Helper.SomeProp ="someValue">
+                    Hello
+            </Button>
 
-            </TabItem>
+            <local:Helper Width="150" Height="30"   SomeProp ="someValue">
+                Hello
+            </local:Helper>
+
+
+
         </TabControl>
 
     </Grid>

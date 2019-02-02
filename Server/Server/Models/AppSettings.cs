@@ -2,9 +2,7 @@
 {
     public class AppSettings
     {
-        public string ConnectionString { get; set; }
-
-        public UserSettings UserSettings { get; set; }
+        public ServerSettings UserSettings { get; set; }
 
         public Logging Logging { get; set; }
     }

@@ -46,8 +46,8 @@ namespace Emulator
                          .Accept
                          .Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-                   //StringContent httpContent = new StringContent("{\"PluginName\":\"SamsungDPlugin\",\"DeviceData\":{\"Temperature\":30.0,\"Humidity\":40.0}}", Encoding.UTF8, "application/json");
-                   StringContent httpContent = new StringContent("{\"PluginName\":\"XiomiDPlugin\",\"DeviceData\":{\"Preasure\":150.0}}", Encoding.UTF8, "application/json");
+                   StringContent httpContent = new StringContent("{\"PluginName\":\"SamsungDPlugin\",\"DeviceData\":{\"Temperature\":30.0,\"Humidity\":40.0}}", Encoding.UTF8, "application/json");
+                   //StringContent httpContent = new StringContent("{\"PluginName\":\"XiomiDPlugin\",\"DeviceData\":{\"Preasure\":150.0}}", Encoding.UTF8, "application/json");
 
 
                    var ll = Enumerable.Range(1, 1500).Select(y =>

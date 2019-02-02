@@ -21,7 +21,6 @@ namespace IoTWebClient.Controllers
         private readonly SignInManager<AppUser> _signInManager;
         private readonly _2FAuthService _2FAuthService;
 
-
         public AccountController(UserManager<AppUser> userManager
             , SignInManager<AppUser> signInManager
             , _2FAuthService twoFAuthService)

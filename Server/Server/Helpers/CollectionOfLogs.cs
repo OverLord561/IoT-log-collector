@@ -1,5 +1,6 @@
 ﻿using DataProviderCommon;
 using Microsoft.Extensions.Options;
+using Server.Extensions;
 using Server.Models;
 using Server.Services;
 using System;
@@ -15,7 +16,7 @@ namespace Server.Helpers
         private readonly AppSettingsAccessor _appSettingsModifier;
 
         public readonly ManualResetEvent resetEvent;
-        private UserSettings _userSettings;
+        private ServerSettings _serverSettings;
         readonly object _locker = new object();
         private bool AreUserSettingsUpdated;
 
@@ -25,20 +26,20 @@ namespace Server.Helpers
 
         public CollectionOfLogs(AppSettingsAccessor appSettingsModifier)
         {
-            _userSettings = appSettingsModifier.GetServerSettings();
+            _serverSettings = appSettingsModifier.GetServerSettings();
             resetEvent = new ManualResetEvent(false);
 
             _appSettingsModifier = appSettingsModifier;
             appSettingsModifier.NotifyDependentEntetiesEvent += HandleUserSettingsUpdate;
 
-            List<DeviceLog> initialLogs = new List<DeviceLog>(_userSettings.CapacityOfCollectionToInsert);
+            List<DeviceLog> initialLogs = new List<DeviceLog>(_serverSettings.CapacityOfCollectionToInsert.Value.ConvertToInt());
             _allCollections = new List<List<DeviceLog>>() { initialLogs };
             _helperQueue = new Queue<List<DeviceLog>>();
         }
 
         private void HandleUserSettingsUpdate()
         {
-            _userSettings = _appSettingsModifier.GetServerSettings();
+            _serverSettings = _appSettingsModifier.GetServerSettings();
             AreUserSettingsUpdated = true;
         }
 
@@ -60,9 +61,9 @@ namespace Server.Helpers
             {
                 lock (_locker)
                 {
-                    if (_helperQueue.Any() && ((AreUserSettingsUpdated) || (_helperQueue.Peek().Count == _userSettings.CapacityOfCollectionToInsert)))
+                    if (_helperQueue.Any() && ((AreUserSettingsUpdated) || (_helperQueue.Peek().Count == _serverSettings.CapacityOfCollectionToInsert.Value.ConvertToInt())))
                     {
-                        AreUserSettingsUpdated = false;                       
+                        AreUserSettingsUpdated = false;
 
                         var collectionToInsert = _helperQueue.Peek();
                         var temporaryObj = new DeviceLog[collectionToInsert.Count];
@@ -73,15 +74,15 @@ namespace Server.Helpers
 
                         RemoveCollectionFromQueue();
 
-                        return temporaryObj.Where(x=>x != null).ToList();
+                        return temporaryObj.Where(x => x != null).ToList();
                     }
                 }
             }
             catch (Exception ex)
             {
-                Debugger.Break();
+                //Debugger.Break();
+                Console.WriteLine(ex.Message);
             }
-           
 
             return new List<DeviceLog>();
         }
@@ -92,10 +93,10 @@ namespace Server.Helpers
             {
                 try
                 {
-                    var newEmptyCollection = new List<DeviceLog>(_userSettings.CapacityOfCollectionToInsert);
+                    var newEmptyCollection = new List<DeviceLog>(_serverSettings.CapacityOfCollectionToInsert.Value.ConvertToInt());
 
                     var currentCollection = _allCollections
-                                            .FirstOrDefault(collection => collection.Count != 0 && collection.Count < _userSettings.CapacityOfCollectionToInsert); // current collection
+                                            .FirstOrDefault(collection => collection.Count != 0 && collection.Count < _serverSettings.CapacityOfCollectionToInsert.Value.ConvertToInt()); // current collection
 
                     if (currentCollection != null)
                     {
@@ -112,7 +113,7 @@ namespace Server.Helpers
                         return emptyCollection;
                     }
 
-                    if (_allCollections.All(collection => collection.Count == _userSettings.CapacityOfCollectionToInsert)) // all collections all full add new 
+                    if (_allCollections.All(collection => collection.Count == _serverSettings.CapacityOfCollectionToInsert.Value.ConvertToInt())) // all collections all full add new 
                     {
                         _allCollections.Add(newEmptyCollection);
                         AddCollectionToQueue(newEmptyCollection);
@@ -127,7 +128,9 @@ namespace Server.Helpers
                 }
                 catch (Exception ex)
                 {
-                    Debugger.Break();
+                    //Debugger.Break();
+                    Console.WriteLine(ex.Message);
+
                     return new List<DeviceLog>(10000);
                 }
             }

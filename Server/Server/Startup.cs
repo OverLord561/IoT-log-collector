@@ -55,7 +55,7 @@ namespace Server
 
             services.AddMvc();
 
-            services.Configure<UserSettings>(Configuration.GetSection("userSettings"));
+            services.Configure<ServerSettings>(Configuration.GetSection("userSettings"));
 
             IntegrateSimpleInjector(services);
         }
@@ -87,16 +87,16 @@ namespace Server
             app.UseHttpsRedirection();
             //создается единственный в приложении маршрут, который позволит сопоставлять запросы с контроллерами и их методами.
             app.UseMvc();
-           
+
         }
 
         private void OnShutdown()
         {
-            var userSettings = new UserSettings();
+            var userSettings = new ServerSettings();
 
             Configuration.Bind("userSettings", userSettings);
 
-            checkerTask.Wait(userSettings.IntervalForWritingIntoDb * 2);
+            checkerTask.Wait(int.Parse(userSettings.IntervalForWritingIntoDb.Value) * 2);
 
             Console.WriteLine("In Shutdown 1");
 

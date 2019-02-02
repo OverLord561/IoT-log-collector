@@ -1,5 +1,4 @@
 ﻿using DataProviderCommon;
-using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Server.Helpers;
 using Server.Models;
@@ -7,7 +6,6 @@ using Server.Repository;
 using Server.ViewModels;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -16,7 +14,7 @@ namespace Server.Services
     public class DevicesLogsService : IDevicesLogsService
     {
         private readonly DeviceHelperType _devicePluginsHelper;
-        private readonly UserSettings _userSettings;
+        private readonly ServerSettings _serverSettings;
         private readonly DataStoragesHelperType _dataStoragesHelper;
         private readonly IDevicesLogsRepository _devicesLogsRepository;
 
@@ -26,7 +24,7 @@ namespace Server.Services
             , IDevicesLogsRepository devicesLogsRepository
             )
         {
-            _userSettings = appSettingsModifier.GetServerSettings();
+            _serverSettings = appSettingsModifier.GetServerSettings();
             _devicePluginsHelper = devicePluginsHelper;
             _dataStoragesHelper = dataStoragesHelper;
             _devicesLogsRepository = devicesLogsRepository;
@@ -46,7 +44,7 @@ namespace Server.Services
             var deviceLog = plugin.ConverterToStandard(messageFromDevice);
 
             Random random = new Random();
-            deviceLog.DateStamp = deviceLog.DateStamp.AddHours(random.Next(1,7));
+            deviceLog.DateStamp = deviceLog.DateStamp.AddHours(random.Next(1, 7));
 
             return deviceLog;
         }
@@ -68,39 +66,23 @@ namespace Server.Services
 
         public IEnumerable<ServerSettingViewModel> GetServerSettings()
         {
-            return new List<ServerSettingViewModel>() {
-                new ServerSettingViewModel()
-                {
-                    Name = "DataStoragePlugin",
-                    Value = _userSettings.DataProviderPluginName,
-                    DisplayName = "Data storage plugin",
-                    IsEditable = false
-                },
-                new ServerSettingViewModel()
-                {
-                    Name = "BulkInsertCapacity",
-                    DisplayName = "Bulk insert capacity",
-                    Value = _userSettings.CapacityOfCollectionToInsert.ToString(),
-                    IsEditable = true
-                },
-                new ServerSettingViewModel()
-                {
-                    Name = "BulkInsertInterval",
-                    DisplayName = "Bulk insert interval",
-                    Value = _userSettings.IntervalForWritingIntoDb.ToString(),
-                    IsEditable = true
-                }
+            return new List<ServerSettingViewModel>() { // TODO iterate through properties
+                _serverSettings.DataStoragePlugin,
+                _serverSettings.IntervalForWritingIntoDb,
+                _serverSettings.CapacityOfCollectionToInsert
             };
         }
 
         public DeviceLogsInChartFormat PrepareLogsForUI(List<DeviceLog> logs, string deviceName)
         {
-            if (!logs.Any()) {
+            if (!logs.Any())
+            {
                 return null;
             }
             var group = logs.GroupBy(l => l.PluginName).FirstOrDefault(gr => gr.Key == deviceName);
 
-            if (group == null) {
+            if (group == null)
+            {
                 return null;
             }
 
@@ -109,6 +91,6 @@ namespace Server.Services
 
             return plugin.PrepareDataForUI(dataForUI);
         }
-        
+
     }
 }
