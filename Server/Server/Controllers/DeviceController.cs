@@ -85,7 +85,7 @@ namespace Server.Controllers
                 _collectionOfLogs.AddLog(log);
 
             }
-            catch (Exception ex)
+            catch (ArgumentNullException ex)
             {
                 //Debugger.Break();
                 Console.WriteLine(ex.Message);
@@ -137,7 +137,7 @@ namespace Server.Controllers
         [EnableCors("AllowSPAAccess")]
         public IActionResult GetDataStoragePlugins()
         {
-            var plugins = _devicesLogsService.GetDataStoragePlugins();
+            var plugins = _devicesLogsService.GetDataStoragePluginsNames();
 
             return new JsonResult(new { StatusCode = StatusCodes.Status200OK, DataStoragePlugins = plugins });
         }

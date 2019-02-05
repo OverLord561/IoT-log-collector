@@ -49,7 +49,7 @@ namespace Server.Services
             return deviceLog;
         }
 
-        public IEnumerable<DataStoragePluginViewModel> GetDataStoragePlugins()
+        public IEnumerable<DataStoragePluginViewModel> GetDataStoragePluginsNames()
         {
             return _dataStoragesHelper.GetDataStoragePluginNames();
         }
@@ -66,6 +66,12 @@ namespace Server.Services
 
         public IEnumerable<ServerSettingViewModel> GetServerSettings()
         {
+            var propertyInfo = _serverSettings.GetType().GetProperties();
+
+            var res = propertyInfo.Select(x => x.GetValue(_serverSettings) as ServerSettingViewModel);
+
+            return res;
+
             return new List<ServerSettingViewModel>() { // TODO iterate through properties
                 _serverSettings.DataStoragePlugin,
                 _serverSettings.IntervalForWritingIntoDb,

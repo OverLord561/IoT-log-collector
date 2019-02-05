@@ -13,9 +13,9 @@ namespace Server.Helpers
 {
     public class CollectionOfLogs
     {
-        private readonly AppSettingsAccessor _appSettingsModifier;
-
         public readonly ManualResetEvent resetEvent;
+
+        private readonly AppSettingsAccessor _appSettingsModifier;
         private ServerSettings _serverSettings;
         readonly object _locker = new object();
         private bool AreUserSettingsUpdated;

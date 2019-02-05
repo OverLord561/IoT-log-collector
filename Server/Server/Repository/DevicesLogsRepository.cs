@@ -29,7 +29,7 @@ namespace Server.Repository
             }
             else
             {
-                DateTime _date = utcDate.Value.FromUtcToLocalTime();
+                DateTime _date = utcDate.Value.FromUnixToLocalTime();
                 return _dataStoragePlugin.Operations.Get(d => d.DateStamp.Day == _date.Day);
             }
         }

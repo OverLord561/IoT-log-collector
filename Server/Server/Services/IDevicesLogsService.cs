@@ -15,7 +15,7 @@ namespace Server.Services
 
         IEnumerable<ServerSettingViewModel> GetServerSettings();
 
-        IEnumerable<DataStoragePluginViewModel> GetDataStoragePlugins();
+        IEnumerable<DataStoragePluginViewModel> GetDataStoragePluginsNames();
 
         IEnumerable<DevicePluginViewModel> GetDevicePlugins();
 

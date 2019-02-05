@@ -16,6 +16,7 @@ namespace Server.Helpers
         private readonly CollectionOfLogs _collectionOfLogs;
         private readonly IDevicesLogsRepository _logsRepository;
         private ServerSettings _serverSettings;
+        private readonly AutoResetEvent _autoResetEvent;
 
         public LogsStorageWriter(CollectionOfLogs collectionOfLogs
             , IDevicesLogsRepository logsRepository
@@ -29,6 +30,8 @@ namespace Server.Helpers
             appSettingsModifier.NotifyDependentEntetiesEvent += HandleUserSettingsUpdate;
 
             _serverSettings = appSettingsModifier.GetServerSettings();
+
+            _autoResetEvent = new AutoResetEvent(false);
         }
 
         public Task RunLogsChecker(CancellationToken appCancellationToken)
@@ -37,7 +40,9 @@ namespace Server.Helpers
             {
                 while (!appCancellationToken.IsCancellationRequested)
                 {
-                    await Task.Delay(TimeSpan.FromMilliseconds(_serverSettings.IntervalForWritingIntoDb.Value.ConvertToInt()));
+
+                    //await Task.Delay(TimeSpan.FromMilliseconds(_serverSettings.IntervalForWritingIntoDb.Value.ConvertToInt()));
+                    _autoResetEvent.WaitOne(_serverSettings.IntervalForWritingIntoDb.Value.ConvertToInt());
 
                     await WriteToDBAsync();
                 }
@@ -70,11 +75,10 @@ namespace Server.Helpers
             return false;
         }
 
-        private async void HandleUserSettingsUpdate()
+        private void HandleUserSettingsUpdate()
         {
             _serverSettings = _appSettingsModifier.GetServerSettings();
-
-            await WriteToDBAsync();
+            _autoResetEvent.Set();
         }
     }
 }

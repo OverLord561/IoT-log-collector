@@ -10,7 +10,7 @@
                 return intValue;
             }
 
-            else return 1;
+            else return 1; //TODO remove magic number/ Return null
 
         }
     }
